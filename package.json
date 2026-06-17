@@ -1,0 +1,36 @@
+{
+  "name": "vision-frontend",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@headlessui/vue": "^1.7.23",
+    "@heroicons/vue": "^2.2.0",
+    "@nuxt/icon": "^2.2.1",
+    "@nuxt/image": "^2.0.0",
+    "@nuxtjs/color-mode": "^4.0.0",
+    "@nuxtjs/tailwindcss": "^6.14.0",
+    "@primeuix/themes": "^2.0.3",
+    "@stripe/stripe-js": "^7.9.0",
+    "chart.js": "^4.5.1",
+    "date-fns": "^4.1.0",
+    "nuxt": "^4.3.1",
+    "primeicons": "^7.0.0",
+    "primevue": "^4.5.4",
+    "quill": "^2.0.3",
+    "vue": "^3.5.30",
+    "vue-draggable-next": "^2.2.1",
+    "vue-router": "^4.6.4",
+    "vue3-carousel": "^0.17.0"
+  },
+  "devDependencies": {
+    "@primevue/nuxt-module": "^4.5.4",
+    "sass-embedded": "^1.99.0"
+  }
+}
