@@ -73,13 +73,13 @@ const events = [
                 <div>
                   <span class="text-[10px] text-tccMutedGray">{{ post.date }}</span>
                   <h3 class="mt-1 font-poppins text-base font-semibold text-tccNavy transition-colors hover:text-tccGold">
-                    <a href="#">{{ post.title }}</a>
+                    <a href="/learn-more">{{ post.title }}</a>
                   </h3>
                   <p class="news-card-excerpt mt-2 text-xs leading-relaxed text-gray-600">{{ post.excerpt }}</p>
                 </div>
                 <div class="mt-4 flex items-center justify-between border-t border-gray-100 pt-3 text-[11px] text-tccMutedGray">
                   <span>{{ post.author }}</span>
-                  <a href="#" class="font-bold text-tccGold hover:underline">Read Article &rarr;</a>
+                  <a href="/learn-more" class="font-bold text-tccGold hover:underline">Read Article &rarr;</a>
                 </div>
               </div>
             </article>
@@ -110,7 +110,7 @@ const events = [
                 <p class="mt-0.5 text-[10px] text-tccMutedGray">{{ event.detail }}</p>
               </div>
               <a
-                href="#"
+                href="/contact"
                 class="rounded border border-tccGold px-3 py-1.5 text-[10px] font-bold text-tccGold transition-all hover:bg-tccGold hover:text-tccDarkNavy"
               >
                 Join

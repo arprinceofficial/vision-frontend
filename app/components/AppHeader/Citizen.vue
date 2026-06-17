@@ -12,9 +12,10 @@ const navLinks = [
 ]
 
 const productLinks = [
-  { label: 'Syndicated Restoration', to: '/#products' },
-  { label: 'Private Portfolio', to: '/#products' },
-  { label: 'Syndicated Drive', to: '/#products' }
+  { label: 'Showroom', to: '/showroom' },
+  { label: 'Live Syndicates', to: '/live-syndicate' },
+  { label: 'Funded Assets', to: '/funded-assets' },
+  { label: 'Coming Soon', to: '/coming-soon-assets' }
 ]
 
 const closeMobileMenu = () => {
@@ -110,8 +111,14 @@ const isActive = (activePaths: string[]) => activePaths.includes(route.path)
         >
           {{ link.label }}
         </a>
-        <a href="/#products" class="block py-2 font-poppins text-sm font-medium text-white/90" @click="closeMobileMenu">
-          Our Products
+        <a
+          v-for="product in productLinks"
+          :key="`mobile-product-${product.label}`"
+          :href="product.to"
+          class="block py-2 font-poppins text-sm font-medium text-white/90"
+          @click="closeMobileMenu"
+        >
+          {{ product.label }}
         </a>
         <div class="border-t border-white/10 pt-3">
           <a

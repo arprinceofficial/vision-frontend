@@ -55,7 +55,7 @@ const upcomingSyndicates = [
             <h3 class="mt-1 font-poppins text-xl font-semibold text-white">{{ item.title }}</h3>
             <p class="news-card-excerpt mt-3 text-xs leading-relaxed text-gray-400">{{ item.description }}</p>
             <a
-              href="/car-detail"
+              href="/coming-soon-details"
               class="mt-6 block w-full rounded-md bg-tccGold py-3 text-center font-poppins text-xs font-bold uppercase tracking-widest text-tccDarkNavy transition-colors duration-200 hover:bg-tccLightGold"
             >
               Register Interest

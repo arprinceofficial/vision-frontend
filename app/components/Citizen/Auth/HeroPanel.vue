@@ -13,7 +13,7 @@ defineProps<{
     <div class="absolute inset-0 bg-gradient-to-tr from-tccDarkNavy via-tccDarkNavy/90 to-tccNavy/40" />
 
     <div class="relative z-10">
-      <a href="/" class="inline-flex items-center gap-2 font-poppins text-xs font-semibold uppercase tracking-wider text-tccGold transition-colors duration-200 hover:text-white">
+      <a href="/showroom" class="inline-flex items-center gap-2 font-poppins text-xs font-semibold uppercase tracking-wider text-tccGold transition-colors duration-200 hover:text-white">
         <i class="pi pi-arrow-left text-[11px]" aria-hidden="true" />
         Back to showroom
       </a>

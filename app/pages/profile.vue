@@ -47,7 +47,8 @@ const allocations = [
     verification: 'Docs Signed',
     verificationTone: 'text-emerald-600',
     image: '/frontend/assets/images/ferrari_berlinetta.png',
-    action: 'Details'
+    action: 'Details',
+    actionRoute: '/car-detail'
   },
   {
     title: 'Aston Martin V8 Vantage',
@@ -59,7 +60,8 @@ const allocations = [
     verification: 'Signature Pending',
     verificationTone: 'text-amber-600',
     image: '/frontend/assets/images/AstonMartin.jpg',
-    action: 'Complete Checkout'
+    action: 'Complete Checkout',
+    actionRoute: '/payment'
   }
 ]
 
@@ -306,7 +308,7 @@ const allocationBadgeClass = (tone: string) => (
                       {{ allocation.verification }}
                     </td>
                     <td class="p-4 text-right">
-                      <a href="#" class="text-xs font-semibold text-tccNavy transition-colors hover:text-tccGold" @click.prevent="notice = { title: allocation.action, message: 'This prototype keeps checkout and asset detail actions on the dashboard.', tone: 'info' }">
+                      <a :href="allocation.actionRoute" class="text-xs font-semibold text-tccNavy transition-colors hover:text-tccGold">
                         {{ allocation.action }} &rarr;
                       </a>
                     </td>
