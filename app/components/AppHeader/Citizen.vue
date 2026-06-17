@@ -1,13 +1,14 @@
 <script setup lang="ts">
 const isMobileMenuOpen = ref(false)
+const route = useRoute()
 
 const navLinks = [
-  { label: 'Home', to: '/' },
-  { label: 'My Assets', to: '/profile' },
-  { label: 'Classification', to: '/investor-classification' },
-  { label: 'Suitability', to: '/questionnaire' },
-  { label: 'KYC Status', to: '/kyc' },
-  { label: 'My Profile', to: '/profile' }
+  { label: 'Home', to: '/', activePaths: ['/'] },
+  { label: 'My Assets', to: '/profile', activePaths: ['/profile'] },
+  { label: 'Classification', to: '/investor-classification', activePaths: ['/investor-classification'] },
+  { label: 'Suitability', to: '/questionnaire', activePaths: ['/questionnaire'] },
+  { label: 'KYC Status', to: '/kyc', activePaths: ['/kyc'] },
+  { label: 'My Profile', to: '/profile', activePaths: [] }
 ]
 
 const productLinks = [
@@ -19,6 +20,8 @@ const productLinks = [
 const closeMobileMenu = () => {
   isMobileMenuOpen.value = false
 }
+
+const isActive = (activePaths: string[]) => activePaths.includes(route.path)
 </script>
 
 <template>
@@ -34,7 +37,7 @@ const closeMobileMenu = () => {
           :key="link.label"
           :href="link.to"
           class="font-poppins text-xs font-semibold uppercase tracking-wider transition-colors duration-200"
-          :class="link.label === 'Home' ? 'text-tccGold hover:text-white' : 'text-white/80 hover:text-white'"
+          :class="isActive(link.activePaths) ? 'text-tccGold hover:text-white' : 'text-white/80 hover:text-white'"
         >
           {{ link.label }}
         </a>
@@ -102,7 +105,7 @@ const closeMobileMenu = () => {
           :key="`mobile-${link.label}`"
           :href="link.to"
           class="block py-2 font-poppins text-sm font-medium"
-          :class="link.label === 'Home' ? 'text-tccGold' : 'text-white/90'"
+          :class="isActive(link.activePaths) ? 'text-tccGold' : 'text-white/90'"
           @click="closeMobileMenu"
         >
           {{ link.label }}
