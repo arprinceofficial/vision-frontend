@@ -53,15 +53,17 @@ const isActive = (activePaths: string[]) => activePaths.includes(route.path)
               <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.17l3.71-3.94a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z" clip-rule="evenodd" />
             </svg>
           </button>
-          <div class="absolute left-0 mt-2 hidden w-52 overflow-hidden rounded-md border border-white/10 bg-tccDarkNavy py-1 shadow-2xl group-hover:block">
-            <a
-              v-for="product in productLinks"
-              :key="product.label"
-              :href="product.to"
-              class="block px-4 py-2 text-xs font-medium text-white/95 transition-colors hover:bg-white/10 hover:text-tccGold"
-            >
-              {{ product.label }}
-            </a>
+          <div class="absolute left-0 top-full z-50 hidden w-52 pt-3 group-hover:block group-focus-within:block">
+            <div class="overflow-hidden rounded-md border border-white/10 bg-tccDarkNavy py-1 shadow-2xl">
+              <a
+                v-for="product in productLinks"
+                :key="product.label"
+                :href="product.to"
+                class="block px-4 py-2 text-xs font-medium text-white/95 transition-colors hover:bg-white/10 hover:text-tccGold"
+              >
+                {{ product.label }}
+              </a>
+            </div>
           </div>
         </div>
       </div>
