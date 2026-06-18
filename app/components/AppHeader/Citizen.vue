@@ -6,11 +6,11 @@ const route = useRoute()
 
 const navLinks = [
   { label: 'Home', to: '/', activePaths: ['/'] },
-  { label: 'My Assets', to: '/profile', activePaths: ['/profile'] },
+  { label: 'My Assets', to: '/my-assets', activePaths: ['/my-assets'] },
   { label: 'Classification', to: '/investor-classification', activePaths: ['/investor-classification'] },
   { label: 'Suitability', to: '/questionnaire', activePaths: ['/questionnaire'] },
   { label: 'KYC Status', to: '/kyc', activePaths: ['/kyc'] },
-  { label: 'My Profile', to: '/profile', activePaths: [] }
+  { label: 'My Profile', to: '/profile', activePaths: ['/profile'] }
 ]
 
 const productLinks = [

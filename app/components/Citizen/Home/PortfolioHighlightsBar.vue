@@ -4,7 +4,7 @@ const highlights = [
     eyebrow: 'Curated Assets',
     value: '110',
     description: 'Built, funded, or managed with specialist partners',
-    to: '/profile'
+    to: '/my-assets'
   },
   {
     eyebrow: 'Registered Members',
