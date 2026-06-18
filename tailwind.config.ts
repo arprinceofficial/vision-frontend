@@ -12,15 +12,15 @@ export default {
   theme: {
     extend: {
       colors: {
-        tccNavy: '#1F3352',
-        tccDarkNavy: '#071427',
-        tccDeepBlack: '#020b17',
-        tccGold: '#cd9b2c',
-        tccLightGold: '#e0b249',
-        tccMutedGold: 'rgba(205, 155, 44, 0.45)',
-        tccLightBg: '#f7f4f0',
-        tccMutedGray: '#6B6B6B',
-        tccBorder: '#E5E5E5'
+        tccNavy: '#17120c',
+        tccDarkNavy: '#0a0806',
+        tccDeepBlack: '#030303',
+        tccGold: '#f7c600',
+        tccLightGold: '#fff1a8',
+        tccMutedGold: 'rgba(247, 198, 0, 0.45)',
+        tccLightBg: '#14110d',
+        tccMutedGray: '#a8a29a',
+        tccBorder: 'rgba(255, 255, 255, 0.14)'
       },
       fontFamily: {
         sans: ['Outfit', 'Poppins', 'sans-serif'],

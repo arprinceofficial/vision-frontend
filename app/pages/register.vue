@@ -106,8 +106,8 @@ const submitRegister = () => {
     <div class="grid flex-grow grid-cols-1 lg:grid-cols-12">
       <CitizenAuthHeroPanel description="Access high-performing alternative assets with ease. Create your membership profile to begin the onboarding checks." />
 
-      <section class="flex items-center justify-center bg-white p-8 sm:p-16 lg:col-span-7">
-        <div class="w-full max-w-md space-y-8">
+      <section class="flex items-center justify-center bg-white/5 p-8 sm:p-16 lg:col-span-7">
+        <div class="restomod-panel w-full max-w-md space-y-8 rounded-[2rem] p-8">
           <div class="flex items-center justify-between border-b border-tccBorder pb-4">
             <div class="flex gap-2" aria-label="Registration progress">
               <span

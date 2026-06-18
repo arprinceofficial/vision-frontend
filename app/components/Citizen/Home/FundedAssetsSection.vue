@@ -40,42 +40,40 @@ const fundedAssets = [
 </script>
 
 <template>
-  <section id="funded-assets" class="border-b border-tccBorder bg-white py-16">
+  <section id="funded-assets" class="border-b border-white/10 bg-tccDeepBlack py-20 text-white">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div class="mb-10">
-        <span class="font-poppins text-xs font-bold uppercase tracking-widest text-tccGold">Proven Track Record</span>
-        <h2 class="mt-1 font-poppins text-3xl font-semibold text-tccNavy sm:text-4xl">Funded & Exited Assets</h2>
-        <p class="mt-1 max-w-xl text-xs text-tccMutedGray">
-          Historical performance of classic automotive assets successfully completed and managed by TCC.
+      <div class="mb-12 grid gap-5 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
+        <div>
+          <span class="restomod-eyebrow">Track Record</span>
+          <h2 class="mt-5 font-poppins text-4xl font-black leading-tight text-white sm:text-5xl">Funded &amp; Exited Assets</h2>
+        </div>
+        <p class="max-w-2xl text-sm leading-relaxed text-white/60 lg:justify-self-end">
+          Historical performance of classic automotive assets successfully completed and managed by The Car Crowd.
         </p>
       </div>
 
-      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <article
           v-for="asset in fundedAssets"
           :key="asset.title"
-          class="overflow-hidden rounded-lg border border-tccBorder bg-[#fcfbf9] transition-shadow hover:shadow-md"
+          class="restomod-image-card overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/5 transition-all duration-300 hover:-translate-y-1 hover:border-tccGold/40"
         >
-          <div class="relative h-44 bg-gray-100">
+          <div class="relative h-52 overflow-hidden bg-tccDeepBlack">
             <div
-              class="absolute left-3 top-3 z-10 flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-white"
-              :class="asset.exited ? 'bg-tccGold text-tccDarkNavy' : 'bg-[#2E7D32]/90'"
+              class="absolute left-4 top-4 z-10 flex items-center gap-1 rounded-full border px-3 py-1 text-[8px] font-bold uppercase tracking-[0.22em]"
+              :class="asset.exited ? 'border-tccGold/30 bg-tccGold text-tccDarkNavy' : 'border-emerald-300/30 bg-emerald-400/20 text-emerald-100'"
             >
-              <svg class="h-2 w-2" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                <path v-if="!asset.exited" d="m2 6 2.4 2.4L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-                <path v-else d="M6 1.5 7.2 4l2.8.4-2 2 0.5 2.8L6 7.8 3.5 9.2 4 6.4l-2-2L4.8 4 6 1.5Z" fill="currentColor" />
-              </svg>
               {{ asset.badge }}
             </div>
-            <img :src="asset.image" :alt="asset.alt" class="h-full w-full object-cover">
+            <img :src="asset.image" :alt="asset.alt" class="h-full w-full object-cover opacity-90">
           </div>
-          <div class="p-4">
-            <h3 class="font-poppins text-sm font-semibold text-tccNavy">{{ asset.title }}</h3>
-            <div class="mt-1 flex items-baseline gap-1">
-              <span class="text-lg font-bold" :class="asset.exited ? 'text-emerald-600' : 'text-tccGold'">{{ asset.cagr }}</span>
-              <span class="font-poppins text-[9px] font-semibold uppercase text-tccMutedGray">CAGR</span>
+          <div class="p-5">
+            <h3 class="font-poppins text-lg font-bold leading-tight text-white">{{ asset.title }}</h3>
+            <div class="mt-3 flex items-baseline gap-2">
+              <span class="text-2xl font-black text-tccGold">{{ asset.cagr }}</span>
+              <span class="font-poppins text-[9px] font-semibold uppercase tracking-[0.2em] text-white/40">CAGR</span>
             </div>
-            <p class="mt-0.5 text-xs text-gray-500">{{ asset.value }}</p>
+            <p class="mt-1 text-xs text-white/50">{{ asset.value }}</p>
           </div>
         </article>
       </div>

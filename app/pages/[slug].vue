@@ -363,16 +363,16 @@ const detailImage = computed(() => {
 </script>
 
 <template>
-  <div v-if="page.type === 'auth'" class="flex min-h-screen flex-col justify-between bg-stone-50">
+  <div v-if="page.type === 'auth'" class="restomod-shell flex min-h-screen flex-col justify-between">
     <div class="grid flex-grow grid-cols-1 lg:grid-cols-12">
       <CitizenAuthHeroPanel description="Recover or verify your secure The Car Crowd investor account before returning to the showroom." />
 
-      <section class="flex items-center justify-center bg-white p-8 sm:p-16 lg:col-span-7">
+      <section class="flex items-center justify-center bg-white/5 p-8 sm:p-16 lg:col-span-7">
         <div class="w-full max-w-md space-y-8">
           <div class="space-y-2 text-center lg:text-left">
-            <span class="font-poppins text-xs font-bold uppercase tracking-widest text-tccGold">{{ page.eyebrow }}</span>
-            <h1 class="font-poppins text-3xl font-semibold text-tccNavy">{{ page.title }}</h1>
-            <p class="text-xs text-tccMutedGray">{{ page.description }}</p>
+            <span class="restomod-eyebrow">{{ page.eyebrow }}</span>
+            <h1 class="font-poppins text-4xl font-black leading-tight text-white">{{ page.title }}</h1>
+            <p class="text-sm leading-relaxed text-white/60">{{ page.description }}</p>
           </div>
 
           <CitizenSharedActionNotice
@@ -416,22 +416,25 @@ const detailImage = computed(() => {
     <CitizenAuthStatsBar />
   </div>
 
-  <div v-else class="flex min-h-screen flex-col bg-[#fcfbf9] text-gray-900">
+  <div v-else class="restomod-shell flex min-h-screen flex-col text-gray-900">
     <AppHeaderCitizen />
 
     <main class="flex-grow">
-      <section v-if="page.type === 'showroom'" class="bg-tccDarkNavy text-white">
-        <div class="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 py-16 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:px-8">
-          <div class="space-y-6">
-            <span class="font-poppins text-xs font-bold uppercase tracking-widest text-tccGold">{{ page.eyebrow }}</span>
-            <h1 class="max-w-3xl font-poppins text-4xl font-semibold leading-tight sm:text-5xl">{{ page.title }}</h1>
-            <p class="max-w-2xl text-sm font-light leading-relaxed text-white/75">{{ page.description }}</p>
+      <section v-if="page.type === 'showroom'" class="relative overflow-hidden bg-tccDeepBlack text-white">
+        <div class="absolute inset-0">
+          <img src="/generated/hero-aston-studio.png" alt="Classic car showroom" class="h-full w-full object-cover opacity-60">
+          <div class="absolute inset-0 bg-gradient-to-b from-tccDeepBlack/60 via-tccDeepBlack/70 to-tccDeepBlack" />
+        </div>
+        <div class="relative mx-auto flex min-h-[560px] max-w-7xl items-center px-4 py-20 sm:px-6 lg:px-8">
+          <div class="max-w-4xl space-y-7">
+            <span class="restomod-eyebrow">{{ page.eyebrow }}</span>
+            <h1 class="font-poppins text-5xl font-black leading-[0.95] text-white sm:text-7xl">{{ page.title }}</h1>
+            <p class="max-w-2xl text-base font-light leading-relaxed text-white/70">{{ page.description }}</p>
             <div class="flex flex-wrap gap-3">
-              <a href="#live-grid" class="rounded bg-tccGold px-5 py-3 font-poppins text-xs font-bold uppercase tracking-wider text-tccDarkNavy">View Live Assets</a>
-              <a href="/funded-assets" class="rounded border border-white/20 px-5 py-3 font-poppins text-xs font-bold uppercase tracking-wider text-white">Funded Archive</a>
+              <a href="#live-grid" class="rounded-full bg-tccGold px-6 py-3.5 font-poppins text-xs font-bold uppercase tracking-[0.22em] text-tccDarkNavy">View Live Assets</a>
+              <a href="/funded-assets" class="rounded-full border border-white/20 bg-white/10 px-6 py-3.5 font-poppins text-xs font-bold uppercase tracking-[0.22em] text-white">Funded Archive</a>
             </div>
           </div>
-          <img src="/generated/hero-aston-studio.png" alt="Classic car showroom" class="h-full min-h-[320px] w-full rounded-lg object-cover">
         </div>
       </section>
 
@@ -441,9 +444,9 @@ const detailImage = computed(() => {
         class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8"
       >
         <div v-if="page.type === 'asset-list'" class="mb-8 space-y-2">
-          <span class="font-poppins text-xs font-bold uppercase tracking-widest text-tccGold">{{ page.eyebrow }}</span>
-          <h1 class="font-poppins text-3xl font-semibold text-tccNavy">{{ page.title }}</h1>
-          <p class="max-w-2xl text-sm text-tccMutedGray">{{ page.description }}</p>
+          <span class="restomod-eyebrow">{{ page.eyebrow }}</span>
+          <h1 class="mt-5 font-poppins text-4xl font-black leading-tight text-white sm:text-5xl">{{ page.title }}</h1>
+          <p class="mt-3 max-w-2xl text-sm leading-relaxed text-white/60">{{ page.description }}</p>
         </div>
 
         <div class="mb-8 flex flex-wrap gap-3">
@@ -454,8 +457,10 @@ const detailImage = computed(() => {
         </div>
 
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
-          <article v-for="asset in assetCards" :key="asset.title" class="overflow-hidden rounded-lg border border-tccBorder bg-white shadow-sm">
-            <img :src="asset.image" :alt="asset.title" class="h-52 w-full object-cover">
+          <article v-for="asset in assetCards" :key="asset.title" class="restomod-image-card overflow-hidden rounded-[1.5rem] border border-tccBorder bg-white shadow-sm">
+            <div class="overflow-hidden">
+              <img :src="asset.image" :alt="asset.title" class="h-52 w-full object-cover">
+            </div>
             <div class="space-y-4 p-5">
               <div class="flex items-center justify-between gap-3">
                 <span class="rounded bg-tccLightBg px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-tccGold">{{ asset.tag }}</span>
@@ -477,13 +482,13 @@ const detailImage = computed(() => {
       </section>
 
       <section v-else-if="page.type === 'asset-detail'" class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-        <div class="overflow-hidden rounded-xl border border-tccBorder bg-white">
-          <div class="relative h-[360px] bg-tccDeepBlack">
+        <div class="restomod-panel overflow-hidden rounded-[2rem]">
+          <div class="relative h-[420px] bg-tccDeepBlack">
             <img :src="detailImage" :alt="page.title" class="h-full w-full object-cover opacity-70">
             <div class="absolute inset-0 bg-gradient-to-t from-tccDeepBlack via-transparent to-transparent" />
             <div class="absolute bottom-0 left-0 p-6 text-white sm:p-10">
-              <span class="font-poppins text-xs font-bold uppercase tracking-widest text-tccGold">{{ page.eyebrow }}</span>
-              <h1 class="mt-2 font-poppins text-4xl font-semibold">{{ page.title }}</h1>
+              <span class="restomod-eyebrow">{{ page.eyebrow }}</span>
+              <h1 class="mt-4 font-poppins text-5xl font-black leading-tight">{{ page.title }}</h1>
               <p class="mt-3 max-w-2xl text-sm font-light text-white/75">{{ page.description }}</p>
             </div>
           </div>
@@ -540,10 +545,10 @@ const detailImage = computed(() => {
       </section>
 
       <section v-else class="mx-auto flex max-w-5xl items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
-        <div class="w-full rounded-xl border border-tccBorder bg-white p-6 shadow-sm sm:p-10">
+        <div class="restomod-panel w-full rounded-[2rem] p-6 sm:p-10">
           <div class="mx-auto max-w-2xl space-y-3 text-center">
-            <span class="font-poppins text-xs font-bold uppercase tracking-widest text-tccGold">{{ page.eyebrow }}</span>
-            <h1 class="font-poppins text-3xl font-semibold text-tccNavy">{{ page.title }}</h1>
+            <span class="restomod-eyebrow">{{ page.eyebrow }}</span>
+            <h1 class="font-poppins text-4xl font-black leading-tight text-white">{{ page.title }}</h1>
             <p class="text-sm font-light leading-relaxed text-tccMutedGray">{{ page.description }}</p>
           </div>
 

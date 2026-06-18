@@ -1,33 +1,47 @@
 <template>
-  <footer
-    class="border-t border-white/20 bg-tccNavy pb-8 pt-16 text-white"
-    style="background-image: linear-gradient(180deg, rgba(2, 17, 45, 0.25) 0%, rgba(2, 17, 45, 0.5) 100%), url('/frontend/assets/images/footer-bg.webp'); background-size: cover; background-position: center bottom;"
-  >
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div class="mx-auto flex max-w-4xl flex-col items-center space-y-6 text-center">
-        <img src="/svg/TCC-Logo.svg" alt="The Car Crowd" class="h-auto w-72 object-contain">
-        <div class="my-4 w-full border-b border-white/10" />
+  <footer class="overflow-hidden border-t border-white/10 bg-tccDeepBlack text-white">
+    <div class="restomod-marquee">
+      <div class="restomod-marquee-track">
+        <span v-for="item in 10" :key="item">The Car Crowd Syndicate</span>
+        <span v-for="item in 10" :key="`repeat-${item}`">Built In The Open</span>
+      </div>
+    </div>
 
-        <div class="space-y-4 text-xs font-light leading-relaxed text-gray-300 sm:text-sm">
-          <p>
-            TheCarCrowd is a UK-based collectible car manager dedicated to unlocking access to collectable cars for individuals across the globe. TheCarCrowd Limited is a company registered in England and Wales, company number 12286089 and is a Sharia compliance certified business. TheCarCrowd Limited offers private syndicates or opportunities to purchase assets directly, both of which are not regulated by the UK Financial Conduct Authority.
-          </p>
-          <p class="font-medium text-tccGold">
-            Your capital is at risk and any funds deposited are not protected by the Financial Services Compensation Scheme (FSCS). The value of your investments can go down as well as up, so you could get back less than you invested. Valuations are directors estimates.
-          </p>
-          <p>
-            Nothing contained on TheCarCrowd site constitutes investment, legal, tax or other advice, or recommendation on the merits, suitability or appropriateness of any investment product. The information contained herein should not be relied on when making any investment or other decision. If you require any investment or other advice, you should contact your financial or other professional adviser. Only qualified individuals are eligible.
-          </p>
-          <p class="text-white/60">
-            Previous performance is not a reliable indicator of future returns and projected returns are for illustration only and do not provide any guarantee of returns.
-          </p>
+    <div class="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.2fr_0.8fr_0.8fr] lg:px-8">
+      <div class="space-y-5">
+        <img src="/svg/TCC-Logo.svg" alt="The Car Crowd" class="h-8 w-auto">
+        <p class="max-w-xl text-sm leading-relaxed text-white/60">
+          Collective ownership for rare automotive assets, combining transparent syndicate structures, specialist curation, and member access to the build journey.
+        </p>
+        <p class="text-xs font-semibold uppercase tracking-[0.26em] text-tccGold">
+          Built in the open. Driven for life.
+        </p>
+      </div>
+
+      <div>
+        <h2 class="font-poppins text-xs font-bold uppercase tracking-[0.24em] text-white">Explore</h2>
+        <div class="mt-5 grid gap-3 text-sm text-white/60">
+          <a href="/showroom" class="transition-colors hover:text-tccGold">Showroom</a>
+          <a href="/live-syndicate" class="transition-colors hover:text-tccGold">Live Syndicates</a>
+          <a href="/funded-assets" class="transition-colors hover:text-tccGold">Funded Assets</a>
+          <a href="/learn-more" class="transition-colors hover:text-tccGold">How It Works</a>
         </div>
       </div>
 
-      <div class="mt-12 border-t border-white/10 pt-6 text-center text-[11px] text-gray-400">
-        <p>TheCarCrowd is registered in England and Wales [12286089]. Registered Office: TheCarCrowd Limited, Northgate Business Centre, 38-40 Northgate, Newark, Notts, NG24 1EZ.</p>
-        <p class="mt-2">&copy; 2026 The Car Crowd. All Rights Reserved. Nuxt prototype build.</p>
+      <div>
+        <h2 class="font-poppins text-xs font-bold uppercase tracking-[0.24em] text-white">Members</h2>
+        <div class="mt-5 grid gap-3 text-sm text-white/60">
+          <a href="/investor-classification" class="transition-colors hover:text-tccGold">Classification</a>
+          <a href="/questionnaire" class="transition-colors hover:text-tccGold">Suitability</a>
+          <a href="/kyc" class="transition-colors hover:text-tccGold">KYC Status</a>
+          <a href="/contact" class="transition-colors hover:text-tccGold">Contact</a>
+        </div>
       </div>
+    </div>
+
+    <div class="border-t border-white/10 px-4 py-6 text-center text-[11px] leading-relaxed text-white/40">
+      <p>TheCarCrowd Limited opportunities are not regulated by the UK Financial Conduct Authority. Your capital is at risk.</p>
+      <p class="mt-1">&copy; 2026 The Car Crowd. Nuxt investor portal prototype.</p>
     </div>
   </footer>
 </template>

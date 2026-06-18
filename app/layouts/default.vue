@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-[#fcfbf9] text-gray-900">
+  <div class="restomod-shell min-h-screen text-gray-900">
     <AppHeaderCitizen />
     <main>
       <slot />

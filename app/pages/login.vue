@@ -51,12 +51,12 @@ const forgotPassword = () => {
     <div class="grid flex-grow grid-cols-1 lg:grid-cols-12">
       <CitizenAuthHeroPanel description="Access high-performing alternative assets with ease. Log in to manage your portfolio, track live syndicates, and secure allocations." />
 
-      <section class="flex items-center justify-center bg-white p-8 sm:p-16 lg:col-span-7">
-        <div class="w-full max-w-md space-y-8">
+      <section class="flex items-center justify-center bg-white/5 p-8 sm:p-16 lg:col-span-7">
+        <div class="restomod-panel w-full max-w-md space-y-8 rounded-[2rem] p-8">
           <div class="space-y-2 text-center lg:text-left">
-            <span class="font-poppins text-xs font-bold uppercase tracking-widest text-tccGold">Platform Sign In</span>
-            <h1 class="font-poppins text-3xl font-semibold text-tccNavy">Welcome Back</h1>
-            <p class="text-xs text-tccMutedGray">Sign in with your registered credentials below</p>
+            <span class="restomod-eyebrow">Platform Sign In</span>
+            <h1 class="font-poppins text-4xl font-black leading-tight text-white">Welcome Back</h1>
+            <p class="text-sm text-white/60">Sign in with your registered credentials below</p>
           </div>
 
           <CitizenSharedActionNotice

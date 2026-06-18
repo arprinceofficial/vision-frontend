@@ -1,26 +1,29 @@
 html {
   scroll-behavior: smooth;
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  background: #fcfbf9;
-  color: #111827;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(247, 198, 0, 0.16), transparent 26rem),
+    radial-gradient(circle at 82% 8%, rgba(112, 70, 25, 0.2), transparent 28rem),
+    #030303;
+  color: #f5f0e8;
   font-family: 'Poppins', sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
 :where(input, select, textarea) {
-  color-scheme: light;
-  background-color: #ffffff;
-  color: #111827;
+  color-scheme: dark;
+  background-color: rgba(255, 255, 255, 0.09);
+  color: #f5f0e8;
 }
 
 :where(input, textarea)::placeholder {
-  color: #94a3b8;
+  color: rgba(245, 240, 232, 0.45);
 }
 
 .news-card-excerpt {
@@ -28,4 +31,253 @@ body {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
   overflow: hidden;
+}
+
+@keyframes restomod-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes restomod-marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes restomod-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+.restomod-shell {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: clip;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent 22rem),
+    radial-gradient(circle at 8% 8%, rgba(247, 198, 0, 0.12), transparent 24rem),
+    radial-gradient(circle at 88% 20%, rgba(138, 84, 24, 0.18), transparent 30rem),
+    #030303;
+  color: #f5f0e8;
+}
+
+.restomod-shell::before {
+  pointer-events: none;
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.18;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: linear-gradient(to bottom, black, transparent 72%);
+}
+
+.restomod-shell > * {
+  position: relative;
+  z-index: 1;
+}
+
+.restomod-shell > header {
+  position: sticky;
+  top: 0;
+  z-index: 80;
+}
+
+.restomod-shell .restomod-reveal {
+  animation: restomod-fade-up 0.72s ease both;
+}
+
+.restomod-shell .bg-white,
+.restomod-shell .bg-stone-50,
+.restomod-shell .bg-\[\#fcfbf9\],
+.restomod-shell .bg-\[\#f7f4f0\],
+.restomod-shell .bg-tccLightBg {
+  background-color: rgba(255, 255, 255, 0.09) !important;
+}
+
+.restomod-shell .bg-gray-100,
+.restomod-shell .bg-stone-100 {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.restomod-shell .border-tccBorder,
+.restomod-shell .border-tccNavy,
+.restomod-shell .border-gray-100,
+.restomod-shell .border-gray-200,
+.restomod-shell .border-gray-300 {
+  border-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+.restomod-shell .hover\:border-tccNavy:hover {
+  border-color: rgba(247, 198, 0, 0.58) !important;
+}
+
+.restomod-shell .border-tccNavy {
+  border-color: rgba(247, 198, 0, 0.58) !important;
+}
+
+.restomod-shell .text-tccNavy,
+.restomod-shell .text-gray-900,
+.restomod-shell .text-gray-800,
+.restomod-shell .text-gray-700 {
+  color: #f5f0e8 !important;
+}
+
+.restomod-shell .text-tccMutedGray,
+.restomod-shell .text-gray-600,
+.restomod-shell .text-gray-500,
+.restomod-shell .text-gray-400 {
+  color: rgba(245, 240, 232, 0.76) !important;
+}
+
+.restomod-shell input,
+.restomod-shell select,
+.restomod-shell textarea {
+  border-color: rgba(255, 255, 255, 0.22) !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f5f0e8 !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.restomod-shell :disabled {
+  opacity: 0.82;
+}
+
+.restomod-shell input:focus,
+.restomod-shell select:focus,
+.restomod-shell textarea:focus {
+  border-color: rgba(247, 198, 0, 0.72) !important;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(247, 198, 0, 0.13);
+}
+
+.restomod-shell option {
+  background-color: #0a0806;
+  color: #f5f0e8;
+}
+
+.restomod-shell input[type='radio'],
+.restomod-shell input[type='checkbox'] {
+  accent-color: #f7c600;
+}
+
+.restomod-shell .shadow-sm,
+.restomod-shell .shadow,
+.restomod-shell .shadow-md,
+.restomod-shell .shadow-lg,
+.restomod-shell .shadow-2xl {
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.32) !important;
+}
+
+.restomod-shell a.bg-tccGold,
+.restomod-shell button.bg-tccGold {
+  border-radius: 999px !important;
+  box-shadow: 0 16px 34px rgba(247, 198, 0, 0.22);
+}
+
+.restomod-shell a.bg-tccDarkNavy,
+.restomod-shell button.bg-tccDarkNavy {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px !important;
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.restomod-shell a.bg-tccDarkNavy:hover,
+.restomod-shell button.bg-tccDarkNavy:hover {
+  border-color: rgba(247, 198, 0, 0.52);
+  background-color: rgba(247, 198, 0, 0.12) !important;
+}
+
+.restomod-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  border: 1px solid rgba(247, 198, 0, 0.45);
+  border-radius: 999px;
+  padding: 0.55rem 1rem;
+  background: rgba(247, 198, 0, 0.08);
+  color: #f7c600;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
+.restomod-eyebrow::before {
+  content: '';
+  width: 0.38rem;
+  height: 0.38rem;
+  border-radius: 999px;
+  background: #f7c600;
+  animation: restomod-pulse 1.8s ease-in-out infinite;
+}
+
+.restomod-panel {
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.105), rgba(255, 255, 255, 0.045)),
+    rgba(10, 8, 6, 0.92);
+  box-shadow: 0 24px 90px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(22px);
+}
+
+.restomod-image-card img {
+  transition: transform 0.8s ease, filter 0.8s ease;
+}
+
+.restomod-image-card:hover img {
+  transform: scale(1.06);
+  filter: saturate(1.12) contrast(1.06);
+}
+
+.restomod-marquee {
+  overflow: hidden;
+  border-block: 1px solid rgba(247, 198, 0, 0.22);
+  background: rgba(247, 198, 0, 0.08);
+}
+
+.restomod-marquee-track {
+  display: flex;
+  width: max-content;
+  min-width: 200%;
+  animation: restomod-marquee 28s linear infinite;
+}
+
+.restomod-marquee-track span {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.9rem 1.25rem;
+  color: #f7c600;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.restomod-marquee-track span::after {
+  content: '*';
+  margin-left: 1.25rem;
+  color: rgba(247, 198, 0, 0.55);
 }
