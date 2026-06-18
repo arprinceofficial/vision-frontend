@@ -425,14 +425,14 @@ const detailImage = computed(() => {
           <img src="/generated/hero-aston-studio.png" alt="Classic car showroom" class="h-full w-full object-cover opacity-60">
           <div class="absolute inset-0 bg-gradient-to-b from-tccDeepBlack/60 via-tccDeepBlack/70 to-tccDeepBlack" />
         </div>
-        <div class="relative mx-auto flex min-h-[560px] max-w-7xl items-center px-4 py-20 sm:px-6 lg:px-8">
-          <div class="max-w-4xl space-y-7">
+        <div class="relative mx-auto flex min-h-[520px] max-w-7xl items-center px-4 py-16 sm:min-h-[560px] sm:px-6 sm:py-20 lg:px-8">
+          <div class="min-w-0 max-w-4xl space-y-7">
             <span class="restomod-eyebrow">{{ page.eyebrow }}</span>
-            <h1 class="font-poppins text-5xl font-black leading-[0.95] text-white sm:text-7xl">{{ page.title }}</h1>
+            <h1 class="font-poppins text-4xl font-black leading-[0.95] text-white sm:text-7xl">{{ page.title }}</h1>
             <p class="max-w-2xl text-base font-light leading-relaxed text-white/70">{{ page.description }}</p>
             <div class="flex flex-wrap gap-3">
-              <a href="#live-grid" class="rounded-full bg-tccGold px-6 py-3.5 font-poppins text-xs font-bold uppercase tracking-[0.22em] text-tccDarkNavy">View Live Assets</a>
-              <a href="/funded-assets" class="rounded-full border border-white/20 bg-white/10 px-6 py-3.5 font-poppins text-xs font-bold uppercase tracking-[0.22em] text-white">Funded Archive</a>
+              <a href="#live-grid" class="rounded-full bg-tccGold px-5 py-3.5 font-poppins text-xs font-bold uppercase tracking-[0.16em] text-tccDarkNavy sm:px-6 sm:tracking-[0.22em]">View Live Assets</a>
+              <a href="/funded-assets" class="rounded-full border border-white/20 bg-white/10 px-5 py-3.5 font-poppins text-xs font-bold uppercase tracking-[0.16em] text-white sm:px-6 sm:tracking-[0.22em]">Funded Archive</a>
             </div>
           </div>
         </div>
@@ -483,12 +483,12 @@ const detailImage = computed(() => {
 
       <section v-else-if="page.type === 'asset-detail'" class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <div class="restomod-panel overflow-hidden rounded-[2rem]">
-          <div class="relative h-[420px] bg-tccDeepBlack">
+          <div class="relative h-[380px] bg-tccDeepBlack sm:h-[420px]">
             <img :src="detailImage" :alt="page.title" class="h-full w-full object-cover opacity-70">
             <div class="absolute inset-0 bg-gradient-to-t from-tccDeepBlack via-transparent to-transparent" />
-            <div class="absolute bottom-0 left-0 p-6 text-white sm:p-10">
+            <div class="absolute bottom-0 left-0 min-w-0 p-4 text-white sm:p-10">
               <span class="restomod-eyebrow">{{ page.eyebrow }}</span>
-              <h1 class="mt-4 font-poppins text-5xl font-black leading-tight">{{ page.title }}</h1>
+              <h1 class="mt-4 font-poppins text-4xl font-black leading-tight sm:text-5xl">{{ page.title }}</h1>
               <p class="mt-3 max-w-2xl text-sm font-light text-white/75">{{ page.description }}</p>
             </div>
           </div>

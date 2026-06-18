@@ -42,7 +42,7 @@ const fundedAssets = [
 <template>
   <section id="funded-assets" class="border-b border-white/10 bg-tccDeepBlack py-20 text-white">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div class="mb-12 grid gap-5 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
+      <div class="mb-12 grid grid-cols-1 gap-5 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
         <div>
           <span class="restomod-eyebrow">Track Record</span>
           <h2 class="mt-5 font-poppins text-4xl font-black leading-tight text-white sm:text-5xl">Funded &amp; Exited Assets</h2>

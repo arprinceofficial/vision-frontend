@@ -145,9 +145,9 @@ const statusBadgeClass = (status: AssetStatus) => {
 </script>
 
 <template>
-  <section class="mx-auto w-full max-w-7xl px-4 py-10 text-white sm:px-6 lg:px-8">
-    <div class="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-stretch">
-      <div class="restomod-reveal flex min-h-[420px] flex-col justify-end overflow-hidden rounded-[1.75rem] border border-white/10 bg-tccDeepBlack p-6 sm:p-8 lg:p-10">
+  <section class="mx-auto w-full max-w-7xl px-3 py-8 text-white sm:px-6 sm:py-10 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-stretch">
+      <div class="restomod-reveal flex min-h-[360px] flex-col justify-end overflow-hidden rounded-[1.5rem] border border-white/10 bg-tccDeepBlack p-5 sm:min-h-[420px] sm:rounded-[1.75rem] sm:p-8 lg:p-10">
         <div class="max-w-2xl">
           <span class="restomod-eyebrow">Member Portfolio</span>
           <h1 class="mt-6 font-poppins text-4xl font-black leading-tight text-white sm:text-5xl lg:text-6xl">
@@ -157,24 +157,24 @@ const statusBadgeClass = (status: AssetStatus) => {
             Track your reserved allocations, funded holdings, valuation movement, member actions, and document records in one portfolio view.
           </p>
           <div class="mt-8 flex flex-col gap-3 sm:flex-row">
-            <a href="/showroom" class="rounded-full bg-tccGold px-6 py-3 text-center font-poppins text-xs font-bold uppercase tracking-[0.22em] text-tccDarkNavy transition-colors hover:bg-tccLightGold">
+            <a href="/showroom" class="rounded-full bg-tccGold px-5 py-3 text-center font-poppins text-xs font-bold uppercase tracking-[0.18em] text-tccDarkNavy transition-colors hover:bg-tccLightGold sm:px-6 sm:tracking-[0.22em]">
               Explore Assets
             </a>
-            <a href="/profile" class="rounded-full border border-white/20 px-6 py-3 text-center font-poppins text-xs font-bold uppercase tracking-[0.22em] text-white transition-colors hover:border-tccGold hover:text-tccGold">
+            <a href="/profile" class="rounded-full border border-white/20 px-5 py-3 text-center font-poppins text-xs font-bold uppercase tracking-[0.18em] text-white transition-colors hover:border-tccGold hover:text-tccGold sm:px-6 sm:tracking-[0.22em]">
               Account Profile
             </a>
           </div>
         </div>
       </div>
 
-      <aside class="restomod-panel restomod-reveal flex flex-col justify-between rounded-[1.75rem] p-6 sm:p-8">
+      <aside class="restomod-panel restomod-reveal flex flex-col justify-between rounded-[1.5rem] p-5 sm:rounded-[1.75rem] sm:p-8">
         <div>
           <p class="font-poppins text-[10px] font-bold uppercase tracking-[0.26em] text-tccGold">Portfolio Snapshot</p>
-          <div class="mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-[1.25rem] border border-white/10 bg-white/10">
+          <div class="mt-6 grid grid-cols-1 gap-px overflow-hidden rounded-[1.25rem] border border-white/10 bg-white/10 min-[420px]:grid-cols-2">
             <div
               v-for="stat in summaryStats"
               :key="stat.label"
-              class="bg-tccDeepBlack/80 p-5"
+              class="bg-tccDeepBlack/80 p-4 sm:p-5"
             >
               <span class="block font-poppins text-[9px] font-semibold uppercase tracking-[0.22em] text-white/40">{{ stat.label }}</span>
               <strong class="mt-2 block font-poppins text-2xl font-black text-white">{{ stat.value }}</strong>
@@ -197,19 +197,19 @@ const statusBadgeClass = (status: AssetStatus) => {
       </aside>
     </div>
 
-    <div class="mt-8 grid gap-8 xl:grid-cols-[1fr_360px]">
-      <div class="space-y-6">
+    <div class="mt-8 grid grid-cols-1 gap-8 xl:grid-cols-[1fr_360px]">
+      <div class="min-w-0 space-y-6">
         <div class="flex flex-col gap-4 rounded-[1.5rem] border border-white/10 bg-white/5 p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 class="font-poppins text-xl font-bold text-white">Asset Allocations</h2>
             <p class="mt-1 text-xs text-white/50">Filter holdings by lifecycle status.</p>
           </div>
-          <div class="flex flex-wrap gap-2">
+          <div class="grid w-full grid-cols-1 gap-2 min-[360px]:grid-cols-2 min-[520px]:flex min-[520px]:w-auto min-[520px]:flex-wrap">
             <button
               v-for="filter in filters"
               :key="filter.id"
               type="button"
-              class="rounded-full border px-4 py-2 font-poppins text-[10px] font-bold uppercase tracking-[0.18em] transition-colors"
+              class="w-full rounded-full border px-3 py-2 font-poppins text-[10px] font-bold uppercase tracking-[0.16em] transition-colors min-[520px]:w-auto min-[520px]:px-4 min-[520px]:tracking-[0.18em]"
               :class="activeFilter === filter.id ? 'border-tccGold bg-tccGold text-tccDarkNavy' : 'border-white/15 bg-white/5 text-white/70 hover:border-tccGold/50 hover:text-white'"
               @click="activeFilter = filter.id"
             >
@@ -218,11 +218,11 @@ const statusBadgeClass = (status: AssetStatus) => {
           </div>
         </div>
 
-        <div class="grid grid-cols-1 gap-5 lg:grid-cols-2">
+        <div class="grid min-w-0 grid-cols-1 gap-5 lg:grid-cols-2">
           <article
             v-for="asset in filteredAssets"
             :key="asset.reference"
-            class="restomod-image-card overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/5 transition-all duration-300 hover:-translate-y-1 hover:border-tccGold/40"
+            class="restomod-image-card min-w-0 overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/5 transition-all duration-300 hover:-translate-y-1 hover:border-tccGold/40"
           >
             <div class="relative h-56 overflow-hidden bg-tccDeepBlack">
               <img :src="asset.image" :alt="asset.alt" class="h-full w-full object-cover opacity-90">
@@ -235,13 +235,13 @@ const statusBadgeClass = (status: AssetStatus) => {
               </span>
             </div>
 
-            <div class="p-6">
-              <div class="flex items-start justify-between gap-4">
+            <div class="p-5 sm:p-6">
+              <div class="flex flex-col gap-3 min-[420px]:flex-row min-[420px]:items-start min-[420px]:justify-between">
                 <div>
                   <p class="font-mono text-[10px] uppercase tracking-[0.16em] text-white/40">{{ asset.reference }}</p>
                   <h3 class="mt-2 font-poppins text-2xl font-bold leading-tight text-white">{{ asset.title }}</h3>
                 </div>
-                <div class="text-right">
+                <div class="min-[420px]:text-right">
                   <span class="block text-[10px] uppercase tracking-[0.18em] text-white/40">Return</span>
                   <strong class="mt-1 block text-lg font-black text-tccGold">{{ asset.performance }}</strong>
                 </div>
@@ -249,7 +249,7 @@ const statusBadgeClass = (status: AssetStatus) => {
 
               <p class="news-card-excerpt mt-4 text-sm leading-relaxed text-white/60">{{ asset.description }}</p>
 
-              <div class="mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10">
+              <div class="mt-6 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 min-[420px]:grid-cols-2">
                 <div class="bg-tccDeepBlack/80 p-4">
                   <span class="block font-poppins text-[9px] uppercase tracking-[0.22em] text-white/40">Allocation</span>
                   <strong class="mt-1 block text-sm font-semibold text-white">{{ asset.allocation }}</strong>
@@ -274,7 +274,7 @@ const statusBadgeClass = (status: AssetStatus) => {
 
               <div class="mt-6 flex flex-col gap-4 border-t border-white/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
                 <p class="text-xs leading-relaxed text-white/50">{{ asset.nextStep }}</p>
-                <a :href="asset.actionRoute" class="shrink-0 rounded-full border border-white/20 px-4 py-2 text-center font-poppins text-[10px] font-bold uppercase tracking-[0.2em] text-white transition-colors hover:border-tccGold hover:text-tccGold">
+                <a :href="asset.actionRoute" class="w-full shrink-0 rounded-full border border-white/20 px-4 py-2 text-center font-poppins text-[10px] font-bold uppercase tracking-[0.18em] text-white transition-colors hover:border-tccGold hover:text-tccGold sm:w-auto sm:tracking-[0.2em]">
                   {{ asset.actionLabel }}
                 </a>
               </div>
