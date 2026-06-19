@@ -1,20 +1,38 @@
-import Aura from '@primeuix/themes/aura'
+import Aura from '@primeuix/themes/aura';
 
 export default defineNuxtConfig({
+  runtimeConfig: {
+    public: {
+      NUXT_PUBLIC_SITE_URL: process.env.NUXT_PUBLIC_SITE_URL,
+      API_URL_ADMIN: process.env.API_URL_ADMIN,
+      API_URL_CITIZEN: process.env.API_URL_CITIZEN,
+      CMS_EMAIL: process.env.CMS_EMAIL,
+      CMS_PASSWORD: process.env.CMS_PASSWORD,
+      STRIPE_PUBLIC_KEY: process.env.STRIPE_PUBLIC_KEY,
+      STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+    },
+  },
   compatibilityDate: '2025-07-15',
-  devtools: { enabled: false },
+  devtools: { enabled: true },
   css: [
+    '~~/assets/fa-6.4.0/css/all.css',
     '~~/assets/css/fonts.css',
+    '~~/assets/scss/style.scss',
     '~~/assets/css/main.css',
-    'primeicons/primeicons.css'
+    'primeicons/primeicons.css',
   ],
   modules: [
     '@nuxtjs/tailwindcss',
     '@nuxt/image',
     '@nuxt/icon',
     '@primevue/nuxt-module',
-    '@nuxtjs/color-mode'
+    '@nuxtjs/color-mode',
   ],
+  vite: {
+    optimizeDeps: {
+      include: ['quill', 'quill-delta'],
+    },
+  },
   colorMode: {
     preference: 'dark',
     fallback: 'dark',
@@ -23,17 +41,17 @@ export default defineNuxtConfig({
     componentName: 'ColorScheme',
     classPrefix: '',
     classSuffix: '',
-    storageKey: 'nuxt-color-mode'
+    storageKey: 'nuxt-color-mode',
   },
   primevue: {
     options: {
       theme: {
-        preset: Aura
-      }
+        preset: Aura,
+      },
     },
     components: {
-      include: '*'
-    }
+      include: '*',
+    },
   },
   app: {
     head: {
@@ -42,16 +60,20 @@ export default defineNuxtConfig({
         {
           name: 'description',
           content:
-            'Unlock access to rare and historical collectible automobiles through fractional ownership of vetted investment-grade cars.'
-        }
+            'Unlock access to rare and historical collectible automobiles through fractional ownership of vetted investment-grade cars.',
+        },
       ],
       link: [
-        { rel: 'icon', type: 'image/svg+xml', href: '/svg/TCC-Logo.svg' }
-      ]
-    }
+        {
+          rel: 'icon',
+          type: 'image/svg+xml',
+          href: '/svg/TCC-Logo.svg',
+        },
+      ],
+    },
   },
   devServer: {
     host: '0.0.0.0',
-    port: 3001
-  }
-})
+    port: 3001,
+  },
+});
