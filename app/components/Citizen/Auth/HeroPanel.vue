@@ -20,7 +20,7 @@ defineProps<{
     </div>
 
     <div class="relative z-10 my-auto space-y-6 py-12">
-      <img src="/svg/TCC-Logo.svg" alt="The Car Crowd" class="h-10 w-auto">
+      <img src="/TCC-Logo.jpeg" alt="The Car Crowd" class="h-10 w-auto">
       <div class="space-y-2">
         <span class="restomod-eyebrow">Member Access</span>
         <h1 class="font-poppins text-4xl font-black leading-[0.95] text-white sm:text-5xl">

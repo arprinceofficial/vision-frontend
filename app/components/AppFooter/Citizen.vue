@@ -9,7 +9,7 @@
 
     <div class="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.2fr_0.8fr_0.8fr] lg:px-8">
       <div class="space-y-5">
-        <img src="/svg/TCC-Logo.svg" alt="The Car Crowd" class="h-8 w-auto">
+        <img src="/TCC-Logo.jpeg" alt="The Car Crowd" class="h-8 w-auto">
         <p class="max-w-xl text-sm leading-relaxed text-white/60">
           Collective ownership for rare automotive assets, combining transparent syndicate structures, specialist curation, and member access to the build journey.
         </p>

@@ -67,7 +67,7 @@ export default defineNuxtConfig({
         {
           rel: 'icon',
           type: 'image/svg+xml',
-          href: '/svg/TCC-Logo.svg',
+          href: '/fav-icon.jpeg',
         },
       ],
     },
