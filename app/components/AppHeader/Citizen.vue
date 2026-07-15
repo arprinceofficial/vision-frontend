@@ -61,7 +61,9 @@ onBeforeUnmount(() => {
   <header class="sticky top-0 z-50 border-b border-white/10 bg-tccDeepBlack/80 backdrop-blur-2xl">
     <nav class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
       <NuxtLink to="/" class="flex shrink-0 items-center" aria-label="The Car Crowd home" @click="closeMobileMenu">
-        <img src="/TCC-Logo.jpeg" alt="The Car Crowd" class="h-auto w-[190px] max-w-[calc(100vw-5.75rem)] transition-transform duration-300 hover:scale-[1.02] sm:w-[220px] xl:w-[160px] 2xl:w-[200px]">
+        <img src="/logo-4-BrrnFFbn.jpeg" alt="The Car Crowd" class="h-auto w-[100px] transition-transform duration-300 hover:scale-[1.02] sm:w-[40px]">
+        <span
+          class="font-mono text-[10px] tracking-[0.25em] uppercase text-bone/80 leading-tight hidden sm:block pl-4">Syndicated<br>Restomod</span>
       </NuxtLink>
 
       <div class="hidden items-center space-x-4 xl:flex 2xl:space-x-6">
