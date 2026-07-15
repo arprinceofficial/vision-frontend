@@ -7,8 +7,8 @@ const route = useRoute()
 const navLinks = [
   { label: 'Home', to: '/', activePaths: ['/'] },
   { label: 'My Assets', to: '/my-assets', activePaths: ['/my-assets'] },
-  { label: 'Classification', to: '/investor-classification', activePaths: ['/investor-classification'] },
-  { label: 'Suitability', to: '/questionnaire', activePaths: ['/questionnaire'] },
+  { label: 'Questionnaire', to: '/investor-classification', activePaths: ['/investor-classification'] },
+  { label: 'Test', to: '/questionnaire', activePaths: ['/questionnaire'] },
   { label: 'KYC Status', to: '/kyc', activePaths: ['/kyc'] },
   { label: 'My Profile', to: '/profile', activePaths: ['/profile'] }
 ]

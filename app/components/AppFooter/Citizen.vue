@@ -9,7 +9,12 @@
 
     <div class="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.2fr_0.8fr_0.8fr] lg:px-8">
       <div class="space-y-5">
-        <img src="/TCC-Logo.jpeg" alt="The Car Crowd" class="h-8 w-auto">
+        <div class="flex items-center gap-2">
+          <img src="/logo-4-BrrnFFbn.jpeg" alt="The Car Crowd"
+            class="h-auto w-[100px] transition-transform duration-300 hover:scale-[1.02] sm:w-[40px]">
+          <span
+            class="font-mono text-[10px] tracking-[0.25em] uppercase text-bone/80 leading-tight hidden sm:block pl-4">Syndicated<br>Restomod</span>
+        </div>
         <p class="max-w-xl text-sm leading-relaxed text-white/60">
           Collective ownership for rare automotive assets, combining transparent syndicate structures, specialist curation, and member access to the build journey.
         </p>
