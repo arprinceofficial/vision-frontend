@@ -10,6 +10,7 @@ const navLinks = [
     { label: 'Questionnaire', to: '/investor-classification', activePaths: ['/investor-classification'] },
     { label: 'Test', to: '/questionnaire', activePaths: ['/questionnaire'] },
     { label: 'blog', to: '/blog', activePaths: ['/blog'] },
+    { label: 'Retail', to: '/retail', activePaths: ['/retail'] },
     { label: 'KYC Status', to: '/kyc', activePaths: ['/kyc'] },
     { label: 'My Profile', to: '/profile', activePaths: ['/profile'] }
 ]
