@@ -11,6 +11,7 @@ const navLinks = [
     { label: 'Test', to: '/questionnaire', activePaths: ['/questionnaire'] },
     { label: 'blog', to: '/blog', activePaths: ['/blog'] },
     { label: 'Retail', to: '/retail', activePaths: ['/retail'] },
+    { label: 'Faqs', to: '/faqs', activePaths: ['/faqs'] },
     { label: 'KYC Status', to: '/kyc', activePaths: ['/kyc'] },
     { label: 'My Profile', to: '/profile', activePaths: ['/profile'] }
 ]
