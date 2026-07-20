@@ -8,12 +8,14 @@ const props = defineProps({
 
 const emit = defineEmits(['add_emit', 'close']);
 
-const visible = ref(props.isOpenModal);
-watch(() => props.isOpenModal, (newVal) => {
-    visible.value = newVal;
+const visible = computed({
+    get: () => props.isOpenModal,
+    set: (value) => {
+        if (!value) emit('close');
+    }
 });
 
-const formData = ref({
+const getInitialFormData = () => ({
     id: null,
     icon: '',
     title_white: '',
@@ -23,11 +25,12 @@ const formData = ref({
     status: false,
 });
 
+const formData = ref(getInitialFormData());
+
 const validations_errors = ref({});
 const skip_validations = ref([
     'id',
     'status',
-    'button_link',
 ]);
 
 watch(() => props.item, (value) => {
@@ -43,15 +46,7 @@ watch(() => props.item, (value) => {
             status: value.status === true || value.status == 1,
         };
     } else {
-        formData.value = {
-            id: null,
-            icon: '',
-            title_white: '',
-            title_color: '',
-            button_text: '',
-            button_link: '',
-            status: false,
-        };
+        formData.value = getInitialFormData();
     }
 }, { immediate: true });
 
@@ -80,15 +75,22 @@ const validateForm = () => {
     return true;
 };
 
+const applyValidationErrors = (errorData) => {
+    if (!errorData) return;
+
+    for (const key in errorData) {
+        if (Object.prototype.hasOwnProperty.call(errorData, key)) {
+            validations_errors.value[key] = Array.isArray(errorData[key]) ? errorData[key][0] : errorData[key];
+        }
+    }
+};
+
 const handleRequestError = (e) => {
-    if (e.response?.status === 404 || e.response?.status === 422) {
+    if (e.response?.status === 404 || e.response?.status === 409 || e.response?.status === 422) {
         const errorsSource = e.response?._data?.data || e.response?._data?.errors;
-        if (errorsSource) {
-            for (const key in errorsSource) {
-                if (Object.prototype.hasOwnProperty.call(errorsSource, key)) {
-                    validations_errors.value[key] = errorsSource[key][0];
-                }
-            }
+        applyValidationErrors(errorsSource);
+        if (!Object.keys(validations_errors.value).length) {
+            response_modal.value = e.response._data;
         }
     } else if (!e.response?.status) {
         response_modal.value = {
@@ -149,8 +151,7 @@ const setIcon = (photo) => {
 </script>
 
 <template>
-    <Dialog v-model:visible="visible" modal :closable="false" :style="{ width: '42rem', maxWidth: 'calc(100vw - 2rem)' }"
-        @update:visible="$emit('close')">
+    <Dialog v-model:visible="visible" modal :closable="false" :style="{ width: '42rem', maxWidth: 'calc(100vw - 2rem)' }">
         <template #header>
             <div class="flex items-center justify-center w-full gap-2">
                 <h4 class="text-xl font-semibold">{{ modalTitle }} Fractional Feature Section</h4>

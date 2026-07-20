@@ -10,7 +10,7 @@ const status = ref(optionsList[0]);
 const search = ref('');
 
 const paginationConfig = ref({
-	data: [],
+	data: {},
 	lang: 'en',
 	align: 'center',
 	action: ''
@@ -23,61 +23,21 @@ const response_modal = ref({});
 
 const isActiveStatus = (value) => value === true || value == 1;
 
-const filteredData = computed(() => {
-	const term = search.value.trim().toLowerCase();
-
-	return data.value.filter((row) => {
-		const matchesSearch = !term || [
-			row.icon,
-			row.title_white,
-			row.title_color,
-			row.button_text,
-			row.button_link,
-		].some((value) => String(value || '').toLowerCase().includes(term));
-
-		if (!matchesSearch) return false;
-
-		if (status.value?.key === 'trashed') {
-			return !!row.deleted_at;
-		}
-
-		if (status.value?.key === 'status') {
-			return String(isActiveStatus(row.status) ? 1 : 0) === String(status.value.value);
-		}
-
-		return true;
-	});
-});
-
 const loadData = async () => {
 	isLoading.value = true;
 	permissions.value = {};
 	try {
-		const requestBody = {
-			paginate: true,
-			page: route.query.page ? route.query.page : 1,
-			length: 10,
-			search: search.value,
-			status: status.value.key == 'status' ? status.value.value : '',
-			trashed: status.value.key == 'trashed' ? 'only' : '',
-		};
-
-		let getData;
-		try {
-			getData = await $fetchAdmin('v1/admin/fractional-feature-sections/all', {
-				method: 'POST',
-				body: requestBody,
-			});
-		} catch (postError) {
-			const statusCode = postError?.response?.status || postError?.statusCode || postError?.status;
-			if (![404, 405].includes(statusCode)) {
-				throw postError;
-			}
-
-			getData = await $fetchAdmin('v1/admin/fractional-feature-sections', {
-				method: 'GET',
-			});
-		}
+		const getData = await $fetchAdmin('v1/admin/fractional-feature-sections/all', {
+			method: 'POST',
+			body: {
+				paginate: true,
+				page: route.query.page ? route.query.page : 1,
+				length: 10,
+				search: search.value,
+				status: status.value.key == 'status' ? status.value.value : '',
+				trashed: status.value.key == 'trashed' ? 'only' : '',
+			},
+		});
 
 		data.value = Array.isArray(getData?.data?.data) ? getData.data.data : [];
 		paginationConfig.value.data = getData?.data?.meta || {};
@@ -207,7 +167,7 @@ const onChangeHandler = () => {
 					</div>
 				</div>
 				<Skeleton v-if="isLoading" width="7rem" height="2.5rem" borderRadius="10px" />
-				<Button v-else-if="permissions?.add" label="Create" @click="addNew" class="text-xs" />
+				<Button v-else-if="permissions?.add" label="Create Fractional Feature Section" @click="addNew" class="text-xs" />
 			</div>
 
 			<div class="pb-2 flex flex-col justify-between w-full">
@@ -277,7 +237,7 @@ const onChangeHandler = () => {
 								</tbody>
 
 								<tbody v-else>
-									<tr v-for="(row, index) in filteredData" :key="index">
+									<tr v-for="(row, index) in data" :key="index">
 										<td class="text-gray-800 dark:text-gray-200 text-center">
 											<img v-if="row.icon" :src="row.icon" alt="Icon" class="h-10 w-10 object-cover rounded" />
 											<span v-else class="text-gray-400">N/A</span>
@@ -315,7 +275,7 @@ const onChangeHandler = () => {
 											</div>
 										</td>
 									</tr>
-									<tr v-if="filteredData.length === 0">
+									<tr v-if="data.length === 0">
 										<td :colspan="permissions.edit || permissions.delete ? 7 : 6" class="text-center text-sm text-gray-500 py-6">
 											No fractional feature sections found.
 										</td>
