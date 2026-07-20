@@ -9,7 +9,6 @@ const response_modal = ref({})
 
 const heroItem = computed(() => data.value[0] || null)
 const hasHeroSection = computed(() => !!heroItem.value)
-const canManageHeroSection = computed(() => (hasHeroSection.value ? permissions.value?.edit : permissions.value?.add))
 
 const isActiveStatus = (status) => status === true || status == 1
 
@@ -82,7 +81,7 @@ const cancelModal = () => {
 				</div>
 				<!-- <Skeleton v-if="isLoading" width="10rem" height="2.5rem" borderRadius="10px" />
 				<Button
-					v-else-if="canManageHeroSection"
+					v-else-if="permissions?.add || permissions?.edit"
 					:label="hasHeroSection ? 'Update Fractional Hero Section' : 'Create Fractional Hero Section'"
 					@click="openManageModal"
 					class="text-xs"
@@ -138,6 +137,12 @@ const cancelModal = () => {
 								</div>
 
 								<div class="flex flex-col items-end gap-3">
+									<span
+										class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium"
+										:class="isActiveStatus(heroItem.status) ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'"
+									>
+										{{ isActiveStatus(heroItem.status) ? 'Active' : 'Inactive' }}
+									</span>
 									<Button v-if="permissions?.edit" label="Edit" class="text-xs" @click="openEditHandler(heroItem)" />
 								</div>
 							</div>

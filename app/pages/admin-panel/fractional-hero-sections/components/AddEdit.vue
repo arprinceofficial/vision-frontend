@@ -205,6 +205,14 @@ const createHandler = async () => {
                     <LazyInputError class="text-sm mt-1" :message="validations_errors.bg_video" />
                 </div>
             </div>
+
+            <div class="flex items-end justify-start gap-4">
+                <label class="font-semibold w-14 mb-2">Status</label>
+                <div class="flex-auto">
+                    <ToggleSwitch v-model="formData.status" @focus="validations_errors.status = ''" />
+                    <LazyInputError class="text-sm mt-1" :message="validations_errors.status" />
+                </div>
+            </div>
         </div>
 
         <template #footer class="flex justify-end gap-2 border-gray-200">
