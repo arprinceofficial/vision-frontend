@@ -181,7 +181,7 @@ const formatNumber = (value) => {
                     </div>
                 </div>
                 <Skeleton v-if="isLoading" width="7rem" height="2.5rem" borderRadius="10px" />
-                <Button v-else-if="permissions?.add" label="Create" @click="addNew" class="text-xs" />
+                <Button v-else-if="permissions?.add" label="Create Fractional Item" @click="addNew" class="text-xs" />
             </div>
 
             <div class="pb-2 flex flex-col justify-between w-full">
@@ -217,7 +217,7 @@ const formatNumber = (value) => {
                                         </th>
                                         <th width="12%">
                                             <div class="flex flex-row items-center justify-start gap-2 text-gray-800 dark:text-gray-200">
-                                                <span>Live Status</span>
+                                                <span>Asset</span>
                                             </div>
                                         </th>
                                         <th width="12%">
@@ -274,7 +274,8 @@ const formatNumber = (value) => {
                                             <span class="text-sm">{{ formatMoney(row.per_share_value ?? row.share_price) }}</span>
                                         </td>
                                         <td class="text-gray-800 dark:text-gray-200 text-start">
-                                            <span class="text-sm">{{ row.live_status || 'N/A' }}</span>
+                                            <span class="text-sm">{{ row.assetable_type || row.assetable?.type || 'N/A' }}</span>
+                                            <p class="text-xs text-gray-500 mt-1">{{ row.assetable_id || row.assetable?.id || 'N/A' }}</p>
                                         </td>
                                         <td class="text-center">
                                             <div class="flex justify-center items-center gap-2 flex-wrap">
