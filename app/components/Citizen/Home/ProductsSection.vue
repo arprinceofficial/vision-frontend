@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const products = [
   {
-    image: '/generated/restoration-workshop.png',
+    image: '/generated/home-bg.png',
     alt: 'Syndicated Restoration',
     badge: 'Pillar 01',
     title: 'One-of-One Builds',
@@ -12,7 +12,7 @@ const products = [
     disabled: false
   },
   {
-    image: '/frontend/assets/images/assetsmarket.png',
+    image: '/generated/partner image.png',
     alt: 'Private Portfolio',
     badge: 'Pillar 02',
     title: 'World-Class Partners',
