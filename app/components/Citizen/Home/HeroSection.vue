@@ -10,7 +10,7 @@ const heroStats = [
   <section class="relative flex min-h-[calc(100vh-64px)] items-center overflow-hidden bg-tccDeepBlack text-white">
     <div class="absolute inset-0 z-0">
       <img
-        src="/generated/restoration-workshop.png"
+        src="/generated/home-bg.png"
         alt="Restomod build workshop"
         class="h-full w-full object-cover opacity-70"
       >
@@ -22,15 +22,15 @@ const heroStats = [
       <div class="mx-auto max-w-6xl space-y-8">
         <span class="restomod-eyebrow mx-auto">Syndicate - Now Forming</span>
 
-        <h1 class="mx-auto max-w-6xl font-poppins text-5xl font-black leading-[0.88] tracking-normal text-white sm:text-7xl lg:text-8xl">
-          Be Part of the
+        <h1 class="mx-auto max-w-6xl font-poppins text-4xl font-black leading-[0.88] tracking-normal text-white sm:text-6xl lg:text-7xl">
+          Experience and be Part of
           <span class="block bg-gradient-to-r from-tccLightGold via-tccGold to-[#b17600] bg-clip-text text-transparent">
-            Creation of an Icon
+            the creation of iconic cars
           </span>
         </h1>
 
         <p class="mx-auto max-w-2xl text-base leading-relaxed text-white/70 sm:text-xl">
-          Syndicated classic car builds, engineered in the open, owned together, and experienced through the full journey.
+          Syndicated Restomod car builds, engineered in the open, owned and experienced together.
         </p>
 
         <div class="flex flex-col justify-center gap-4 pt-2 sm:flex-row">

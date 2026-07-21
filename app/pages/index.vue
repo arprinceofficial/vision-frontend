@@ -8,10 +8,10 @@ definePageMeta({
   <div class="w-full">
     <CitizenHomeHeroSection />
     <CitizenHomePortfolioHighlightsBar />
-    <CitizenHomeLiveSyndicatesSection />
+    <!-- <CitizenHomeLiveSyndicatesSection /> -->
     <CitizenHomeUpcomingSyndicatesSection />
     <CitizenHomeProductsSection />
     <CitizenHomeFundedAssetsSection />
-    <CitizenHomeCommunityEventsSection />
+    <!-- <CitizenHomeCommunityEventsSection /> -->
   </div>
 </template>

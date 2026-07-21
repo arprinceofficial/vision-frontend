@@ -23,7 +23,7 @@ const products = [
     disabled: false
   },
   {
-    image: '/generated/hero-aston-studio.png',
+    image: '/generated/experiential.jpeg',
     alt: 'Syndicated Drive',
     badge: 'Pillar 03',
     title: 'Member Experience',
