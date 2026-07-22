@@ -13,6 +13,11 @@ const email = ref('')
 const password = ref('')
 const showPassword = ref(false)
 const notice = ref<{ title: string, message: string, tone: NoticeTone } | null>(null)
+const forgotPasswordUrl = computed(() => {
+  const normalizedEmail = email.value.trim()
+
+  return normalizedEmail ? `/forgot-password?email=${encodeURIComponent(normalizedEmail)}` : '/forgot-password'
+})
 
 const submitLogin = () => {
   if (!email.value || !password.value) {
@@ -33,16 +38,6 @@ const submitLogin = () => {
   window.setTimeout(() => {
     void navigateTo('/profile')
   }, 650)
-}
-
-const forgotPassword = () => {
-  notice.value = {
-    title: 'Reset Password',
-    message: email.value
-      ? `A reset link would be sent to ${email.value} in the connected app.`
-      : 'Enter your email address first, then request a reset link.',
-    tone: 'info'
-  }
 }
 </script>
 
@@ -83,9 +78,9 @@ const forgotPassword = () => {
               <div class="space-y-1">
                 <div class="flex items-center justify-between">
                   <label for="password" class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">Password</label>
-                  <button type="button" class="text-[11px] font-semibold text-tccGold transition-colors hover:text-tccNavy" @click="forgotPassword">
+                  <a :href="forgotPasswordUrl" class="text-[11px] font-semibold text-tccGold transition-colors hover:text-tccLightGold">
                     Forgot Password?
-                  </button>
+                  </a>
                 </div>
                 <div class="relative">
                   <input
@@ -114,7 +109,7 @@ const forgotPassword = () => {
 
             <p class="pt-2 text-center text-xs font-light text-gray-500">
               Don't have an account?
-              <a href="/register" class="ml-1 font-bold uppercase text-tccGold transition-colors hover:text-tccNavy">Register Now</a>
+              <a href="/register" class="ml-1 font-bold uppercase text-tccGold transition-colors hover:text-tccLightGold">Register Now</a>
             </p>
           </form>
         </div>
