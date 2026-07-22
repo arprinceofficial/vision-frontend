@@ -22,19 +22,23 @@ type QuestionAnswerPayload = {
     question_id: string
     selected_option: string
 }
-type QuestionAnswerResponse = {
-    question_id: string
-    is_correct: boolean
+type QuestionnaireSubmitPayload = {
+    answers: QuestionAnswerPayload[]
+}
+type QuestionnaireSubmitResponse = {
+    is_passed: boolean
+    title: string
     message: string
+    review_question_id?: string
 }
 
 const route = useRoute()
 const stage = ref<Stage>(route.query.stage === 'quiz' ? 'quiz' : 'facts')
 const currentStep = ref(1)
-const isSubmittingAnswer = ref(false)
+const isSubmittingQuestionnaire = ref(false)
 const notice = ref<{ title: string, message: string, tone: NoticeTone } | null>(null)
 const answers = reactive<Record<string, string>>({})
-const answerResponses = reactive<Record<string, QuestionAnswerResponse>>({})
+const finalResult = ref<QuestionnaireSubmitResponse | null>(null)
 
 const keyFacts = [
     {
@@ -110,28 +114,23 @@ const activeQuestion = computed(() => {
     }
 })
 const totalQuestions = computed(() => questions.value.length)
-const activeAnswerResponse = computed(() => answerResponses[activeQuestion.value.id])
-const isActiveAnswerCorrect = computed(() => Boolean(activeAnswerResponse.value?.is_correct))
 const progress = computed(() => totalQuestions.value ? `${(currentStep.value / totalQuestions.value) * 100}%` : '0%')
 const primaryActionLabel = computed(() => {
-    if (isSubmittingAnswer.value) return 'Checking Answer...'
-    if (isActiveAnswerCorrect.value) {
-        return currentStep.value === totalQuestions.value ? 'Complete Quiz' : 'Next Question'
-    }
-    return 'Submit Answer'
+    if (isSubmittingQuestionnaire.value) return 'Submitting...'
+    return currentStep.value === totalQuestions.value ? 'Submit Questionnaire' : 'Continue'
 })
 
-// Replace this adapter with the API call later; the page already consumes this response shape.
-const submitQuestionAnswer = async (payload: QuestionAnswerPayload): Promise<QuestionAnswerResponse> => {
-    const correctAnswer = mockAnswerKey[payload.question_id]
-    const isCorrect = payload.selected_option === correctAnswer
+// Replace this adapter with the final submit API later; correctness is checked only after all answers are sent.
+const submitQuestionnaireAnswers = async (payload: QuestionnaireSubmitPayload): Promise<QuestionnaireSubmitResponse> => {
+    const reviewAnswer = payload.answers.find((answer) => mockAnswerKey[answer.question_id] !== answer.selected_option)
 
     return {
-        question_id: payload.question_id,
-        is_correct: isCorrect,
-        message: isCorrect
-            ? 'Your answer is correct. You can continue.'
-            : 'That answer is not correct. Please review the question and select another answer.'
+        is_passed: !reviewAnswer,
+        title: reviewAnswer ? 'Questionnaire Review Required' : 'Suitability Verified Successfully',
+        message: reviewAnswer
+            ? 'Your submitted answers did not pass the suitability check. Please review your answers and submit again.'
+            : 'Your answers have been submitted successfully.',
+        review_question_id: reviewAnswer?.question_id
     }
 }
 
@@ -141,9 +140,7 @@ const resetQuizState = () => {
     Object.keys(answers).forEach((key) => {
         delete answers[key]
     })
-    Object.keys(answerResponses).forEach((key) => {
-        delete answerResponses[key]
-    })
+    finalResult.value = null
 }
 
 const startQuiz = () => {
@@ -160,7 +157,7 @@ const previousQuestion = () => {
 
 const selectAnswer = (questionId: string, answer: string) => {
     answers[questionId] = answer
-    delete answerResponses[questionId]
+    finalResult.value = null
     notice.value = null
 }
 
@@ -170,30 +167,25 @@ const goToNextQuestion = () => {
         notice.value = null
         return
     }
-
-    stage.value = 'success'
-    notice.value = null
 }
 
 const getOptionClasses = (optionValue: string) => {
     const questionId = activeQuestion.value.id
     const isSelected = answers[questionId] === optionValue
-    const response = answerResponses[questionId]
 
     if (!isSelected) return 'border-tccBorder'
-    if (!response) return 'border-tccNavy bg-tccLightBg'
 
-    return response.is_correct
-        ? 'border-emerald-400/50 bg-emerald-400/10'
-        : 'border-red-400/50 bg-red-400/10'
+    return 'border-tccNavy bg-tccLightBg'
 }
 
-const handlePrimaryAction = async () => {
-    if (isActiveAnswerCorrect.value) {
-        goToNextQuestion()
-        return
-    }
+const buildQuestionnairePayload = (): QuestionnaireSubmitPayload => ({
+    answers: questions.value.map((question) => ({
+        question_id: question.id,
+        selected_option: answers[question.id] as string
+    }))
+})
 
+const handlePrimaryAction = async () => {
     const question = activeQuestion.value
 
     if (!question || !answers[question.id]) {
@@ -205,28 +197,64 @@ const handlePrimaryAction = async () => {
         return
     }
 
-    isSubmittingAnswer.value = true
+    if (currentStep.value < totalQuestions.value) {
+        goToNextQuestion()
+        return
+    }
+
+    const firstUnansweredIndex = questions.value.findIndex((quizQuestion) => !answers[quizQuestion.id])
+
+    if (firstUnansweredIndex !== -1) {
+        currentStep.value = firstUnansweredIndex + 1
+        notice.value = {
+            title: 'Answer Required',
+            message: 'Please answer every question before submitting the questionnaire.',
+            tone: 'warning'
+        }
+        return
+    }
+
+    isSubmittingQuestionnaire.value = true
+    notice.value = null
 
     try {
-        const response = await submitQuestionAnswer({
-            question_id: question.id,
-            selected_option: answers[question.id] as string
-        })
+        const payload = buildQuestionnairePayload()
 
-        answerResponses[question.id] = response
+        console.log('[Questionnaire] submit questionnaire', payload)
+
+        const response = await submitQuestionnaireAnswers(payload)
+
+        console.log('[Questionnaire] submit response', response)
+
+        finalResult.value = response
+
+        if (response.is_passed) {
+            stage.value = 'success'
+            notice.value = null
+            return
+        }
+
+        if (response.review_question_id) {
+            const reviewQuestionIndex = questions.value.findIndex((quizQuestion) => quizQuestion.id === response.review_question_id)
+
+            if (reviewQuestionIndex !== -1) {
+                currentStep.value = reviewQuestionIndex + 1
+            }
+        }
+
         notice.value = {
-            title: response.is_correct ? 'Correct Answer' : 'Incorrect Answer',
+            title: response.title,
             message: response.message,
-            tone: response.is_correct ? 'success' : 'error'
+            tone: 'error'
         }
     } catch {
         notice.value = {
-            title: 'Unable To Check Answer',
-            message: 'Please try submitting your answer again.',
+            title: 'Unable To Submit',
+            message: 'Please try submitting the questionnaire again.',
             tone: 'error'
         }
     } finally {
-        isSubmittingAnswer.value = false
+        isSubmittingQuestionnaire.value = false
     }
 }
 </script>
@@ -300,7 +328,8 @@ const handlePrimaryAction = async () => {
                             :class="getOptionClasses(option.value)">
                             <input :checked="answers[activeQuestion.id] === option.value" type="radio"
                                 :name="activeQuestion.id" :value="option.value" class="mt-1 accent-tccNavy"
-                                :disabled="isSubmittingAnswer" @change="selectAnswer(activeQuestion.id, option.value)">
+                                :disabled="isSubmittingQuestionnaire"
+                                @change="selectAnswer(activeQuestion.id, option.value)">
                             <span class="text-xs font-light text-gray-700">{{ option.label }}</span>
                         </label>
                     </div>
@@ -314,7 +343,7 @@ const handlePrimaryAction = async () => {
                     </button>
                     <button type="button"
                         class="rounded bg-tccGold px-6 py-2.5 font-poppins text-xs font-bold uppercase tracking-wider text-tccDarkNavy shadow transition-colors hover:bg-tccLightGold"
-                        :disabled="isSubmittingAnswer" @click="handlePrimaryAction">
+                        :disabled="isSubmittingQuestionnaire" @click="handlePrimaryAction">
                         {{ primaryActionLabel }} <span aria-hidden="true">&rarr;</span>
                     </button>
                 </div>
@@ -329,10 +358,10 @@ const handlePrimaryAction = async () => {
                 <div class="space-y-2">
                     <span class="font-poppins text-xs font-bold uppercase tracking-widest text-tccGold">Verification
                         Complete</span>
-                    <h1 class="font-poppins text-2xl font-semibold text-tccNavy">Suitability Verified Successfully</h1>
+                    <h1 class="font-poppins text-2xl font-semibold text-tccNavy">
+                        {{ finalResult?.title || 'Suitability Verified Successfully' }}</h1>
                     <p class="mx-auto max-w-sm text-xs text-tccMutedGray">
-                        Thank you for completing the suitability steps. Your classification and quiz records are
-                        securely logged.
+                        {{ finalResult?.message || 'Thank you for completing the suitability steps. Your classification and quiz records are securely logged.' }}
                     </p>
                 </div>
 
