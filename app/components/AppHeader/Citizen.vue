@@ -1,46 +1,66 @@
 <script setup lang="ts">
 const isMobileMenuOpen = ref(false)
-const isProductsMenuOpen = ref(false)
-const productsMenuRef = ref<HTMLElement | null>(null)
+const openChildMenuLabel = ref<string | null>(null)
+const desktopNavRef = ref<HTMLElement | null>(null)
 const route = useRoute()
 
-const navLinks = [
+type NavLink = {
+    label: string
+    to?: string
+    activePaths?: string[]
+    child?: NavLink[]
+}
+
+const navLinks: NavLink[] = [
     { label: 'Home', to: '/', activePaths: ['/'] },
     { label: 'My Assets', to: '/my-assets', activePaths: ['/my-assets'] },
-    { label: 'Questionnaire', to: '/investor-classification', activePaths: ['/investor-classification'] },
-    { label: 'Test', to: '/questionnaire', activePaths: ['/questionnaire'] },
+    {
+        label: 'Our Products',
+        activePaths: ['/showroom', '/live-syndicate', '/funded-assets', '/coming-soon-assets'],
+        child: [
+            { label: 'Showroom', to: '/showroom', activePaths: ['/showroom'] },
+            { label: 'Live Syndicates', to: '/live-syndicate', activePaths: ['/live-syndicate'] },
+            { label: 'Funded Assets', to: '/funded-assets', activePaths: ['/funded-assets'] },
+            { label: 'Coming Soon', to: '/coming-soon-assets', activePaths: ['/coming-soon-assets'] }
+        ]
+    },
     { label: 'blog', to: '/blog', activePaths: ['/blog'] },
     { label: 'Retail', to: '/retail', activePaths: ['/retail'] },
     { label: 'Faqs', to: '/faqs', activePaths: ['/faqs'] },
-    { label: 'KYC Status', to: '/kyc', activePaths: ['/kyc'] },
-    { label: 'My Profile', to: '/profile', activePaths: ['/profile'] }
-]
-
-const productLinks = [
-    { label: 'Showroom', to: '/showroom' },
-    { label: 'Live Syndicates', to: '/live-syndicate' },
-    { label: 'Funded Assets', to: '/funded-assets' },
-    { label: 'Coming Soon', to: '/coming-soon-assets' }
 ]
 
 const closeMobileMenu = () => {
     isMobileMenuOpen.value = false
-    isProductsMenuOpen.value = false
+    closeChildMenu()
 }
 
-const openProductsMenu = () => {
-    isProductsMenuOpen.value = true
+const hasChildMenu = (link: NavLink) => Boolean(link.child?.length)
+
+const getMenuId = (link: NavLink) => `${link.label.toLowerCase().replace(/\s+/g, '-')}-menu`
+
+const openChildMenu = (link: NavLink) => {
+    if (hasChildMenu(link)) {
+        openChildMenuLabel.value = link.label
+    }
 }
 
-const closeProductsMenu = () => {
-    isProductsMenuOpen.value = false
+const toggleChildMenu = (link: NavLink) => {
+    openChildMenuLabel.value = openChildMenuLabel.value === link.label ? null : link.label
 }
 
-const isActive = (activePaths: string[]) => activePaths.includes(route.path)
+const closeChildMenu = () => {
+    openChildMenuLabel.value = null
+}
+
+const isActive = (activePaths?: string[]) => Boolean(activePaths?.includes(route.path))
+
+const isLinkActive = (link: NavLink): boolean => {
+    return isActive(link.activePaths) || Boolean(link.child?.some((child) => isLinkActive(child)))
+}
 
 const handleDocumentClick = (event: MouseEvent) => {
-    if (!productsMenuRef.value?.contains(event.target as Node)) {
-        closeProductsMenu()
+    if (!desktopNavRef.value?.contains(event.target as Node)) {
+        closeChildMenu()
     }
 }
 
@@ -71,41 +91,43 @@ onBeforeUnmount(() => {
                     class="font-mono text-[10px] tracking-[0.25em] uppercase text-bone/80 leading-tight hidden sm:block pl-4">Syndicated<br>Restomod</span>
             </NuxtLink>
 
-            <div class="hidden items-center space-x-4 xl:flex 2xl:space-x-6">
-                <a v-for="link in navLinks" :key="link.label" :href="link.to"
-                    class="font-poppins text-[10px] font-semibold uppercase tracking-[0.14em] transition-colors duration-200 2xl:text-[11px] 2xl:tracking-[0.18em]"
-                    :class="isActive(link.activePaths) ? 'text-tccGold hover:text-white' : 'text-white/70 hover:text-white'">
-                    {{ link.label }}
-                </a>
-
-                <div ref="productsMenuRef" class="relative" @mouseenter="openProductsMenu"
-                    @mouseleave="closeProductsMenu">
-                    <button type="button"
-                        class="flex items-center gap-1 font-poppins text-[10px] font-semibold uppercase tracking-[0.14em] transition-colors duration-200 hover:text-white focus:outline-none 2xl:text-[11px] 2xl:tracking-[0.18em]"
-                        :class="isProductsMenuOpen ? 'text-tccGold' : 'text-white/70'"
-                        :aria-expanded="isProductsMenuOpen" aria-controls="products-menu" aria-haspopup="true"
-                        @click.stop="openProductsMenu">
-                        Our Products
-                        <svg class="h-3 w-3 transition-transform duration-200"
-                            :class="isProductsMenuOpen ? 'rotate-180' : ''" viewBox="0 0 20 20" fill="currentColor"
-                            aria-hidden="true">
-                            <path fill-rule="evenodd"
-                                d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.17l3.71-3.94a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z"
-                                clip-rule="evenodd" />
-                        </svg>
-                    </button>
-                    <div v-show="isProductsMenuOpen" id="products-menu"
-                        class="absolute right-0 top-full z-[100] w-60 pt-4" @click.stop>
-                        <div
-                            class="overflow-hidden rounded-[1.25rem] border border-tccGold/25 bg-[#050403] py-2 shadow-[0_24px_80px_rgba(0,0,0,0.75)] ring-1 ring-white/10">
-                            <a v-for="product in productLinks" :key="product.label" :href="product.to"
-                                class="block px-5 py-3 text-xs font-semibold text-white/90 transition-colors hover:bg-tccGold hover:text-tccDarkNavy"
-                                @click="closeProductsMenu">
-                                {{ product.label }}
-                            </a>
+            <div ref="desktopNavRef" class="hidden items-center space-x-4 xl:flex 2xl:space-x-6">
+                <template v-for="link in navLinks" :key="link.label">
+                    <div v-if="hasChildMenu(link)" class="relative" @mouseenter="openChildMenu(link)"
+                        @mouseleave="closeChildMenu">
+                        <button type="button"
+                            class="flex items-center gap-1 font-poppins text-[10px] font-semibold uppercase tracking-[0.14em] transition-colors duration-200 hover:text-white focus:outline-none 2xl:text-[11px] 2xl:tracking-[0.18em]"
+                            :class="openChildMenuLabel === link.label || isLinkActive(link) ? 'text-tccGold' : 'text-white/70'"
+                            :aria-expanded="openChildMenuLabel === link.label" :aria-controls="getMenuId(link)"
+                            aria-haspopup="true" @click.stop="toggleChildMenu(link)">
+                            {{ link.label }}
+                            <svg class="h-3 w-3 transition-transform duration-200"
+                                :class="openChildMenuLabel === link.label ? 'rotate-180' : ''" viewBox="0 0 20 20"
+                                fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd"
+                                    d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.17l3.71-3.94a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                        <div v-show="openChildMenuLabel === link.label" :id="getMenuId(link)"
+                            class="absolute right-0 top-full z-[100] w-60 pt-4" @click.stop>
+                            <div
+                                class="overflow-hidden rounded-[1.25rem] border border-tccGold/25 bg-[#050403] py-2 shadow-[0_24px_80px_rgba(0,0,0,0.75)] ring-1 ring-white/10">
+                                <a v-for="child in link.child" :key="child.label" :href="child.to"
+                                    class="block px-5 py-3 text-xs font-semibold transition-colors hover:bg-tccGold hover:text-tccDarkNavy"
+                                    :class="isLinkActive(child) ? 'text-tccGold' : 'text-white/90'"
+                                    @click="closeChildMenu">
+                                    {{ child.label }}
+                                </a>
+                            </div>
                         </div>
                     </div>
-                </div>
+                    <a v-else :href="link.to"
+                        class="font-poppins text-[10px] font-semibold uppercase tracking-[0.14em] transition-colors duration-200 2xl:text-[11px] 2xl:tracking-[0.18em]"
+                        :class="isLinkActive(link) ? 'text-tccGold hover:text-white' : 'text-white/70 hover:text-white'">
+                        {{ link.label }}
+                    </a>
+                </template>
             </div>
 
             <div class="hidden items-center space-x-3 xl:flex">
@@ -135,16 +157,24 @@ onBeforeUnmount(() => {
         <div v-show="isMobileMenuOpen" id="mobile-menu"
             class="border-t border-white/10 bg-tccDeepBlack/95 backdrop-blur-xl xl:hidden">
             <div class="space-y-3 px-4 pb-4 pt-2">
-                <a v-for="link in navLinks" :key="`mobile-${link.label}`" :href="link.to"
-                    class="block py-2 font-poppins text-xs font-semibold uppercase tracking-[0.18em]"
-                    :class="isActive(link.activePaths) ? 'text-tccGold' : 'text-white/90'" @click="closeMobileMenu">
-                    {{ link.label }}
-                </a>
-                <a v-for="product in productLinks" :key="`mobile-product-${product.label}`" :href="product.to"
-                    class="block py-2 font-poppins text-xs font-semibold uppercase tracking-[0.18em] text-white/90"
-                    @click="closeMobileMenu">
-                    {{ product.label }}
-                </a>
+                <template v-for="link in navLinks" :key="`mobile-${link.label}`">
+                    <div v-if="hasChildMenu(link)" class="space-y-1">
+                        <p class="py-2 font-poppins text-xs font-semibold uppercase tracking-[0.18em]"
+                            :class="isLinkActive(link) ? 'text-tccGold' : 'text-white/90'">
+                            {{ link.label }}
+                        </p>
+                        <a v-for="child in link.child" :key="`mobile-child-${child.label}`" :href="child.to"
+                            class="block py-2 pl-4 font-poppins text-xs font-semibold uppercase tracking-[0.18em]"
+                            :class="isLinkActive(child) ? 'text-tccGold' : 'text-white/75'" @click="closeMobileMenu">
+                            {{ child.label }}
+                        </a>
+                    </div>
+                    <a v-else :href="link.to"
+                        class="block py-2 font-poppins text-xs font-semibold uppercase tracking-[0.18em]"
+                        :class="isLinkActive(link) ? 'text-tccGold' : 'text-white/90'" @click="closeMobileMenu">
+                        {{ link.label }}
+                    </a>
+                </template>
                 <div class="border-t border-white/10 pt-3">
                     <a href="/login"
                         class="block w-full rounded bg-tccGold px-4 py-2 text-center font-poppins text-sm font-semibold text-tccDarkNavy transition-colors hover:bg-tccLightGold"
