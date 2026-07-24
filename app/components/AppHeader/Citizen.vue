@@ -16,12 +16,11 @@ const navLinks: NavLink[] = [
     { label: 'My Assets', to: '/my-assets', activePaths: ['/my-assets'] },
     {
         label: 'Our Products',
-        activePaths: ['/showroom', '/live-syndicate', '/funded-assets', '/coming-soon-assets'],
+        activePaths: ['/private-portfolios', '/syndicate-restoration', '/syndicates'],
         child: [
-            { label: 'Showroom', to: '/showroom', activePaths: ['/showroom'] },
-            { label: 'Live Syndicates', to: '/live-syndicate', activePaths: ['/live-syndicate'] },
-            { label: 'Funded Assets', to: '/funded-assets', activePaths: ['/funded-assets'] },
-            { label: 'Coming Soon', to: '/coming-soon-assets', activePaths: ['/coming-soon-assets'] }
+            { label: 'Private Portfolios', to: '/private-portfolios', activePaths: ['/private-portfolios'] },
+            { label: 'Syndicated Restoration', to: '/syndicate-restoration', activePaths: ['/syndicate-restoration'] },
+            { label: 'Syndicates', to: '/syndicates', activePaths: ['/syndicates'] },
         ]
     },
     { label: 'blog', to: '/blog', activePaths: ['/blog'] },

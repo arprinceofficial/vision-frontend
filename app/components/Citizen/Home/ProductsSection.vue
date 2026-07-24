@@ -19,7 +19,7 @@ const products = [
         description:
             'Specialist sourcing, restoration, storage, insurance, and member administration are coordinated through a professional syndicate structure.',
         action: 'Learn More',
-        to: 'https://thecarcrowd.uk/private-portfolios/',
+        to: '/private-portfolios',
         disabled: false
     },
     {
