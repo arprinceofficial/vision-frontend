@@ -8,7 +8,7 @@ const products = [
         description:
             'Members join rare automotive projects from the earliest stage, following acquisition, teardown, engineering, finishing, and experience access.',
         action: 'Learn More',
-        to: 'https://thecarcrowd.uk/syndicate-restoration/',
+        to: '/syndicate-restoration',
         disabled: false
     },
     {
@@ -34,6 +34,8 @@ const products = [
         disabled: true
     }
 ]
+
+const isExternalLink = (to: string) => /^https?:\/\//.test(to)
 </script>
 
 <template>
@@ -63,7 +65,9 @@ const products = [
                             </h3>
                             <p class="mt-4 text-sm leading-relaxed text-white/60">{{ product.description }}</p>
                         </div>
-                        <a v-if="!product.disabled" :href="product.to" target="_blank" rel="noopener noreferrer"
+                        <a v-if="!product.disabled" :href="product.to"
+                            :target="isExternalLink(product.to) ? '_blank' : undefined"
+                            :rel="isExternalLink(product.to) ? 'noopener noreferrer' : undefined"
                             class="mt-7 block rounded-full border border-white/20 py-3 text-center font-poppins text-xs font-bold uppercase tracking-[0.22em] text-white transition-colors duration-200 hover:border-tccGold hover:text-tccGold">
                             {{ product.action }}
                         </a>

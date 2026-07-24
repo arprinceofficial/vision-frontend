@@ -39,9 +39,9 @@ const pageMap: Record<string, PageConfig> = {
   'otp-verification': {
     title: 'Verification Code',
     eyebrow: 'Secure Sign In',
-    description: 'Enter the four digit code sent to your email inbox before continuing to the showroom.',
+    description: 'Enter the four digit code sent to your email inbox before continuing to syndicated restoration.',
     type: 'auth',
-    primary: { label: 'Verify Code', to: '/showroom' },
+    primary: { label: 'Verify Code', to: '/syndicate-restoration' },
     secondary: { label: 'Back to Login', to: '/login' }
   },
   'about-you': {
@@ -88,11 +88,11 @@ const pageMap: Record<string, PageConfig> = {
   congratulations: {
     title: 'Congratulations',
     eyebrow: 'Access Approved',
-    description: 'Your investor journey is ready. You can now explore the showroom and follow live allocations.',
+    description: 'Your investor journey is ready. You can now explore syndicated restoration and follow live allocations.',
     type: 'status',
     icon: 'pi-star',
     tone: 'success',
-    primary: { label: 'Open Showroom', to: '/showroom' }
+    primary: { label: 'Open Syndicated Restoration', to: '/syndicate-restoration' }
   },
   'kyc-success': {
     title: 'Identity Verified',
@@ -129,7 +129,7 @@ const pageMap: Record<string, PageConfig> = {
     description: 'Understand the trust structure, voting rights, storage, insurance, and exit mechanics before allocating capital.',
     type: 'documents',
     primary: { label: 'Start Classification', to: '/investor-classification' },
-    secondary: { label: 'View Showroom', to: '/showroom' }
+    secondary: { label: 'View Syndicated Restoration', to: '/syndicate-restoration' }
   },
   showroom: {
     title: 'Investment Showroom',
@@ -224,7 +224,7 @@ const pageMap: Record<string, PageConfig> = {
     icon: 'pi-check',
     tone: 'success',
     primary: { label: 'Go to Dashboard', to: '/profile' },
-    secondary: { label: 'View Showroom', to: '/showroom' }
+    secondary: { label: 'View Syndicated Restoration', to: '/syndicate-restoration' }
   },
   'documents-review': {
     title: 'Documents Review',
@@ -365,7 +365,7 @@ const detailImage = computed(() => {
 <template>
   <div v-if="page.type === 'auth'" class="restomod-shell flex min-h-screen flex-col justify-between">
     <div class="grid flex-grow grid-cols-1 lg:grid-cols-12">
-      <CitizenAuthHeroPanel description="Recover or verify your secure The Car Crowd investor account before returning to the showroom." />
+      <CitizenAuthHeroPanel description="Recover or verify your secure The Car Crowd investor account before returning to syndicated restoration." />
 
       <section class="flex items-center justify-center bg-white/5 p-8 sm:p-16 lg:col-span-7">
         <div class="w-full max-w-md space-y-8">
@@ -450,7 +450,7 @@ const detailImage = computed(() => {
         </div>
 
         <div class="mb-8 flex flex-wrap gap-3">
-          <a href="/showroom" class="rounded border border-tccBorder bg-white px-4 py-2 font-poppins text-xs font-semibold uppercase text-tccNavy">Showroom</a>
+          <a href="/syndicate-restoration" class="rounded border border-tccBorder bg-white px-4 py-2 font-poppins text-xs font-semibold uppercase text-tccNavy">Syndicated Restoration</a>
           <a href="/live-syndicate" class="rounded border border-tccBorder bg-white px-4 py-2 font-poppins text-xs font-semibold uppercase text-tccNavy">Live</a>
           <a href="/funded-assets" class="rounded border border-tccBorder bg-white px-4 py-2 font-poppins text-xs font-semibold uppercase text-tccNavy">Funded</a>
           <a href="/coming-soon-assets" class="rounded border border-tccBorder bg-white px-4 py-2 font-poppins text-xs font-semibold uppercase text-tccNavy">Coming Soon</a>

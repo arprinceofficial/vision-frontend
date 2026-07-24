@@ -13,9 +13,9 @@ defineProps<{
     <div class="absolute inset-0 bg-gradient-to-b from-tccDeepBlack/80 via-tccDeepBlack/60 to-tccDeepBlack" />
 
     <div class="relative z-10">
-      <a href="/showroom" class="inline-flex items-center gap-2 rounded-full border border-tccGold/40 bg-tccGold/10 px-4 py-2 font-poppins text-xs font-semibold uppercase tracking-[0.18em] text-tccGold transition-colors duration-200 hover:text-white">
+      <a href="/syndicate-restoration" class="inline-flex items-center gap-2 rounded-full border border-tccGold/40 bg-tccGold/10 px-4 py-2 font-poppins text-xs font-semibold uppercase tracking-[0.18em] text-tccGold transition-colors duration-200 hover:text-white">
         <i class="pi pi-arrow-left text-[11px]" aria-hidden="true" />
-        Back to showroom
+        Back to restoration
       </a>
     </div>
 
