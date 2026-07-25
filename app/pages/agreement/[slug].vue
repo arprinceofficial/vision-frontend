@@ -3,7 +3,7 @@ definePageMeta({
     layout: 'default'
 })
 
-type AgreementStage = 'overview' | 'subscription' | 'terms' | 'signature'
+type AgreementStage = 'overview' | 'subscription' | 'terms' | 'signature' | 'signed-documents'
 
 type TimelineStep = {
     key: string
@@ -128,7 +128,11 @@ const proceedToSignature = () => {
 }
 
 const submitSignature = () => {
-    // Backend wiring will attach the signed document payload in the next integration pass.
+    currentStage.value = 'signed-documents'
+}
+
+const proceedToVote = () => {
+    // Vote stage will be wired in the next step of the allocation flow.
 }
 
 useHead(() => ({
@@ -144,9 +148,9 @@ useHead(() => ({
 
 <template>
     <div class="bg-tccDeepBlack font-poppins text-white">
-        <CitizenAgreementAgreementBreadcrumb :reference="agreement.reference" />
+        <CitizenAgreementBreadcrumb :reference="agreement.reference" />
 
-        <CitizenAgreementAgreementTimeline
+        <CitizenAgreementTimeline
             :steps="timelineSteps"
             :active-index="activeTimelineIndex"
             @show-overview="showOverview"
@@ -155,7 +159,7 @@ useHead(() => ({
 
         <section class="bg-tccDeepBlack pb-14 sm:pb-16">
             <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-                <CitizenAgreementAgreementSummaryStrip :agreement="agreement" :total-investment="totalInvestment" />
+                <CitizenAgreementSummaryStrip :agreement="agreement" :total-investment="totalInvestment" />
 
                 <Transition name="agreement-fade" mode="out-in">
                     <CitizenAgreementWhatHappensNextSection
@@ -172,6 +176,13 @@ useHead(() => ({
                         :agreement="agreement"
                         @back-to-documents="showTerms"
                         @submit="submitSignature"
+                    />
+
+                    <CitizenAgreementSignedDocumentsReviewSection
+                        v-else-if="currentStage === 'signed-documents'"
+                        key="signed-documents"
+                        :agreement="agreement"
+                        @proceed-to-vote="proceedToVote"
                     />
 
                     <CitizenAgreementDocumentReviewSection
