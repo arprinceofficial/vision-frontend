@@ -3,7 +3,16 @@ definePageMeta({
     layout: 'default'
 })
 
-type AgreementStage = 'overview' | 'subscription' | 'terms' | 'signature' | 'signed-documents'
+type AgreementStage =
+    | 'overview'
+    | 'subscription'
+    | 'terms'
+    | 'signature'
+    | 'signed-documents'
+    | 'vote'
+    | 'cart'
+    | 'payment-agreement'
+    | 'bank-transfer'
 
 type TimelineStep = {
     key: string
@@ -98,7 +107,21 @@ const subscriptionBullets = [
     'The syndicate being the sole beneficiary of the Bare Trust'
 ]
 
-const activeTimelineIndex = computed(() => (currentStage.value === 'overview' ? 0 : 1))
+const activeTimelineIndex = computed(() => {
+    const stageIndexMap: Record<AgreementStage, number> = {
+        overview: 0,
+        subscription: 1,
+        terms: 1,
+        signature: 1,
+        'signed-documents': 1,
+        vote: 2,
+        cart: 3,
+        'payment-agreement': 4,
+        'bank-transfer': 5
+    }
+
+    return stageIndexMap[currentStage.value]
+})
 const activeDocumentIndex = computed(() => (currentStage.value === 'terms' ? 2 : 1))
 const totalInvestment = computed(() => `GBP ${agreement.value.allocationCost.toLocaleString('en-GB')}`)
 
@@ -132,7 +155,23 @@ const submitSignature = () => {
 }
 
 const proceedToVote = () => {
-    // Vote stage will be wired in the next step of the allocation flow.
+    currentStage.value = 'vote'
+}
+
+const proceedToCart = () => {
+    currentStage.value = 'cart'
+}
+
+const proceedToPaymentAgreement = () => {
+    currentStage.value = 'payment-agreement'
+}
+
+const proceedToBankTransfer = () => {
+    currentStage.value = 'bank-transfer'
+}
+
+const confirmPayment = () => {
+    // Payment confirmation modal and profile handoff will be added in the next flow step.
 }
 
 useHead(() => ({
@@ -183,6 +222,36 @@ useHead(() => ({
                         key="signed-documents"
                         :agreement="agreement"
                         @proceed-to-vote="proceedToVote"
+                    />
+
+                    <CitizenAgreementSyndicateVoteSection
+                        v-else-if="currentStage === 'vote'"
+                        key="vote"
+                        :agreement="agreement"
+                        @continue="proceedToCart"
+                    />
+
+                    <CitizenAgreementAllocationCartSection
+                        v-else-if="currentStage === 'cart'"
+                        key="cart"
+                        :agreement="agreement"
+                        @proceed-to-payment="proceedToPaymentAgreement"
+                    />
+
+                    <CitizenAgreementPaymentAgreementSection
+                        v-else-if="currentStage === 'payment-agreement'"
+                        key="payment-agreement"
+                        :agreement="agreement"
+                        @back-to-cart="proceedToCart"
+                        @proceed-to-payment="proceedToBankTransfer"
+                    />
+
+                    <CitizenAgreementBankTransferDetailsSection
+                        v-else-if="currentStage === 'bank-transfer'"
+                        key="bank-transfer"
+                        :agreement="agreement"
+                        @back-to-cart="proceedToCart"
+                        @confirm-payment="confirmPayment"
                     />
 
                     <CitizenAgreementDocumentReviewSection
