@@ -29,7 +29,7 @@ const currentSyndicates = [
     image: '/generated/hero-aston-studio.png',
     alt: 'Lamborghini Diablo VT Roadster',
     action: 'Find Out More',
-    to: '/car-detail',
+    to: '/syndicates/lamborghini-diablo-vt-roadster',
     isLive: true
   },
   {
@@ -117,7 +117,7 @@ const expertPanels = [
 
 <template>
   <div class="bg-tccDeepBlack font-poppins text-white">
-    <section class="relative flex min-h-[620px] items-end overflow-hidden bg-[#101515] pb-20 pt-24 text-white">
+    <section class="relative flex min-h-[430px] items-end overflow-hidden bg-[#101515] pb-12 pt-20 text-white sm:min-h-[500px] lg:min-h-[560px]">
       <img
         src="/frontend/assets/images/porsche.jpeg"
         alt="The Car Crowd syndicate collectible car"
@@ -128,13 +128,13 @@ const expertPanels = [
 
       <div class="relative mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-12">
         <div class="max-w-4xl">
-          <h1 class="text-[38px] font-bold leading-tight sm:text-[58px]">TheCarCrowd Syndicates</h1>
-          <p class="mt-4 max-w-3xl text-[16px] font-medium leading-relaxed text-white/85 sm:text-lg">
+          <h1 class="text-[clamp(2rem,6vw,3.75rem)] font-bold leading-tight">TheCarCrowd Syndicates</h1>
+          <p class="mt-3 max-w-3xl text-[14px] font-medium leading-relaxed text-white/85 sm:text-base">
             Our syndicates allow you to join together with other like minded individuals and benefit from potential future appreciation.
           </p>
           <a
             href="#current-syndicates"
-            class="mt-9 inline-flex items-center gap-3 rounded-full bg-tccGold px-6 py-3.5 text-[14px] font-bold text-tccDarkNavy transition-colors hover:bg-tccLightGold"
+            class="mt-7 inline-flex items-center gap-3 rounded-full bg-tccGold px-5 py-3 text-[13px] font-bold text-tccDarkNavy transition-colors hover:bg-tccLightGold"
           >
             Join Syndicate
             <span class="grid h-5 w-5 place-items-center rounded-full bg-tccDarkNavy text-white">
@@ -145,28 +145,28 @@ const expertPanels = [
       </div>
     </section>
 
-    <section class="border-y border-white/10 bg-[#080705] py-7 text-white">
+    <section class="border-y border-white/10 bg-[#080705] py-6 text-white">
       <div class="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
         <div class="flex items-center gap-5">
           <span class="h-px flex-1 bg-white/15" />
           <h2 class="text-center text-[16px] font-semibold text-white/90">Featured In</h2>
           <span class="h-px flex-1 bg-white/15" />
         </div>
-        <div class="mt-7 grid grid-cols-2 gap-4 text-center text-[11px] font-bold uppercase tracking-[0.18em] text-white/55 sm:grid-cols-5">
+        <div class="mt-5 grid grid-cols-2 gap-4 text-center text-[10px] font-bold uppercase tracking-[0.16em] text-white/55 sm:grid-cols-5">
           <span v-for="item in featuredIn" :key="item">{{ item }}</span>
         </div>
       </div>
     </section>
 
-    <section id="current-syndicates" class="border-b border-white/10 bg-[#050403] py-20 sm:py-24">
+    <section id="current-syndicates" class="border-b border-white/10 bg-[#050403] py-12 sm:py-16">
       <div class="mx-auto max-w-7xl px-6 sm:px-10 lg:px-14">
-        <h2 class="text-center text-[36px] font-semibold leading-tight text-white sm:text-[46px]">Current Syndicates</h2>
+        <h2 class="text-center text-[28px] font-semibold leading-tight text-white sm:text-[36px]">Current Syndicates</h2>
 
-        <div class="mt-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <div class="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           <article
             v-for="item in currentSyndicates"
             :key="`${item.title}-${item.marque}`"
-            class="group relative min-h-[360px] overflow-hidden rounded-md border border-white/10 bg-white/5 transition-all duration-300 hover:-translate-y-1 hover:border-tccGold/40"
+            class="group relative min-h-[280px] overflow-hidden rounded-md border border-white/10 bg-white/5 transition-all duration-300 hover:-translate-y-1 hover:border-tccGold/40 sm:min-h-[320px]"
           >
             <img :src="item.image" :alt="item.alt" class="absolute inset-0 h-full w-full object-cover opacity-80 transition-transform duration-500 group-hover:scale-105">
             <div class="absolute inset-0 bg-black/45" />
@@ -178,11 +178,11 @@ const expertPanels = [
               {{ item.status }}
             </span>
 
-            <div class="absolute inset-x-0 bottom-0 p-6">
-              <h3 class="text-[30px] font-semibold leading-none text-white">{{ item.title }}</h3>
+            <div class="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+              <h3 class="text-[24px] font-semibold leading-none text-white sm:text-[28px]">{{ item.title }}</h3>
               <p class="mt-2 text-[13px] font-medium text-white/75">{{ item.marque }}</p>
-              <a :href="item.to" class="mt-7 inline-flex items-center gap-4 text-[13px] font-semibold text-white/85 transition-colors hover:text-tccGold">
-                <span class="grid h-9 w-9 place-items-center bg-tccGold text-tccDarkNavy">
+              <a :href="item.to" class="mt-5 inline-flex items-center gap-3 text-[13px] font-semibold text-white/85 transition-colors hover:text-tccGold">
+                <span class="grid h-8 w-8 place-items-center bg-tccGold text-tccDarkNavy">
                   <i class="fa-solid fa-arrow-right text-sm" aria-hidden="true" />
                 </span>
                 {{ item.action }}
@@ -193,23 +193,23 @@ const expertPanels = [
       </div>
     </section>
 
-    <section class="border-b border-white/10 bg-[#080705] py-20 sm:py-24">
+    <section class="border-b border-white/10 bg-[#080705] py-12 sm:py-16">
       <div class="mx-auto max-w-7xl px-6 sm:px-10 lg:px-14">
-        <h2 class="text-center text-[36px] font-semibold leading-tight text-white sm:text-[46px]">Funded Syndicates</h2>
+        <h2 class="text-center text-[28px] font-semibold leading-tight text-white sm:text-[36px]">Funded Syndicates</h2>
 
-        <div class="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3">
+        <div class="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
           <article
             v-for="item in fundedSyndicates"
             :key="`${item.title}-${item.model}`"
-            class="group relative min-h-[360px] overflow-hidden rounded-md border border-white/10 bg-white/5 transition-all duration-300 hover:-translate-y-1 hover:border-tccGold/40"
+            class="group relative min-h-[280px] overflow-hidden rounded-md border border-white/10 bg-white/5 transition-all duration-300 hover:-translate-y-1 hover:border-tccGold/40 sm:min-h-[320px]"
           >
             <img :src="item.image" :alt="item.alt" class="absolute inset-0 h-full w-full object-cover opacity-80 transition-transform duration-500 group-hover:scale-105">
             <div class="absolute inset-0 bg-gradient-to-t from-black via-black/35 to-black/5" />
-            <div class="absolute inset-x-0 bottom-0 p-6">
-              <h3 class="text-[30px] font-semibold leading-none text-white">{{ item.title }}</h3>
+            <div class="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+              <h3 class="text-[24px] font-semibold leading-none text-white sm:text-[28px]">{{ item.title }}</h3>
               <p class="mt-2 text-[13px] font-medium text-white/75">{{ item.model }}</p>
-              <a :href="item.to" class="mt-6 inline-flex items-center gap-4 text-[13px] font-semibold text-white/85 transition-colors hover:text-tccGold">
-                <span class="grid h-9 w-9 place-items-center bg-tccGold text-tccDarkNavy">
+              <a :href="item.to" class="mt-5 inline-flex items-center gap-3 text-[13px] font-semibold text-white/85 transition-colors hover:text-tccGold">
+                <span class="grid h-8 w-8 place-items-center bg-tccGold text-tccDarkNavy">
                   <i class="fa-solid fa-arrow-right text-sm" aria-hidden="true" />
                 </span>
                 Find Out More
@@ -220,22 +220,22 @@ const expertPanels = [
       </div>
     </section>
 
-    <section class="border-b border-white/10 bg-[#050403] py-20 sm:py-24">
+    <section class="border-b border-white/10 bg-[#050403] py-12 sm:py-16">
       <div class="mx-auto max-w-7xl px-6 sm:px-10 lg:px-14">
-        <h2 class="text-center text-[36px] font-semibold leading-tight text-white sm:text-[46px]">How It Works</h2>
+        <h2 class="text-center text-[28px] font-semibold leading-tight text-white sm:text-[36px]">How It Works</h2>
 
-        <div class="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3">
+        <div class="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
           <article
             v-for="item in howItWorks"
             :key="item.title"
             class="overflow-hidden rounded-md border border-white/10 bg-white/5 shadow-[0_24px_70px_rgba(0,0,0,0.28)] transition-all duration-300 hover:-translate-y-1 hover:border-tccGold/40"
           >
-            <img :src="item.image" :alt="item.alt" class="h-56 w-full object-cover opacity-90">
-            <div class="px-6 pb-9 pt-5">
-              <h3 class="text-[22px] font-semibold leading-tight text-white">{{ item.title }}</h3>
-              <p class="mt-4 text-[15px] leading-relaxed text-white/65">{{ item.body }}</p>
-              <a href="/register" class="mt-8 inline-flex items-center gap-3 text-[13px] font-medium text-white/70 transition-colors hover:text-tccGold">
-                <span class="grid h-9 w-9 place-items-center bg-tccGold text-tccDarkNavy">
+            <img :src="item.image" :alt="item.alt" class="h-44 w-full object-cover opacity-90 sm:h-52">
+            <div class="px-5 pb-7 pt-5 sm:px-6">
+              <h3 class="text-xl font-semibold leading-tight text-white">{{ item.title }}</h3>
+              <p class="mt-3 text-[14px] leading-relaxed text-white/65">{{ item.body }}</p>
+              <a href="/register" class="mt-6 inline-flex items-center gap-3 text-[13px] font-medium text-white/70 transition-colors hover:text-tccGold">
+                <span class="grid h-8 w-8 place-items-center bg-tccGold text-tccDarkNavy">
                   <i class="fa-solid fa-arrow-right text-sm" aria-hidden="true" />
                 </span>
                 Join Us
@@ -246,10 +246,10 @@ const expertPanels = [
       </div>
     </section>
 
-    <section class="border-b border-white/10 bg-[#080705] py-20 sm:py-24">
+    <section class="border-b border-white/10 bg-[#080705] py-12 sm:py-16">
       <div class="mx-auto grid max-w-7xl grid-cols-1 gap-12 px-6 sm:px-10 lg:grid-cols-12 lg:px-14">
         <div class="lg:col-span-8">
-          <h2 class="max-w-4xl text-[34px] font-semibold leading-tight text-white sm:text-[46px]">
+          <h2 class="max-w-4xl text-[28px] font-semibold leading-tight text-white sm:text-[36px]">
             Fuel Your Future with These Experts in Collectible Cars
           </h2>
           <img
@@ -258,8 +258,8 @@ const expertPanels = [
             class="mt-8 aspect-[1.75/1] w-full rounded-md object-cover"
           >
           <div class="mt-8 max-w-4xl">
-            <h3 class="text-[22px] font-semibold text-white">The First And Largest</h3>
-            <p class="mt-4 text-[15px] leading-relaxed text-white/65">
+            <h3 class="text-xl font-semibold text-white">The First And Largest</h3>
+            <p class="mt-3 text-[14px] leading-relaxed text-white/65">
               We are the UK's first platform dedicated to collectible cars with industry-leading experience in both automotive and financial services. We are the largest collectible car asset specialist in the UK.
             </p>
           </div>
@@ -268,8 +268,8 @@ const expertPanels = [
         <div class="space-y-9 border-white/10 lg:col-span-4 lg:border-l lg:pl-10">
           <article v-for="panel in expertPanels" :key="panel.title">
             <img :src="panel.image" :alt="panel.alt" class="aspect-[1.65/1] w-full rounded-md object-cover">
-            <h3 class="mt-5 text-[22px] font-semibold text-white">{{ panel.title }}</h3>
-            <p class="mt-3 text-[15px] leading-relaxed text-white/65">{{ panel.body }}</p>
+            <h3 class="mt-4 text-xl font-semibold text-white">{{ panel.title }}</h3>
+            <p class="mt-3 text-[14px] leading-relaxed text-white/65">{{ panel.body }}</p>
           </article>
         </div>
       </div>
