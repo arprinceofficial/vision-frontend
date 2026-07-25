@@ -37,20 +37,20 @@ const signedDocuments = [
 </script>
 
 <template>
-  <section class="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-    <div class="mb-8 text-center">
-      <span class="mx-auto grid h-16 w-16 place-items-center rounded-full border border-tccGold/35 bg-tccGold/10 text-tccGold shadow-[0_0_42px_rgba(247,198,0,0.14)]">
-        <i class="pi pi-file-edit text-2xl" aria-hidden="true" />
+  <section class="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+    <div class="mb-7 text-center">
+      <span class="mx-auto grid h-14 w-14 place-items-center rounded-full border border-tccGold/35 bg-tccGold/10 text-tccGold shadow-[0_0_42px_rgba(247,198,0,0.14)]">
+        <i class="pi pi-file-edit text-xl" aria-hidden="true" />
       </span>
-      <h1 class="mt-4 font-poppins text-3xl font-black text-white sm:text-4xl">Signed Documents</h1>
-      <p class="mt-2 text-sm text-white/55">View your signed investment documents</p>
+      <h1 class="mt-3 font-poppins text-2xl font-black text-white sm:text-3xl">Signed Documents</h1>
+      <p class="mt-2 text-[13px] text-white/55">View your signed investment documents</p>
     </div>
 
-    <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
-      <main class="space-y-6">
-        <section class="rounded-2xl border border-tccGold/35 bg-tccGold/10 p-5 text-center shadow-[0_22px_80px_rgba(0,0,0,0.28)] sm:p-6">
-          <h2 class="font-poppins text-xl font-black text-white">Documents Available</h2>
-          <p class="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-white/72">
+    <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_20rem]">
+      <main class="space-y-5">
+        <section class="rounded-2xl border border-tccGold/35 bg-tccGold/10 p-5 text-center shadow-[0_22px_80px_rgba(0,0,0,0.28)]">
+          <h2 class="font-poppins text-lg font-black text-white">Documents Available</h2>
+          <p class="mx-auto mt-2.5 max-w-2xl text-[13px] leading-relaxed text-white/72">
             Your signed investment documents are ready for review.
             Signed by Nayab Navib Navib on {{ transaction.signedDate }}.
           </p>
@@ -59,25 +59,25 @@ const signedDocuments = [
         <section class="rounded-2xl border border-white/10 bg-white/[0.05] p-5 text-white">
           <div class="flex items-center gap-3">
             <i class="pi pi-chart-line text-tccGold" aria-hidden="true" />
-            <h2 class="font-poppins text-xl font-black">Investment Summary</h2>
+            <h2 class="font-poppins text-lg font-black">Investment Summary</h2>
           </div>
 
           <div class="mt-5 grid gap-3 sm:grid-cols-2">
             <div class="rounded-xl border border-white/10 bg-tccDeepBlack/70 px-4 py-3">
               <span class="text-[10px] font-black uppercase tracking-[0.16em] text-white/45">Vehicle</span>
-              <strong class="mt-1 block text-sm text-white">{{ transaction.vehicle }}</strong>
+              <strong class="mt-1 block text-[13px] text-white">{{ transaction.vehicle }}</strong>
             </div>
             <div class="rounded-xl border border-white/10 bg-tccDeepBlack/70 px-4 py-3">
               <span class="text-[10px] font-black uppercase tracking-[0.16em] text-white/45">Number of Allocations</span>
-              <strong class="mt-1 block text-sm text-white">{{ transaction.allocations }}</strong>
+              <strong class="mt-1 block text-[13px] text-white">{{ transaction.allocations }}</strong>
             </div>
             <div class="rounded-xl border border-white/10 bg-tccDeepBlack/70 px-4 py-3">
               <span class="text-[10px] font-black uppercase tracking-[0.16em] text-white/45">Signed Date</span>
-              <strong class="mt-1 block text-sm text-white">{{ transaction.signedDate }}</strong>
+              <strong class="mt-1 block text-[13px] text-white">{{ transaction.signedDate }}</strong>
             </div>
             <div class="rounded-xl border border-white/10 bg-tccDeepBlack/70 px-4 py-3">
               <span class="text-[10px] font-black uppercase tracking-[0.16em] text-white/45">Reference</span>
-              <strong class="mt-1 block font-mono text-sm text-tccGold">{{ transaction.referenceId }}</strong>
+              <strong class="mt-1 block font-mono text-[13px] text-tccGold">{{ transaction.referenceId }}</strong>
             </div>
           </div>
         </section>
@@ -85,7 +85,7 @@ const signedDocuments = [
         <section class="space-y-4">
           <div class="flex items-center gap-3 text-white">
             <i class="pi pi-file-pdf text-tccGold" aria-hidden="true" />
-            <h2 class="font-poppins text-xl font-black">Signed Documents</h2>
+            <h2 class="font-poppins text-lg font-black">Signed Documents</h2>
           </div>
 
           <article
@@ -96,7 +96,7 @@ const signedDocuments = [
             <header class="flex flex-col gap-3 bg-tccDeepBlack px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
               <div class="flex flex-wrap items-center gap-3">
                 <i class="pi pi-file-pdf text-tccGold" aria-hidden="true" />
-                <h3 class="font-poppins text-sm font-black sm:text-base">{{ document.title }}</h3>
+                <h3 class="font-poppins text-[13px] font-black sm:text-sm">{{ document.title }}</h3>
                 <span class="rounded-full bg-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-white/70">
                   {{ document.badge }}
                 </span>
@@ -119,7 +119,7 @@ const signedDocuments = [
               </div>
             </header>
 
-            <div class="pdf-viewer-toolbar border-b px-3 py-2 text-xs">
+            <div class="pdf-viewer-toolbar border-b px-3 py-2 text-[11px]">
               <div class="flex flex-wrap items-center justify-between gap-3">
                 <div class="flex items-center gap-3">
                   <i class="pi pi-bars" aria-hidden="true" />
@@ -134,19 +134,19 @@ const signedDocuments = [
               </div>
             </div>
 
-            <div class="pdf-viewer-surface max-h-[34rem] overflow-auto p-4 sm:p-6">
-              <div class="pdf-preview-page mx-auto min-h-[30rem] max-w-2xl p-6 sm:p-10">
+            <div class="pdf-viewer-surface max-h-[32rem] overflow-auto p-4 sm:p-5">
+              <div class="pdf-preview-page mx-auto min-h-[28rem] max-w-2xl p-6 sm:p-8">
                 <div class="border-t border-[#c6ccd6] pt-8">
                   <p class="pdf-preview-kicker text-[11px] font-black uppercase tracking-[0.18em]">Dummy PDF Preview</p>
-                  <h4 class="pdf-preview-title mt-5 font-poppins text-xl font-black">{{ document.title }}</h4>
-                  <div class="pdf-preview-copy mt-6 space-y-4 text-sm leading-relaxed">
+                  <h4 class="pdf-preview-title mt-5 font-poppins text-lg font-black">{{ document.title }}</h4>
+                  <div class="pdf-preview-copy mt-6 space-y-4 text-[13px] leading-relaxed">
                     <p v-for="clause in document.clauses" :key="clause">{{ clause }}</p>
                   </div>
                   <div class="pdf-preview-signature mt-12 rounded border border-dashed p-4">
                     <span class="pdf-preview-kicker text-xs font-semibold uppercase tracking-[0.16em]">Signed electronically</span>
                     <div class="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <strong class="pdf-preview-title">Nayab Navib Navib</strong>
-                      <span class="pdf-preview-muted text-sm">{{ transaction.signedDate }}</span>
+                      <span class="pdf-preview-muted text-[13px]">{{ transaction.signedDate }}</span>
                     </div>
                   </div>
                 </div>
@@ -159,16 +159,16 @@ const signedDocuments = [
       <aside class="space-y-4 lg:sticky lg:top-24 lg:self-start">
         <NuxtLink
           :to="`/profile/transactions/${transaction.id}/payment-details`"
-          class="inline-flex w-full items-center justify-center gap-2 rounded-full bg-tccGold px-5 py-3 font-poppins text-xs font-black uppercase tracking-[0.14em] text-tccDarkNavy shadow-lg shadow-tccGold/20 transition-colors hover:bg-tccLightGold"
+          class="inline-flex w-full items-center justify-center gap-2 rounded-full bg-tccGold px-4 py-2.5 font-poppins text-[10px] font-black uppercase tracking-[0.14em] text-tccDarkNavy shadow-lg shadow-tccGold/20 transition-colors hover:bg-tccLightGold"
         >
-          <i class="pi pi-credit-card text-xs" aria-hidden="true" />
+          <i class="pi pi-credit-card text-[10px]" aria-hidden="true" />
           Go to Payment Details
         </NuxtLink>
 
         <section class="rounded-2xl border border-white/10 bg-white/[0.05] p-5 text-white">
           <div class="flex items-center gap-3">
             <i class="pi pi-info-circle text-tccGold" aria-hidden="true" />
-            <h2 class="font-poppins text-lg font-black">Document Information</h2>
+            <h2 class="font-poppins text-base font-black">Document Information</h2>
           </div>
 
           <div class="mt-4 space-y-3">
@@ -185,14 +185,14 @@ const signedDocuments = [
                 <i class="pi text-sm" :class="item.icon" aria-hidden="true" />
               </span>
               <div>
-                <h3 class="font-poppins text-sm font-black">{{ item.title }}</h3>
+                <h3 class="font-poppins text-[13px] font-black">{{ item.title }}</h3>
                 <p class="mt-1 text-xs text-white/55">{{ item.copy }}</p>
               </div>
             </div>
           </div>
         </section>
 
-        <div class="rounded-2xl border border-white/10 bg-white/[0.05] p-4 text-sm text-white/60">
+        <div class="rounded-2xl border border-white/10 bg-white/[0.05] p-4 text-[13px] text-white/60">
           <div class="flex gap-3">
             <i class="pi pi-headphones mt-1 text-tccGold" aria-hidden="true" />
             <div>
@@ -206,9 +206,9 @@ const signedDocuments = [
 
         <NuxtLink
           :to="`/profile/transactions/${transaction.id}`"
-          class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/20 px-5 py-3 font-poppins text-xs font-black uppercase tracking-[0.14em] text-white/75 transition-colors hover:border-tccGold hover:text-tccGold"
+          class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/20 px-4 py-2.5 font-poppins text-[10px] font-black uppercase tracking-[0.14em] text-white/75 transition-colors hover:border-tccGold hover:text-tccGold"
         >
-          <i class="pi pi-arrow-left text-xs" aria-hidden="true" />
+          <i class="pi pi-arrow-left text-[10px]" aria-hidden="true" />
           Back to Allocation Details
         </NuxtLink>
       </aside>

@@ -9,21 +9,21 @@ const { profileSummary, navItems } = useProfileDashboard()
 </script>
 
 <template>
-  <section class="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-    <div class="grid grid-cols-1 gap-8 lg:grid-cols-[20rem_minmax(0,1fr)]">
-      <aside class="space-y-6">
-        <div class="relative overflow-hidden rounded-2xl border border-tccGold/20 bg-[#0b0a08] p-6 text-center text-white shadow-[0_24px_80px_rgba(0,0,0,0.32)]">
+  <section class="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-[17.5rem_minmax(0,1fr)]">
+      <aside class="space-y-5">
+        <div class="relative overflow-hidden rounded-2xl border border-tccGold/20 bg-[#0b0a08] p-5 text-center text-white shadow-[0_24px_80px_rgba(0,0,0,0.32)]">
           <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(247,198,0,0.18),transparent_18rem)]" />
-          <div class="relative z-10 space-y-4">
-            <div class="mx-auto grid h-20 w-20 place-items-center rounded-full border border-tccGold/50 bg-tccGold/10 text-tccGold">
-              <span class="font-poppins text-2xl font-black uppercase">{{ profileSummary.initials }}</span>
+          <div class="relative z-10 space-y-3.5">
+            <div class="mx-auto grid h-16 w-16 place-items-center rounded-full border border-tccGold/50 bg-tccGold/10 text-tccGold shadow-[0_0_34px_rgba(247,198,0,0.14)]">
+              <span class="font-poppins text-xl font-black uppercase">{{ profileSummary.initials }}</span>
             </div>
             <div>
-              <h1 class="font-poppins text-base font-black text-white">{{ profileSummary.name }}</h1>
-              <p class="mt-1 text-xs text-white/55">{{ profileSummary.email }}</p>
+              <h1 class="font-poppins text-[15px] font-black text-white">{{ profileSummary.name }}</h1>
+              <p class="mt-1 text-[11px] text-white/55">{{ profileSummary.email }}</p>
             </div>
             <div class="space-y-2 rounded-xl border border-white/10 bg-white/[0.04] p-3 text-left">
-              <div class="flex justify-between text-[10px] font-semibold uppercase tracking-[0.12em] text-white/60">
+              <div class="flex justify-between text-[9px] font-semibold uppercase tracking-[0.12em] text-white/60">
                 <span>Profile Completion</span>
                 <span class="text-tccGold">{{ profileSummary.completion }}%</span>
               </div>
@@ -34,23 +34,23 @@ const { profileSummary, navItems } = useProfileDashboard()
           </div>
         </div>
 
-        <nav class="rounded-2xl border border-white/12 bg-white/[0.06] p-3 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
+        <nav class="rounded-2xl border border-white/12 bg-white/[0.06] p-2.5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
           <NuxtLink
             v-for="item in navItems"
             :key="item.id"
             :to="item.to"
-            class="flex min-h-12 items-center gap-3 rounded-xl px-4 py-3 font-poppins text-sm font-semibold text-white/78 transition-colors hover:bg-white/[0.08] hover:text-tccGold"
-            :class="activeSection === item.id ? 'bg-white/[0.11] text-white' : ''"
+            class="flex min-h-11 items-center gap-3 rounded-xl border border-transparent px-3.5 py-2.5 font-poppins text-[13px] font-semibold text-white/76 transition-all hover:bg-white/[0.08] hover:text-tccGold"
+            :class="activeSection === item.id ? 'border-tccGold/20 bg-white/[0.11] text-white shadow-[inset_3px_0_0_rgba(247,198,0,0.95)]' : ''"
           >
-            <i class="pi text-sm text-tccGold" :class="item.icon" aria-hidden="true" />
+            <i class="pi text-xs text-tccGold" :class="item.icon" aria-hidden="true" />
             {{ item.label }}
           </NuxtLink>
 
           <NuxtLink
             to="/login"
-            class="mt-2 flex min-h-12 items-center gap-3 rounded-xl px-4 py-3 font-poppins text-sm font-semibold text-red-400 transition-colors hover:bg-red-500/10 hover:text-red-300"
+            class="mt-2 flex min-h-11 items-center gap-3 rounded-xl px-3.5 py-2.5 font-poppins text-[13px] font-semibold text-red-400 transition-colors hover:bg-red-500/10 hover:text-red-300"
           >
-            <i class="pi pi-sign-out text-sm" aria-hidden="true" />
+            <i class="pi pi-sign-out text-xs" aria-hidden="true" />
             Logout
           </NuxtLink>
         </nav>
