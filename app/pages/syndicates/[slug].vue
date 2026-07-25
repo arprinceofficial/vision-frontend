@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import IncompleteAllocationModal from '~/components/Citizen/Syndicates/IncompleteAllocationModal.vue'
+
 definePageMeta({
     layout: 'default'
 })
@@ -32,6 +34,7 @@ type NewsCard = {
 
 type SyndicateDetail = {
     slug: string
+    allocationId: string
     status: string
     collection: string
     allocationsTotal: number
@@ -57,6 +60,7 @@ const route = useRoute()
 const syndicates: SyndicateDetail[] = [
     {
         slug: 'lamborghini-diablo-vt-roadster',
+        allocationId: 'NN93366393',
         status: 'Live Now',
         collection: 'Modern Classics Collection',
         allocationsTotal: 80,
@@ -201,8 +205,14 @@ const closeAllocationModal = () => {
     isAllocationModalVisible.value = false
 }
 
-const selectAllocationFlow = () => {
+const selectAllocationFlow = async () => {
     isAllocationModalVisible.value = false
+
+    if (!syndicate.value) {
+        return
+    }
+
+    await navigateTo(`/agreement/${encodeURIComponent(syndicate.value.allocationId)}`)
 }
 
 onMounted(() => {
@@ -657,8 +667,8 @@ useHead(() => ({
         </section>
 
         <ClientOnly>
-            <CitizenSyndicatesIncompleteAllocationModal :is-open-modal="isAllocationModalVisible"
-                :title="syndicate.title" :slots="allocationCount" :allocation-cost="syndicate.allocationCost"
+            <IncompleteAllocationModal :is-open-modal="isAllocationModalVisible" :title="syndicate.title"
+                :slots="allocationCount" :allocation-cost="syndicate.allocationCost"
                 :progress="allocationRecoveryProgress" @close="closeAllocationModal" @start-fresh="selectAllocationFlow"
                 @continue-existing="selectAllocationFlow" />
         </ClientOnly>
