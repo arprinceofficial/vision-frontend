@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import IncompleteAllocationModal from '~/components/Citizen/Syndicates/IncompleteAllocationModal.vue'
-
 definePageMeta({
     layout: 'default'
 })
@@ -300,10 +298,10 @@ useHead(() => ({
                             <div v-for="spec in syndicate.specs" :key="spec.label"
                                 class="border-b border-white/12 px-3 py-3 text-center last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0">
                                 <strong class="block font-poppins text-lg font-black text-white">{{ spec.value
-                                    }}</strong>
+                                }}</strong>
                                 <span
                                     class="mt-2 block text-[9px] font-bold uppercase tracking-[0.18em] text-white/38">{{
-                                    spec.label }}</span>
+                                        spec.label }}</span>
                             </div>
                         </div>
                     </article>
@@ -388,7 +386,7 @@ useHead(() => ({
                                         Returns</span>
                                     <strong
                                         class="mt-2 block text-lg font-black leading-tight text-tccGold sm:text-xl">{{
-                                        syndicate.cagr }}</strong>
+                                            syndicate.cagr }}</strong>
                                     <span class="mt-1 block text-[11px] text-white/45">Forecasted investment returns are
                                         for illustration only</span>
                                 </div>
@@ -471,8 +469,7 @@ useHead(() => ({
                             </div>
 
                             <div class="grid grid-cols-2 overflow-hidden rounded-md border border-white/12">
-                                <div v-for="item in 4" :key="item"
-                                    class="border-white/12 p-3"
+                                <div v-for="item in 4" :key="item" class="border-white/12 p-3"
                                     :class="{ 'border-r': item % 2 === 1, 'border-b': item < 3 }">
                                     <div class="h-2.5 w-20 rounded bg-white/12" />
                                     <div class="mt-3 h-5 w-24 max-w-full rounded bg-white/15" />
@@ -640,7 +637,7 @@ useHead(() => ({
                                         class="h-9 w-9 shrink-0 rounded-full border border-white/20">
                                     <div class="min-w-0">
                                         <span class="block truncate text-xs font-bold text-white/75">{{ post.author
-                                            }}</span>
+                                        }}</span>
                                         <span class="block text-[10px] text-white/40">{{ post.date }}</span>
                                     </div>
                                 </div>
@@ -660,10 +657,10 @@ useHead(() => ({
         </section>
 
         <ClientOnly>
-            <IncompleteAllocationModal :is-open-modal="isAllocationModalVisible" :title="syndicate.title"
-                :slots="allocationCount" :allocation-cost="syndicate.allocationCost"
-                :progress="allocationRecoveryProgress" @close="closeAllocationModal"
-                @start-fresh="selectAllocationFlow" @continue-existing="selectAllocationFlow" />
+            <CitizenSyndicatesIncompleteAllocationModal :is-open-modal="isAllocationModalVisible"
+                :title="syndicate.title" :slots="allocationCount" :allocation-cost="syndicate.allocationCost"
+                :progress="allocationRecoveryProgress" @close="closeAllocationModal" @start-fresh="selectAllocationFlow"
+                @continue-existing="selectAllocationFlow" />
         </ClientOnly>
     </div>
 </template>
