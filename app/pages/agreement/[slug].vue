@@ -55,6 +55,7 @@ const agreement = computed(() => {
 
 const currentStage = ref<AgreementStage>('overview')
 const isReadyToSignModalOpen = ref(false)
+const isPaymentConfirmationModalOpen = ref(false)
 
 const timelineSteps: TimelineStep[] = [
     { key: 'what-happens-next', label: 'What Happens Next', icon: 'pi pi-verified' },
@@ -171,7 +172,21 @@ const proceedToBankTransfer = () => {
 }
 
 const confirmPayment = () => {
-    // Payment confirmation modal and profile handoff will be added in the next flow step.
+    isPaymentConfirmationModalOpen.value = true
+}
+
+const closePaymentConfirmationModal = () => {
+    isPaymentConfirmationModalOpen.value = false
+}
+
+const editPaymentCart = () => {
+    isPaymentConfirmationModalOpen.value = false
+    currentStage.value = 'cart'
+}
+
+const completePaymentConfirmation = () => {
+    isPaymentConfirmationModalOpen.value = false
+    void navigateTo('/profile/transactions')
 }
 
 useHead(() => ({
@@ -275,6 +290,14 @@ useHead(() => ({
             :support-email="agreement.supportEmail"
             @close="closeReadyToSignModal"
             @proceed="proceedToSignature"
+        />
+
+        <CitizenAgreementPaymentConfirmationModal
+            :is-open-modal="isPaymentConfirmationModalOpen"
+            :agreement="agreement"
+            @close="closePaymentConfirmationModal"
+            @edit-cart="editPaymentCart"
+            @confirm="completePaymentConfirmation"
         />
     </div>
 </template>
