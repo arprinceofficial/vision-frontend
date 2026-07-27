@@ -47,10 +47,11 @@ const agreementRecords: AgreementRecord[] = [
 ]
 
 const slug = computed(() => String(route.params.slug || ''))
-const agreement = computed(() => {
+const agreement = computed<AgreementRecord>(() => {
     const normalizedSlug = slug.value.toLowerCase()
+    const matchedAgreement = agreementRecords.find((record) => record.id.toLowerCase() === normalizedSlug)
 
-    return agreementRecords.find((record) => record.id.toLowerCase() === normalizedSlug) || agreementRecords[0]
+    return matchedAgreement ?? agreementRecords[0]!
 })
 
 const currentStage = ref<AgreementStage>('overview')
@@ -125,6 +126,17 @@ const activeTimelineIndex = computed(() => {
 })
 const activeDocumentIndex = computed(() => (currentStage.value === 'terms' ? 2 : 1))
 const totalInvestment = computed(() => `GBP ${agreement.value.allocationCost.toLocaleString('en-GB')}`)
+
+watch(currentStage, async () => {
+    await nextTick()
+
+    if (typeof window !== 'undefined') {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        })
+    }
+}, { flush: 'post' })
 
 const showOverview = () => {
     currentStage.value = 'overview'
