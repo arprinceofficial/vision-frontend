@@ -67,48 +67,6 @@ const timelineSteps: TimelineStep[] = [
     { key: 'payment', label: 'Payment', icon: 'pi pi-credit-card' }
 ]
 
-const overviewCards = [
-    {
-        icon: 'pi pi-check-circle',
-        title: 'Review and sign the documents',
-        copy: 'This is the formal bit. Take your time to read the Subscription Agreement and Terms & Conditions. Then you can eSign them and a copy will be emailed to you.'
-    },
-    {
-        icon: 'pi pi-building-columns',
-        title: 'Syndicate Vote',
-        copy: 'As a Syndicate member you will be asked to vote on day to day operational topics for the Asset. The first vote will be about storage.'
-    },
-    {
-        icon: 'pi pi-clock',
-        title: 'Funds transfer into Escrow account',
-        copy: 'We have set up a dedicated Escrow account for you to transfer the funds for your allocation or allocations.'
-    }
-]
-
-const documentCards = [
-    {
-        icon: 'pi pi-file-pdf',
-        title: 'Subscription Agreement',
-        copy: 'Review the legal agreement between you, as part of the Syndicate, and the Trust that holds the asset.'
-    },
-    {
-        icon: 'pi pi-file',
-        title: 'Terms and Conditions',
-        copy: 'Understand your rights, obligations, and the operational details of being a Syndicate member.'
-    },
-    {
-        icon: 'pi pi-pencil',
-        title: 'Digital Signature',
-        copy: 'You are now able to digitally sign the documents and copies will be emailed to you and available on the platform.'
-    }
-]
-
-const subscriptionBullets = [
-    'Cost of asset and associated fees',
-    'The Bare Trust name which will hold the asset',
-    'The syndicate being the sole beneficiary of the Bare Trust'
-]
-
 const activeTimelineIndex = computed(() => {
     const stageIndexMap: Record<AgreementStage, number> = {
         overview: 0,
@@ -231,7 +189,6 @@ useHead(() => ({
                     <CitizenAgreementWhatHappensNextSection
                         v-if="currentStage === 'overview'"
                         key="overview"
-                        :cards="overviewCards"
                         :support-email="agreement.supportEmail"
                         @get-started="showSubscription"
                     />
@@ -285,8 +242,6 @@ useHead(() => ({
                         v-else
                         key="documents"
                         :current-stage="currentStage"
-                        :document-cards="documentCards"
-                        :subscription-bullets="subscriptionBullets"
                         :active-document-index="activeDocumentIndex"
                         :support-email="agreement.supportEmail"
                         @show-subscription="showSubscription"
