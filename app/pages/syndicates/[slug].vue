@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import IncompleteAllocationModal from '~/components/Citizen/Syndicates/IncompleteAllocationModal.vue'
-
 definePageMeta({
     layout: 'default'
 })
@@ -20,6 +18,17 @@ type TechnicalDatum = {
     icon: string
     label: string
     value: string
+}
+
+type AnalysisTabKey = 'thisCar' | 'widerMarket' | 'netReturns'
+
+type AnalysisTab = {
+    label: string
+    eyebrow: string
+    lead: string
+    paragraphs: string[]
+    conclusion: string
+    metrics: SyndicateStat[]
 }
 
 type NewsCard = {
@@ -50,7 +59,7 @@ type SyndicateDetail = {
     description: string[]
     specs: SyndicateStat[]
     gallery: GalleryImage[]
-    analysis: string[]
+    analysisTabs: Record<AnalysisTabKey, AnalysisTab>
     technicalData: TechnicalDatum[]
     news: NewsCard[]
 }
@@ -108,12 +117,62 @@ const syndicates: SyndicateDetail[] = [
                 class: 'md:col-span-2 md:h-[420px]'
             }
         ],
-        analysis: [
-            'Not all VT Roadsters are equal. This one was acquired specifically because the specification aligns with everything the data supports.',
-            'A rare open-roof V12, complex silver paintwork and red interior place this car in a very small group of collector-grade Diablos.',
-            'Acquired at GBP 400,000, the car sits below the current market average for comparable examples. Against a factory demonstrator listed at GBP 499,995, the value position is clear.',
-            'High enough to attract buyers who want to drive it, but strong enough to preserve the long-term ownership case.'
-        ],
+        analysisTabs: {
+            thisCar: {
+                label: 'This Car',
+                eyebrow: 'Chassis No. #126642',
+                lead: 'A specification-led Diablo VT Roadster with the right combination of scarcity, usability and collector-grade theatre.',
+                paragraphs: [
+                    'Not all VT Roadsters are equal. This one was acquired specifically because the specification aligns with everything the data supports.',
+                    'A rare open-roof V12, complex silver paintwork and red interior place this car in a very small group of collector-grade Diablos.',
+                    'Acquired at GBP 400,000, the car sits below the current market average for comparable examples. Against a factory demonstrator listed at GBP 499,995, the value position is clear.',
+                    'High enough to attract buyers who want to drive it, but strong enough to preserve the long-term ownership case.'
+                ],
+                conclusion:
+                    'Download the investment pack for full specification, market analysis and syndicate details.',
+                metrics: [
+                    { label: 'Model Year', value: '1997' },
+                    { label: 'Engine', value: '5.7L V12' },
+                    { label: 'Mileage', value: '12600' }
+                ]
+            },
+            widerMarket: {
+                label: 'Wider Market & Investment Thesis',
+                eyebrow: 'Market Position',
+                lead: 'The investment case is built around analogue-era supercars, limited-production open V12 models and a buyer base that increasingly rewards originality.',
+                paragraphs: [
+                    'Late-1990s poster cars have moved from nostalgia buys into serious collectible territory, with the strongest examples showing resilience when specification and condition are clear.',
+                    'The VT Roadster benefits from a narrow supply pool, distinctive design language and the final pre-Audi Lamborghini character that collectors continue to separate from later cars.',
+                    'Comparable open V12 cars remain difficult to source in correct specification. That scarcity supports disciplined pricing and helps preserve liquidity when the vehicle is presented properly.',
+                    'The thesis is not based on short-term hype. It is based on a recognisable icon, a limited ownership base and a market that has become more selective about provenance.'
+                ],
+                conclusion:
+                    'The wider market supports a selective acquisition strategy focused on rare configuration, documented condition and realistic exit pricing.',
+                metrics: [
+                    { label: 'Production Era', value: 'Pre-Audi' },
+                    { label: 'Collector Theme', value: 'Analogue V12' },
+                    { label: 'Market Signal', value: 'Limited Supply' }
+                ]
+            },
+            netReturns: {
+                label: 'Net Returns & What It Means For You',
+                eyebrow: 'Return Profile',
+                lead: 'Projected returns are illustrative, but the syndicate structure is designed to make the ownership economics transparent before members commit funds.',
+                paragraphs: [
+                    'Each allocation tracks a defined portion of the vehicle economics, so members can understand their exposure without needing to purchase or manage the full asset.',
+                    'The forecast assumes disciplined acquisition, sensible holding costs and a realistic exit route. Costs, fees and projected proceeds should be reviewed together, not in isolation.',
+                    'A single allocation provides access to the upside case while limiting capital outlay compared with sole ownership. It also spreads administration and custody responsibilities across the syndicate.',
+                    'Capital remains at risk, and future values can move down as well as up. The key question is whether the risk, hold period and potential return fit your portfolio.'
+                ],
+                conclusion:
+                    'Use the investment pack to review estimated fees, assumptions and downside scenarios before making an allocation decision.',
+                metrics: [
+                    { label: 'Allocation Cost', value: 'GBP 5,000' },
+                    { label: 'Forecast', value: 'Up to 18% CAGR' },
+                    { label: 'Hold Case', value: 'Medium Term' }
+                ]
+            }
+        },
         technicalData: [
             { icon: 'pi pi-cog', label: 'Engine', value: '5.7L V12' },
             { icon: 'pi pi-bolt', label: 'Power', value: '485 bhp' },
@@ -170,6 +229,7 @@ const allocationCount = ref(1)
 const isAllocationModalVisible = ref(false)
 const isClientReady = ref(false)
 const allocationRecoveryProgress = 0
+const activeAnalysisTab = ref<AnalysisTabKey>('thisCar')
 
 const formatCurrency = (value: number) => `GBP ${value.toLocaleString('en-GB')}`
 
@@ -180,6 +240,18 @@ const totalInvestment = computed(() => {
 
     return formatCurrency(allocationCount.value * syndicate.value.allocationCost)
 })
+
+const currentAnalysisTab = computed(() => {
+    if (!syndicate.value) {
+        return null
+    }
+
+    return syndicate.value.analysisTabs[activeAnalysisTab.value] || syndicate.value.analysisTabs.thisCar
+})
+
+const setActiveAnalysisTab = (key: string | number) => {
+    activeAnalysisTab.value = String(key) as AnalysisTabKey
+}
 
 const decreaseAllocation = () => {
     allocationCount.value = Math.max(1, allocationCount.value - 1)
@@ -326,10 +398,10 @@ useHead(() => ({
                                     class="rounded-full bg-tccGold px-4 py-2 text-[10px] font-bold uppercase tracking-[0.14em] text-tccDarkNavy">
                                     Photos
                                 </button>
-                                <button type="button"
+                                <!-- <button type="button"
                                     class="rounded-full px-4 py-2 text-[10px] font-bold uppercase tracking-[0.14em] text-white/45">
                                     Interactive 3D
-                                </button>
+                                </button> -->
                             </div>
                         </div>
 
@@ -533,27 +605,45 @@ useHead(() => ({
                         Analysis</h2>
                     <p class="mt-2 text-sm text-white/50">Everything you need to make an informed decision</p>
 
-                    <div class="mt-8 flex flex-wrap gap-3 border-b border-white/12">
-                        <button type="button"
-                            class="border-b-2 border-tccGold px-1 pb-4 text-[10px] font-black uppercase tracking-[0.22em] text-tccGold">
-                            This Car
-                        </button>
-                        <button type="button"
-                            class="px-1 pb-4 text-[10px] font-black uppercase tracking-[0.22em] text-white/40">
-                            Wider Market &amp; Investment Thesis
-                        </button>
-                        <button type="button"
-                            class="px-1 pb-4 text-[10px] font-black uppercase tracking-[0.22em] text-white/40">
-                            Net Returns &amp; What It Means For You
+                    <div class="mt-8 flex flex-wrap gap-x-5 gap-y-2 border-b border-white/12" role="tablist"
+                        aria-label="Investment analysis tabs">
+                        <button v-for="(tab, key) in syndicate.analysisTabs" :key="key" type="button" role="tab"
+                            :aria-selected="activeAnalysisTab === key" class="border-b-2 px-1 pb-4 text-left text-[10px] font-black uppercase tracking-[0.22em] transition-colors"
+                            :class="activeAnalysisTab === key
+                                ? 'border-tccGold text-tccGold'
+                                : 'border-transparent text-white/40 hover:border-white/20 hover:text-white/75'"
+                            @click="setActiveAnalysisTab(key)">
+                            {{ tab.label }}
                         </button>
                     </div>
 
-                    <div class="mt-8 max-w-4xl space-y-4 text-sm leading-relaxed text-white/62">
-                        <p class="font-bold text-white/80">Chassis No. #126642</p>
-                        <p v-for="paragraph in syndicate.analysis" :key="paragraph">{{ paragraph }}</p>
-                        <p class="font-bold text-white/85">
-                            Download the investment pack for full specification, market analysis and syndicate details.
-                        </p>
+                    <div v-if="currentAnalysisTab" class="mt-8 max-w-4xl">
+                        <div class="rounded-lg border border-white/10 bg-white/[0.035] p-5 sm:p-6">
+                            <p class="text-[10px] font-black uppercase tracking-[0.22em] text-tccGold">
+                                {{ currentAnalysisTab.eyebrow }}
+                            </p>
+                            <p class="mt-3 text-base font-bold leading-relaxed text-white/88">
+                                {{ currentAnalysisTab.lead }}
+                            </p>
+
+                            <div class="mt-5 grid gap-3 sm:grid-cols-3">
+                                <div v-for="metric in currentAnalysisTab.metrics" :key="`${activeAnalysisTab}-${metric.label}`"
+                                    class="rounded-md border border-white/10 bg-tccDeepBlack/45 p-4">
+                                    <span
+                                        class="block text-[9px] font-black uppercase tracking-[0.18em] text-white/38">
+                                        {{ metric.label }}
+                                    </span>
+                                    <strong class="mt-2 block text-sm font-black text-white">{{ metric.value }}</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 space-y-4 text-sm leading-relaxed text-white/64">
+                            <p v-for="paragraph in currentAnalysisTab.paragraphs" :key="`${activeAnalysisTab}-${paragraph}`">
+                                {{ paragraph }}
+                            </p>
+                            <p class="font-bold text-white/88">{{ currentAnalysisTab.conclusion }}</p>
+                        </div>
                     </div>
 
                     <button type="button"
@@ -667,7 +757,7 @@ useHead(() => ({
         </section>
 
         <ClientOnly>
-            <IncompleteAllocationModal :is-open-modal="isAllocationModalVisible" :title="syndicate.title"
+            <CitizenSyndicatesIncompleteAllocationModal :is-open-modal="isAllocationModalVisible" :title="syndicate.title"
                 :slots="allocationCount" :allocation-cost="syndicate.allocationCost"
                 :progress="allocationRecoveryProgress" @close="closeAllocationModal" @start-fresh="selectAllocationFlow"
                 @continue-existing="selectAllocationFlow" />
