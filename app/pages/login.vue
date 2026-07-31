@@ -111,55 +111,80 @@ const submitLogin = async () => {
                     <CitizenSharedActionNotice v-if="notice" :title="notice.title" :message="notice.message"
                         :tone="notice.tone" />
 
-                    <form class="space-y-6" @submit.prevent="submitLogin">
-                        <div class="space-y-4">
-                            <div class="space-y-1">
-                                <label for="email"
-                                    class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">Email
-                                    Address</label>
-                                <input id="email" v-model="email" type="email" required
-                                    placeholder="john.doe@example.com"
-                                    class="w-full rounded-lg border border-tccBorder px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-tccNavy">
+                    <ClientOnly>
+                        <form class="space-y-6" @submit.prevent="submitLogin">
+                            <div class="space-y-4">
+                                <div class="space-y-1">
+                                    <label for="email"
+                                        class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">Email
+                                        Address</label>
+                                    <input id="email" v-model="email" type="email" required
+                                        placeholder="john.doe@example.com"
+                                        class="w-full rounded-lg border border-tccBorder px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-tccNavy">
+                                </div>
+
+                                <div class="space-y-1">
+                                    <div class="flex items-center justify-between">
+                                        <label for="password"
+                                            class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">Password</label>
+                                        <a :href="forgotPasswordUrl"
+                                            class="text-[11px] font-semibold text-tccGold transition-colors hover:text-tccLightGold">
+                                            Forgot Password?
+                                        </a>
+                                    </div>
+                                    <div class="relative">
+                                        <input id="password" v-model="password"
+                                            :type="showPassword ? 'text' : 'password'" required placeholder="Password"
+                                            class="w-full rounded-lg border border-tccBorder px-4 py-2.5 pr-10 text-sm focus:outline-none focus:ring-1 focus:ring-tccNavy">
+                                        <button type="button"
+                                            class="absolute inset-y-0 right-3 flex items-center text-gray-400 transition-colors hover:text-tccNavy"
+                                            :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                                            @click="showPassword = !showPassword">
+                                            <i class="pi" :class="showPassword ? 'pi-eye' : 'pi-eye-slash'"
+                                                aria-hidden="true" />
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="space-y-1">
-                                <div class="flex items-center justify-between">
-                                    <label for="password"
-                                        class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">Password</label>
-                                    <a :href="forgotPasswordUrl"
-                                        class="text-[11px] font-semibold text-tccGold transition-colors hover:text-tccLightGold">
-                                        Forgot Password?
-                                    </a>
+                            <button type="submit"
+                                class="w-full rounded-lg bg-tccDarkNavy py-3.5 text-center font-poppins text-xs font-bold uppercase tracking-widest text-white shadow-lg transition-colors hover:bg-tccNavy disabled:cursor-not-allowed disabled:opacity-70"
+                                :disabled="isSubmitting">
+                                <span v-if="isSubmitting">Signing In...</span>
+                                <span v-else>Sign In &rarr;</span>
+                            </button>
+
+                            <p class="pt-2 text-center text-xs font-light text-gray-500">
+                                Don't have an account?
+                                <a href="/register"
+                                    class="ml-1 font-bold uppercase text-tccGold transition-colors hover:text-tccLightGold">Register
+                                    Now</a>
+                            </p>
+                        </form>
+
+                        <template #fallback>
+                            <div class="space-y-6" aria-busy="true">
+                                <div class="space-y-4">
+                                    <div class="space-y-2">
+                                        <div class="h-3 w-28 animate-pulse rounded-full bg-white/10" />
+                                        <div
+                                            class="h-[42px] w-full animate-pulse rounded-lg border border-white/10 bg-white/10" />
+                                    </div>
+                                    <div class="space-y-2">
+                                        <div class="flex items-center justify-between">
+                                            <div class="h-3 w-20 animate-pulse rounded-full bg-white/10" />
+                                            <div class="h-3 w-24 animate-pulse rounded-full bg-white/10" />
+                                        </div>
+                                        <div
+                                            class="h-[42px] w-full animate-pulse rounded-lg border border-white/10 bg-white/10" />
+                                    </div>
                                 </div>
-                                <div class="relative">
-                                    <input id="password" v-model="password" :type="showPassword ? 'text' : 'password'"
-                                        required placeholder="Password"
-                                        class="w-full rounded-lg border border-tccBorder px-4 py-2.5 pr-10 text-sm focus:outline-none focus:ring-1 focus:ring-tccNavy">
-                                    <button type="button"
-                                        class="absolute inset-y-0 right-3 flex items-center text-gray-400 transition-colors hover:text-tccNavy"
-                                        :aria-label="showPassword ? 'Hide password' : 'Show password'"
-                                        @click="showPassword = !showPassword">
-                                        <i class="pi" :class="showPassword ? 'pi-eye' : 'pi-eye-slash'"
-                                            aria-hidden="true" />
-                                    </button>
-                                </div>
+                                <div
+                                    class="h-[46px] w-full animate-pulse rounded-lg border border-white/10 bg-white/10" />
+                                <div class="mx-auto h-3 w-48 animate-pulse rounded-full bg-white/10" />
                             </div>
-                        </div>
-
-                        <button type="submit"
-                            class="w-full rounded-lg bg-tccDarkNavy py-3.5 text-center font-poppins text-xs font-bold uppercase tracking-widest text-white shadow-lg transition-colors hover:bg-tccNavy disabled:cursor-not-allowed disabled:opacity-70"
-                            :disabled="isSubmitting">
-                            <span v-if="isSubmitting">Signing In...</span>
-                            <span v-else>Sign In &rarr;</span>
-                        </button>
-
-                        <p class="pt-2 text-center text-xs font-light text-gray-500">
-                            Don't have an account?
-                            <a href="/register"
-                                class="ml-1 font-bold uppercase text-tccGold transition-colors hover:text-tccLightGold">Register
-                                Now</a>
-                        </p>
-                    </form>
+                        </template>
+                    </ClientOnly>
                 </div>
             </section>
         </div>

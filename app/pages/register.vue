@@ -346,7 +346,8 @@ const resendOtp = async () => {
                     <CitizenSharedActionNotice v-if="notice" :title="notice.title" :message="notice.message"
                         :tone="notice.tone" />
 
-                    <form class="space-y-6" @submit.prevent>
+                    <ClientOnly>
+                        <form class="space-y-6" @submit.prevent>
                         <div v-show="currentStep === 1" class="space-y-6">
                             <div class="space-y-2 text-center lg:text-left">
                                 <span class="font-poppins text-xs font-bold uppercase tracking-widest text-tccGold">{{
@@ -548,7 +549,29 @@ const resendOtp = async () => {
                                 class="ml-1 font-bold uppercase text-tccGold transition-colors hover:text-tccNavy">Log
                                 In</a>
                         </p>
-                    </form>
+                        </form>
+
+                        <template #fallback>
+                            <div class="space-y-6" aria-busy="true">
+                                <div class="space-y-2 text-center lg:text-left">
+                                    <div class="mx-auto h-3 w-32 animate-pulse rounded-full bg-white/10 lg:mx-0" />
+                                    <div class="mx-auto h-8 w-56 animate-pulse rounded-lg bg-white/10 lg:mx-0" />
+                                    <div
+                                        class="mx-auto h-3 w-full max-w-xs animate-pulse rounded-full bg-white/10 lg:mx-0" />
+                                </div>
+
+                                <div class="space-y-2">
+                                    <div class="h-3 w-28 animate-pulse rounded-full bg-white/10" />
+                                    <div
+                                        class="h-[42px] w-full animate-pulse rounded-lg border border-white/10 bg-white/10" />
+                                </div>
+
+                                <div
+                                    class="h-[46px] w-full animate-pulse rounded-lg border border-white/10 bg-white/10" />
+                                <div class="mx-auto h-3 w-44 animate-pulse rounded-full bg-white/10" />
+                            </div>
+                        </template>
+                    </ClientOnly>
                 </div>
             </section>
         </div>
