@@ -2,8 +2,10 @@
 const isMobileMenuOpen = ref(false)
 const openChildMenuLabel = ref<string | null>(null)
 const desktopNavRef = ref<HTMLElement | null>(null)
+const profileMenuRef = ref<HTMLElement | null>(null)
+const isProfileMenuOpen = ref(false)
 const route = useRoute()
-const { citizen_user, isCitizenLoggedIn } = citizenAuth()
+const { citizen_user, isCitizenLoggedIn, isLoadingLogout, logout } = citizenAuth()
 const currentUser = computed(() => getCitizenUserData(citizen_user.value))
 const profilePhoto = computed(() => currentUser.value?.user_info?.photo || currentUser.value?.photo || '/assets/images/user-placeholder.svg')
 const profileAlt = computed(() => {
@@ -12,6 +14,7 @@ const profileAlt = computed(() => {
     const fullName = `${firstName} ${lastName}`.trim()
     return fullName || 'Profile'
 })
+const needsOnboarding = computed(() => Boolean(isCitizenLoggedIn.value && getCustomerOnboardingRoute(citizen_user.value)))
 
 type NavLink = {
     label: string
@@ -40,6 +43,7 @@ const navLinks: NavLink[] = [
 const closeMobileMenu = () => {
     isMobileMenuOpen.value = false
     closeChildMenu()
+    closeProfileMenu()
 }
 
 const hasChildMenu = (link: NavLink) => Boolean(link.child?.length)
@@ -60,6 +64,22 @@ const closeChildMenu = () => {
     openChildMenuLabel.value = null
 }
 
+const toggleProfileMenu = () => {
+    if (!needsOnboarding.value) return
+    isProfileMenuOpen.value = !isProfileMenuOpen.value
+    closeChildMenu()
+}
+
+const closeProfileMenu = () => {
+    isProfileMenuOpen.value = false
+}
+
+const handleLogout = async () => {
+    closeProfileMenu()
+    closeMobileMenu()
+    await logout()
+}
+
 const isActive = (activePaths?: string[]) => Boolean(activePaths?.includes(route.path))
 
 const isLinkActive = (link: NavLink): boolean => {
@@ -70,12 +90,16 @@ const handleDocumentClick = (event: MouseEvent) => {
     if (!desktopNavRef.value?.contains(event.target as Node)) {
         closeChildMenu()
     }
+    if (!profileMenuRef.value?.contains(event.target as Node)) {
+        closeProfileMenu()
+    }
 }
 
 watch(
     () => route.path,
     () => {
         closeMobileMenu()
+        closeProfileMenu()
     }
 )
 
@@ -139,10 +163,31 @@ onBeforeUnmount(() => {
             </div>
 
             <div class="hidden items-center space-x-3 xl:flex">
-                <a v-if="isCitizenLoggedIn" href="/profile" class="group relative" aria-label="Profile">
-                    <img :src="profilePhoto" :alt="profileAlt"
-                        class="h-8 w-8 rounded-full border border-white/30 transition-colors duration-300 group-hover:border-tccGold">
-                </a>
+                <div v-if="isCitizenLoggedIn" ref="profileMenuRef" class="relative">
+                    <button v-if="needsOnboarding" type="button" class="group relative block"
+                        :aria-expanded="isProfileMenuOpen" aria-controls="profile-menu" aria-label="Open profile menu"
+                        @click.stop="toggleProfileMenu">
+                        <img :src="profilePhoto" :alt="profileAlt"
+                            class="h-8 w-8 rounded-full border border-white/30 transition-colors duration-300 group-hover:border-tccGold">
+                    </button>
+                    <a v-else href="/profile" class="group relative block" aria-label="Profile">
+                        <img :src="profilePhoto" :alt="profileAlt"
+                            class="h-8 w-8 rounded-full border border-white/30 transition-colors duration-300 group-hover:border-tccGold">
+                    </a>
+
+                    <div v-show="needsOnboarding && isProfileMenuOpen" id="profile-menu"
+                        class="absolute right-0 top-full z-[100] w-44 pt-4" @click.stop>
+                        <div
+                            class="overflow-hidden rounded-[1rem] border border-tccGold/25 bg-[#050403] py-1.5 shadow-[0_24px_80px_rgba(0,0,0,0.75)] ring-1 ring-white/10">
+                            <button type="button"
+                                class="flex w-full items-center gap-3 px-4 py-3 text-left font-poppins text-xs font-semibold uppercase tracking-[0.14em] text-red-300 transition-colors hover:bg-red-500/10 hover:text-red-200 disabled:cursor-not-allowed disabled:opacity-60"
+                                :disabled="isLoadingLogout" @click="handleLogout">
+                                <i class="pi pi-sign-out text-xs" aria-hidden="true" />
+                                <span>{{ isLoadingLogout ? 'Logging Out...' : 'Logout' }}</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
                 <template v-else>
                     <a href="/login"
                         class="rounded-full border border-white/20 px-5 py-2.5 font-poppins text-[11px] font-bold uppercase tracking-[0.18em] text-white transition-all duration-300 hover:border-tccGold hover:text-tccGold">
@@ -190,7 +235,13 @@ onBeforeUnmount(() => {
                     </a>
                 </template>
                 <div class="border-t border-white/10 pt-3">
-                    <a v-if="isCitizenLoggedIn" href="/profile"
+                    <button v-if="isCitizenLoggedIn && needsOnboarding" type="button"
+                        class="flex w-full items-center justify-center gap-2 rounded bg-red-500/10 px-4 py-2 text-center font-poppins text-sm font-semibold text-red-300 transition-colors hover:bg-red-500/15 hover:text-red-200 disabled:cursor-not-allowed disabled:opacity-60"
+                        :disabled="isLoadingLogout" @click="handleLogout">
+                        <i class="pi pi-sign-out text-xs" aria-hidden="true" />
+                        {{ isLoadingLogout ? 'Logging Out...' : 'Logout' }}
+                    </button>
+                    <a v-else-if="isCitizenLoggedIn" href="/profile"
                         class="flex w-full items-center justify-center gap-2 rounded bg-tccGold px-4 py-2 text-center font-poppins text-sm font-semibold text-tccDarkNavy transition-colors hover:bg-tccLightGold"
                         @click="closeMobileMenu">
                         <img :src="profilePhoto" :alt="profileAlt" class="h-6 w-6 rounded-full">

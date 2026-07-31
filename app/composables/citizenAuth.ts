@@ -51,12 +51,16 @@ export const citizenAuth = () => {
 
     async function logout() {
         isLoadingLogout.value = true;
-        if (!isCitizenLoggedIn.value) return;
-        await $fetchCitizen(LOGOUT, { method: 'POST' });
-        citizen_user.value = null;
-        cookie.value = null;
-        isLoadingLogout.value = false;
-        await router.push('/');
+        try {
+            if (isCitizenLoggedIn.value) {
+                await $fetchCitizen(LOGOUT, { method: 'POST' });
+            }
+        } finally {
+            citizen_user.value = null;
+            cookie.value = null;
+            isLoadingLogout.value = false;
+            await router.push('/');
+        }
     }
 
     return {
