@@ -19,13 +19,6 @@ type QuizQuestion = {
     prompt: string
     options: QuizOption[]
 }
-type QuestionAnswerPayload = {
-    question_id: string
-    selected_option: string
-}
-type QuestionnaireSubmitPayload = {
-    answers: QuestionAnswerPayload[]
-}
 type QuestionnaireSubmitResponse = {
     is_passed: boolean
     title: string
@@ -36,10 +29,15 @@ type QuestionnaireSubmitResponse = {
 const route = useRoute()
 const stage = ref<Stage>(route.query.stage === 'quiz' ? 'quiz' : 'facts')
 const currentStep = ref(1)
+const isLoadingQuestions = ref(route.query.stage === 'quiz')
 const isSubmittingQuestionnaire = ref(false)
 const notice = ref<{ title: string, message: string, tone: NoticeTone } | null>(null)
 const answers = reactive<Record<string, string>>({})
 const finalResult = ref<QuestionnaireSubmitResponse | null>(null)
+const questions = ref<QuizQuestion[]>([])
+const quizType = ref('')
+const citizen_user = citizenUser()
+const { onboardingQuizQuestions, submitOnboardingQuiz } = citizenAuth()
 
 const keyFacts = [
     {
@@ -60,52 +58,6 @@ const keyFacts = [
     }
 ]
 
-const questions = ref<QuizQuestion[]>([
-    {
-        id: 'q1',
-        prompt: 'What does it mean to have a syndicate slot which is the single beneficiary of a Trust?',
-        options: [
-            { value: 'a', label: 'You hold ownership of a share in a syndicate enabling you and other members to decide on the day-to-day control of the asset held in the Trust.' },
-            { value: 'b', label: "You are part of a syndicate but don't have any say in what happens to the Trust." },
-            { value: 'c', label: 'It is like a traditional debt loan where you will receive fixed interest payments.' }
-        ]
-    },
-    {
-        id: 'q2',
-        prompt: 'What can happen to the value of the vehicle asset held by the Trust?',
-        options: [
-            { value: 'a', label: 'The value of classic automotive assets is guaranteed to rise in all conditions.' },
-            { value: 'b', label: 'The value of the assets can go down as well as up, exposing capital to risk.' },
-            { value: 'c', label: 'The valuation stays static for the entire duration of the syndicate.' }
-        ]
-    },
-    {
-        id: 'q3',
-        prompt: 'What involvement does TheCarCrowd Limited have with the Syndicate?',
-        options: [
-            { value: 'a', label: 'TheCarCrowd Limited acts as a commercial lender with discretion over asset purchases.' },
-            { value: 'b', label: 'TheCarCrowd Limited manages marketing but has no role in trust operations.' },
-            { value: 'c', label: 'TheCarCrowd Limited operates as the Trustee, executing operational decisions as voted by syndicate members. TCC may also own fractional slots.' }
-        ]
-    },
-    {
-        id: 'q4',
-        prompt: 'What independent oversight does Legal Alternative provide?',
-        options: [
-            { value: 'a', label: 'Legal Alternative regulates all crowdfunding sites within UK jurisdictions.' },
-            { value: 'b', label: 'Legal Alternative is a second signatory for transactions, ensuring operations are performed in the interests of syndicate beneficiaries.' },
-            { value: 'c', label: 'Legal Alternative holds custody of vehicle titles in a physical safety vault.' }
-        ]
-    }
-])
-
-const mockAnswerKey: Record<string, string> = {
-    q1: 'a',
-    q2: 'b',
-    q3: 'c',
-    q4: 'b'
-}
-
 const activeQuestion = computed(() => {
     const index = Math.max(0, Math.min(currentStep.value - 1, questions.value.length - 1))
     return questions.value[index] ?? {
@@ -117,21 +69,67 @@ const activeQuestion = computed(() => {
 const totalQuestions = computed(() => questions.value.length)
 const progress = computed(() => totalQuestions.value ? `${(currentStep.value / totalQuestions.value) * 100}%` : '0%')
 const primaryActionLabel = computed(() => {
+    if (isLoadingQuestions.value) return 'Loading...'
     if (isSubmittingQuestionnaire.value) return 'Submitting...'
     return currentStep.value === totalQuestions.value ? 'Submit Questionnaire' : 'Continue'
 })
 
-// Replace this adapter with the final submit API later; correctness is checked only after all answers are sent.
-const submitQuestionnaireAnswers = async (payload: QuestionnaireSubmitPayload): Promise<QuestionnaireSubmitResponse> => {
-    const reviewAnswer = payload.answers.find((answer) => mockAnswerKey[answer.question_id] !== answer.selected_option)
+const getErrorMessage = (error: any, fallback: string) => (
+    error?.response?._data?.message ||
+    error?.data?.message ||
+    fallback
+)
 
-    return {
-        is_passed: !reviewAnswer,
-        title: reviewAnswer ? 'Questionnaire Review Required' : 'Suitability Verified Successfully',
-        message: reviewAnswer
-            ? 'Your submitted answers did not pass the suitability check. Please review your answers and submit again.'
-            : 'Your answers have been submitted successfully.',
-        review_question_id: reviewAnswer?.question_id
+const refreshCitizenUser = async () => {
+    const refreshedUser = await fetchCitizenCurrentUser()
+    if (refreshedUser) {
+        citizen_user.value = refreshedUser
+    }
+}
+
+const normalizeQuizQuestions = (response: any): QuizQuestion[] => {
+    quizType.value = response?.data?.quiz_type || ''
+    const apiQuestions = Array.isArray(response?.data?.questions) ? response.data.questions : []
+
+    return apiQuestions.map((question: any, index: number) => ({
+        id: String(question?.question_id || question?.id || `question${index + 1}`),
+        prompt: question?.question_text || question?.title || '',
+        options: Array.isArray(question?.options)
+            ? question.options.map((option: any) => ({
+                value: String(option?.key || option?.value || option?.id || ''),
+                label: option?.text || option?.label || option?.title || '',
+            })).filter((option: QuizOption) => option.value && option.label)
+            : []
+    }))
+}
+
+const loadQuizQuestions = async () => {
+    isLoadingQuestions.value = true
+    notice.value = null
+
+    try {
+        const response: any = await onboardingQuizQuestions()
+        const normalizedQuestions = normalizeQuizQuestions(response)
+
+        questions.value = normalizedQuestions
+        currentStep.value = 1
+
+        if (!normalizedQuestions.length) {
+            notice.value = {
+                title: 'No Questions Available',
+                message: response?.message || 'No questionnaire questions were returned.',
+                tone: 'warning'
+            }
+        }
+    } catch (error: any) {
+        questions.value = []
+        notice.value = {
+            title: 'Unable To Load Questions',
+            message: getErrorMessage(error, 'Quiz questions could not be loaded.'),
+            tone: 'error'
+        }
+    } finally {
+        isLoadingQuestions.value = false
     }
 }
 
@@ -144,9 +142,10 @@ const resetQuizState = () => {
     finalResult.value = null
 }
 
-const startQuiz = () => {
+const startQuiz = async () => {
     resetQuizState()
     stage.value = 'quiz'
+    await loadQuizQuestions()
 }
 
 const previousQuestion = () => {
@@ -179,15 +178,29 @@ const getOptionClasses = (optionValue: string) => {
     return 'border-tccNavy bg-tccLightBg'
 }
 
-const buildQuestionnairePayload = (): QuestionnaireSubmitPayload => ({
-    answers: questions.value.map((question) => ({
-        question_id: question.id,
-        selected_option: answers[question.id] as string
-    }))
-})
+const buildQuestionnairePayload = () => {
+    const payload: Record<string, string> = {
+        quiz_type: quizType.value
+    }
+
+    questions.value.forEach((question, index) => {
+        payload[`question${index + 1}`] = answers[question.id] as string
+    })
+
+    return payload
+}
 
 const handlePrimaryAction = async () => {
     const question = activeQuestion.value
+
+    if (!questions.value.length) {
+        notice.value = {
+            title: 'No Questions Available',
+            message: 'Please try loading the questionnaire again.',
+            tone: 'warning'
+        }
+        return
+    }
 
     if (!question || !answers[question.id]) {
         notice.value = {
@@ -220,44 +233,43 @@ const handlePrimaryAction = async () => {
 
     try {
         const payload = buildQuestionnairePayload()
+        const response: any = await submitOnboardingQuiz(payload)
+        const isSuccessfulResponse = response?.status === true || response?.success === true
 
-        console.log('[Questionnaire] submit questionnaire', payload)
-
-        const response = await submitQuestionnaireAnswers(payload)
-
-        console.log('[Questionnaire] submit response', response)
-
-        finalResult.value = response
-
-        if (response.is_passed) {
-            stage.value = 'success'
-            notice.value = null
+        if (!isSuccessfulResponse) {
+            notice.value = {
+                title: response?.data?.title || 'Questionnaire Review Required',
+                message: response?.message || 'Your submitted answers did not pass the suitability check.',
+                tone: 'error'
+            }
             return
         }
 
-        if (response.review_question_id) {
-            const reviewQuestionIndex = questions.value.findIndex((quizQuestion) => quizQuestion.id === response.review_question_id)
-
-            if (reviewQuestionIndex !== -1) {
-                currentStep.value = reviewQuestionIndex + 1
-            }
+        finalResult.value = {
+            is_passed: true,
+            title: response?.data?.title || 'Suitability Verified Successfully',
+            message: response?.message || 'Your answers have been submitted successfully.',
         }
 
-        notice.value = {
-            title: response.title,
-            message: response.message,
-            tone: 'error'
-        }
-    } catch {
+        await refreshCitizenUser()
+        stage.value = 'success'
+        notice.value = null
+    } catch (error: any) {
         notice.value = {
             title: 'Unable To Submit',
-            message: 'Please try submitting the questionnaire again.',
+            message: getErrorMessage(error, 'Please try submitting the questionnaire again.'),
             tone: 'error'
         }
     } finally {
         isSubmittingQuestionnaire.value = false
     }
 }
+
+onMounted(() => {
+    if (route.query.stage === 'quiz') {
+        void startQuiz()
+    }
+})
 </script>
 
 <template>
@@ -319,7 +331,20 @@ const handlePrimaryAction = async () => {
                 <CitizenSharedActionNotice v-if="notice" :title="notice.title" :message="notice.message"
                     :tone="notice.tone" />
 
-                <div class="space-y-4">
+                <div v-if="isLoadingQuestions" class="space-y-4" aria-busy="true">
+                    <div class="h-5 w-4/5 animate-pulse rounded-full bg-gray-200" />
+                    <div class="space-y-3">
+                        <div v-for="index in 3" :key="index"
+                            class="h-14 animate-pulse rounded-lg border border-tccBorder bg-stone-50" />
+                    </div>
+                </div>
+
+                <div v-else-if="!questions.length"
+                    class="rounded-lg border border-tccBorder bg-stone-50 p-5 text-center text-sm text-tccMutedGray">
+                    No questionnaire questions are available right now.
+                </div>
+
+                <div v-else class="space-y-4">
                     <h2 class="font-poppins text-base font-semibold text-tccNavy">
                         {{ currentStep }}. {{ activeQuestion.prompt }}
                     </h2>
@@ -344,7 +369,7 @@ const handlePrimaryAction = async () => {
                     </button>
                     <button type="button"
                         class="rounded bg-tccGold px-6 py-2.5 font-poppins text-xs font-bold uppercase tracking-wider text-tccDarkNavy shadow transition-colors hover:bg-tccLightGold"
-                        :disabled="isSubmittingQuestionnaire" @click="handlePrimaryAction">
+                        :disabled="isLoadingQuestions || isSubmittingQuestionnaire" @click="handlePrimaryAction">
                         {{ primaryActionLabel }} <span aria-hidden="true">&rarr;</span>
                     </button>
                 </div>
