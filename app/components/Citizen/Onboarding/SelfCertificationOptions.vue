@@ -7,7 +7,6 @@ type SelfCertificationOption = {
     letter: string
     title: string
     description: string
-    statements: string[]
 }
 type SelfCertificationQuestionResponse = {
     question_id: string
@@ -65,10 +64,6 @@ const mockSelfCertificationQuestion: SelfCertificationQuestionResponse = {
             letter: 'A',
             title: 'High Net Worth Investor',
             description: 'You believe you are a High Net Worth investor because at least one of the below statements is most applicable to you',
-            statements: [
-                'You have an annual income of £100,000 or more',
-                'You have net assets of £250,000 or more (Net assets do NOT include: your primary residence, your pension or any pension withdrawals)'
-            ]
         },
         {
             id: 'sophisticated',
@@ -76,12 +71,6 @@ const mockSelfCertificationQuestion: SelfCertificationQuestionResponse = {
             letter: 'B',
             title: 'Self Certified Sophisticated Investor',
             description: 'You believe you are a Sophisticated Investor because at least one of the below statements is most applicable to you',
-            statements: [
-                'You have worked in Private Equity or in the provision of financial service for SMEs',
-                'You have been the director of a company with an annual turnover of at least £1 million',
-                'Made two or more investments into unlisted companies in the last two years.',
-                'Been a member of a network or syndicate of business angels for more than 6 months'
-            ]
         },
         {
             id: 'ordinary',
@@ -89,7 +78,6 @@ const mockSelfCertificationQuestion: SelfCertificationQuestionResponse = {
             letter: 'C',
             title: 'Ordinary Investor',
             description: 'If the above statements do not apply to you or you are not sure which option best suits you please get in touch with the team.',
-            statements: []
         }
     ]
 }
@@ -309,17 +297,6 @@ onMounted(async () => {
                                     class="font-poppins text-base font-bold text-white transition-colors group-hover:text-tccGold">
                                     {{ option.title }}</h2>
                                 <p class="mt-1 text-sm leading-snug text-white/75">{{ option.description }}</p>
-
-                                <div v-if="option.statements.length" class="mt-3 space-y-2">
-                                    <div v-for="(statement, index) in option.statements" :key="statement"
-                                        class="flex items-start gap-3 text-sm leading-relaxed text-white/65">
-                                        <span
-                                            class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded border border-tccGold/40 bg-white/5 font-poppins text-[11px] font-bold text-tccGold">
-                                            {{ index + 1 }}
-                                        </span>
-                                        <span>{{ statement }}</span>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </button>
