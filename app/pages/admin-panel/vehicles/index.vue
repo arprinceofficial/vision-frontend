@@ -2,11 +2,27 @@
 import AddEdit from './components/AddEdit.vue';
 definePageMeta({ middleware: ['auth-admin'], layout: 'admin' });
 
-const { $optionsList } = useNuxtApp();
+const vehicleOptionsList = [
+    { name: 'All', value: '', key: '' },
+    { name: 'Inactive', value: '0', key: 'status' },
+    { name: 'Active', value: '1', key: 'status' },
+    { name: 'Retail', value: '2', key: 'status' },
+    { name: 'Basic', value: '3', key: 'status' },
+    { name: 'Regular', value: '4', key: 'status' },
+    { name: 'Upcoming', value: '5', key: 'status' },
+    { name: 'On Live', value: '6', key: 'status' },
+    { name: 'Trashed', value: 'only', key: 'trashed' },
+];
 
-const optionsList = $optionsList();
+const vehicleStatusMap = vehicleOptionsList.reduce((map, item) => {
+    if (item.key === 'status') {
+        map[item.value] = item.name;
+    }
+    return map;
+}, {});
+
 const route = useRoute();
-const status = ref(optionsList[0]);
+const status = ref(vehicleOptionsList[0]);
 const search = ref('');
 
 const paginationConfig = ref({
@@ -54,7 +70,12 @@ watch(() => route.query, (to) => {
     loadData();
 })
 
-const isActiveStatus = (value) => value == 1 || value === true;
+const isActiveStatus = (value) => value === true || (Number(value) > 0 && Number(value) <= 6);
+const getVehicleStatusName = (value) => {
+    if (value === true) return vehicleStatusMap['1'];
+    if (value === false) return vehicleStatusMap['0'];
+    return vehicleStatusMap[String(value)] || '';
+};
 
 const isOpenModal = ref(false);
 const item = ref({});
@@ -156,7 +177,7 @@ const onChangeHandler = () => {
                         </div>
                         <div class="flex items-center gap-3 w-full md:w-auto">
                             <label for="status" class="text-gray-800 dark:text-gray-200">Status</label>
-                            <Select v-model="status" :options="optionsList" optionLabel="name" @change="onChangeHandler"
+                            <Select v-model="status" :options="vehicleOptionsList" optionLabel="name" @change="onChangeHandler"
                                 placeholder="Select" class="w-full md:w-auto" />
                         </div>
                     </div>
@@ -268,10 +289,9 @@ const onChangeHandler = () => {
                                         </td>
                                         <td>
                                             <div class="flex justify-center items-center">
-                                                <span v-if="isActiveStatus(item.status)" class="text-green-600"><i
-                                                        class="fa fa-power-off" aria-hidden="true"></i></span>
-                                                <span v-else class="text-red-500"><i class="fa fa-power-off"
-                                                        aria-hidden="true"></i></span>
+                                                <span :class="isActiveStatus(item.status) ? 'text-green-600' : 'text-red-500'">
+                                                    {{ getVehicleStatusName(item.status) }}
+                                                </span>
                                             </div>
                                         </td>
                                         <td v-if="permissions.edit || permissions.delete">
