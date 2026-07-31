@@ -4,6 +4,8 @@ const OTP_VERIFY = '/v1/customer/otp-verify';
 const OTP_RESEND = '/v1/customer/otp-resend';
 const LOGOUT = '/v1/customer/logout';
 const CURRENT_USER = '/v1/customer/user';
+const ONBOARDING_QUIZ_QUESTIONS = '/v1/customer/onboarding/quiz/questions';
+const ONBOARDING_CERTIFICATION = '/v1/customer/onboarding/certification';
 
 export const citizenUser = () => {
     return useState('citizen_user', () => undefined);
@@ -49,6 +51,24 @@ export const citizenAuth = () => {
         });
     }
 
+    async function onboardingQuizQuestions(payload: any = {}) {
+        const { step, ...body } = payload || {};
+        const hasBody = Object.keys(body).length > 0;
+
+        return await $fetchCitizen(ONBOARDING_QUIZ_QUESTIONS, {
+            method: 'POST',
+            query: step ? { step } : undefined,
+            body: hasBody ? body : undefined,
+        });
+    }
+
+    async function submitOnboardingCertification(payload: any) {
+        return await $fetchCitizen(ONBOARDING_CERTIFICATION, {
+            method: 'POST',
+            body: payload,
+        });
+    }
+
     async function logout() {
         isLoadingLogout.value = true;
         try {
@@ -71,6 +91,8 @@ export const citizenAuth = () => {
         register,
         otpVerify,
         otpResend,
+        onboardingQuizQuestions,
+        submitOnboardingCertification,
         logout,
     };
 };
