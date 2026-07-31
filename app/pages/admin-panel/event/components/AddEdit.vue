@@ -32,6 +32,7 @@ const formData = ref({
 const validations_errors = ref({ });
 const skip_validations = ref([
     'id',
+    'photo',
     'status',
 ]);
 

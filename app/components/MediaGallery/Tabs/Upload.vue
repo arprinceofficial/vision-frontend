@@ -3,6 +3,7 @@ const emit = defineEmits(['uploadSuccess']);
 
 const files = ref([]);
 const filePreviews = ref([]);
+const uploadInput = ref(null);
 const isDragging = ref(false);
 const content_title = ref('');
 const categoryId = ref(null);
@@ -42,9 +43,23 @@ onMounted(() => {
     loadCategories();
 });
 
+const clearSelectedFiles = () => {
+    filePreviews.value.forEach(p => URL.revokeObjectURL(p.url));
+    files.value = [];
+    filePreviews.value = [];
+    if (uploadInput.value) {
+        uploadInput.value.value = '';
+    }
+};
+
+onBeforeUnmount(() => {
+    clearSelectedFiles();
+});
+
 const handleFileSelect = (event) => {
     uploadError.value = '';
     processFiles(event.target.files);
+    event.target.value = '';
 };
 
 const handleDrop = (event) => {
@@ -67,6 +82,15 @@ const processFiles = (selectedFiles) => {
             url: URL.createObjectURL(file)
         }));
     }
+};
+
+const removeFile = (index) => {
+    const [preview] = filePreviews.value.splice(index, 1);
+    if (preview?.url) {
+        URL.revokeObjectURL(preview.url);
+    }
+    files.value.splice(index, 1);
+    uploadError.value = '';
 };
 
 const handleUpload = async () => {
@@ -108,8 +132,7 @@ const handleUpload = async () => {
         if (getData.status === true) {
             emit('uploadSuccess', getData.data);
             // Reset form
-            files.value = [];
-            filePreviews.value = [];
+            clearSelectedFiles();
             content_title.value = '';
             categoryId.value = null;
         } else {
@@ -138,7 +161,7 @@ const handleUpload = async () => {
         <label for="media_upload_files" class="block border-2 border-dashed rounded-xl p-8 text-center transition cursor-pointer"
             :class="isDragging ? 'border-sky-500 bg-sky-50 dark:bg-sky-900/20' : 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'"
             @dragover.prevent="isDragging = true" @dragleave.prevent="isDragging = false" @drop.prevent="handleDrop">
-            <input type="file" id="media_upload_files" multiple class="hidden" @change="handleFileSelect"
+            <input ref="uploadInput" type="file" id="media_upload_files" multiple class="hidden" @change="handleFileSelect"
                 accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml,image/bmp,video/mp4,video/avi,video/quicktime,video/x-ms-wmv,video/x-flv,video/webm" />
             <div class="flex flex-col items-center justify-center gap-3 pointer-events-none">
                 <i class="pi pi-cloud-upload text-4xl" :class="isDragging ? 'text-sky-600' : 'text-sky-500'"></i>
@@ -154,12 +177,19 @@ const handleUpload = async () => {
 
         <!-- Previews -->
         <div v-if="filePreviews.length > 0" class="flex flex-wrap gap-4">
-            <div v-for="(preview, index) in filePreviews" :key="index"
+            <div v-for="(preview, index) in filePreviews" :key="preview.url"
                 class="relative group w-24 h-24 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
                 <img v-if="preview.isImage" :src="preview.url" :alt="preview.name" class="w-full h-full object-cover" />
                 <video v-else-if="preview.isVideo" :src="preview.url" class="w-full h-full object-cover" muted loop
                     playsinline @mouseover="$event.target.play()" @mouseleave="$event.target.pause()"></video>
                 <div v-else class="text-xs text-center text-gray-500 break-all p-1">{{ preview.name }}</div>
+
+                <button type="button"
+                    class="absolute top-1.5 right-1.5 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-white shadow transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300 disabled:cursor-not-allowed disabled:opacity-60"
+                    :aria-label="`Delete ${preview.name}`" title="Delete file" :disabled="isUploading"
+                    @click.stop="removeFile(index)">
+                    <i class="pi pi-trash text-xs"></i>
+                </button>
 
                 <div
                     class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition flex flex-col justify-end p-2 pointer-events-none">

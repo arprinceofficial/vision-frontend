@@ -2,11 +2,11 @@
 const AddEdit = defineAsyncComponent(() => import('./components/AddEdit.vue'));
 definePageMeta({ middleware: ['auth-admin'], layout: 'admin' });
 
-const { $optionsListAcIn } = useNuxtApp();
+const { $optionsList } = useNuxtApp();
 
-const optionsListAcIn = $optionsListAcIn();
+const optionsList = $optionsList();
 const route = useRoute();
-const status = ref(optionsListAcIn[0]);
+const status = ref(optionsList[0]);
 const search = ref('');
 
 const paginationConfig = ref({
@@ -157,7 +157,7 @@ const onChangeHandler = () => {
                         </div>
                         <div class="flex items-center gap-3 w-full md:w-auto">
                             <label for="status" class="text-gray-800 dark:text-gray-200">Status</label>
-                            <Select v-model="status" :options="optionsListAcIn" optionLabel="name" @change="onChangeHandler"
+                            <Select v-model="status" :options="optionsList" optionLabel="name" @change="onChangeHandler"
                                 placeholder="Select" class="w-full md:w-auto" />
                         </div>
                     </div>
