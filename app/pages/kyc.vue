@@ -25,25 +25,33 @@ const form = reactive({
 
 const notice = ref<{ title: string, message: string, tone: NoticeTone } | null>(null)
 const fileName = ref('')
+const documentFile = ref<File | null>(null)
 const errors = ref<Set<string>>(new Set())
-
-const fields = [
-    { key: 'firstName', label: 'First Name', placeholder: 'John', type: 'text' },
-    { key: 'lastName', label: 'Last Name', placeholder: 'Doe', type: 'text' },
-    { key: 'dob', label: 'Date of Birth', placeholder: 'DD/MM/YYYY', type: 'text' },
-    { key: 'buildingNo', label: 'Building Name or Number', placeholder: 'e.g. Flat 3A or House 12', type: 'text' },
-    { key: 'addressLine', label: 'Address Line', placeholder: 'e.g. Northgate Business Centre', type: 'text' },
-    { key: 'town', label: 'Town / City', placeholder: 'e.g. Newark', type: 'text' },
-    { key: 'postcode', label: 'Postcode', placeholder: 'e.g. NG24 1EZ', type: 'text' }
-] as const
 
 const hasError = (key: string) => errors.value.has(key)
 
 const handleFile = (event: Event) => {
     const input = event.target as HTMLInputElement
-    fileName.value = input.files?.[0]?.name || ''
+    documentFile.value = input.files?.[0] || null
+    fileName.value = documentFile.value?.name || ''
     errors.value.delete('documentFile')
 }
+
+const getKycPayload = () => ({
+    first_name: form.firstName.trim(),
+    last_name: form.lastName.trim(),
+    dob: form.dob.trim(),
+    gender: form.gender,
+    country: form.country,
+    building_no: form.buildingNo.trim(),
+    address_line: form.addressLine.trim(),
+    town: form.town.trim(),
+    postcode: form.postcode.trim(),
+    document_type: form.documentType,
+    document_file: documentFile.value,
+})
+
+const kycPayload = ref<ReturnType<typeof getKycPayload> | null>(null)
 
 const skipKyc = () => {
     notice.value = {
@@ -77,6 +85,8 @@ const submitKyc = () => {
         return
     }
 
+    kycPayload.value = getKycPayload()
+
     notice.value = {
         title: 'Identity Verified',
         message: 'Your mock AML database checks returned successfully. Redirecting to the dashboard.',
@@ -98,12 +108,31 @@ const submitKyc = () => {
                 :tone="notice.tone" />
 
             <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <div v-for="field in fields.slice(0, 3)" :key="field.key" class="space-y-1">
-                    <label :for="field.key" class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">{{
-                        field.label }}</label>
-                    <input :id="field.key" v-model="form[field.key]" :type="field.type" :placeholder="field.placeholder"
+                <div class="space-y-1">
+                    <label for="firstName" class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">
+                        First Name
+                    </label>
+                    <input id="firstName" v-model="form.firstName" type="text" placeholder="John"
                         class="w-full rounded-lg border px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-tccNavy"
-                        :class="hasError(field.key) ? 'border-red-400 bg-red-50' : 'border-tccBorder'">
+                        :class="hasError('firstName') ? 'border-red-400 bg-red-50' : 'border-tccBorder'">
+                </div>
+
+                <div class="space-y-1">
+                    <label for="lastName" class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">
+                        Last Name
+                    </label>
+                    <input id="lastName" v-model="form.lastName" type="text" placeholder="Doe"
+                        class="w-full rounded-lg border px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-tccNavy"
+                        :class="hasError('lastName') ? 'border-red-400 bg-red-50' : 'border-tccBorder'">
+                </div>
+
+                <div class="space-y-1">
+                    <label for="dob" class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">
+                        Date of Birth
+                    </label>
+                    <input id="dob" v-model="form.dob" type="text" placeholder="DD/MM/YYYY"
+                        class="w-full rounded-lg border px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-tccNavy"
+                        :class="hasError('dob') ? 'border-red-400 bg-red-50' : 'border-tccBorder'">
                 </div>
 
                 <div class="space-y-1">
@@ -133,12 +162,41 @@ const submitKyc = () => {
                     </select>
                 </div>
 
-                <div v-for="field in fields.slice(3)" :key="field.key" class="space-y-1">
-                    <label :for="field.key" class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">{{
-                        field.label }}</label>
-                    <input :id="field.key" v-model="form[field.key]" :type="field.type" :placeholder="field.placeholder"
+                <div class="space-y-1">
+                    <label for="buildingNo" class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">
+                        Building Name or Number
+                    </label>
+                    <input id="buildingNo" v-model="form.buildingNo" type="text" placeholder="e.g. Flat 3A or House 12"
                         class="w-full rounded-lg border px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-tccNavy"
-                        :class="hasError(field.key) ? 'border-red-400 bg-red-50' : 'border-tccBorder'">
+                        :class="hasError('buildingNo') ? 'border-red-400 bg-red-50' : 'border-tccBorder'">
+                </div>
+
+                <div class="space-y-1">
+                    <label for="addressLine" class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">
+                        Address Line
+                    </label>
+                    <input id="addressLine" v-model="form.addressLine" type="text"
+                        placeholder="e.g. Northgate Business Centre"
+                        class="w-full rounded-lg border px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-tccNavy"
+                        :class="hasError('addressLine') ? 'border-red-400 bg-red-50' : 'border-tccBorder'">
+                </div>
+
+                <div class="space-y-1">
+                    <label for="town" class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">
+                        Town / City
+                    </label>
+                    <input id="town" v-model="form.town" type="text" placeholder="e.g. Newark"
+                        class="w-full rounded-lg border px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-tccNavy"
+                        :class="hasError('town') ? 'border-red-400 bg-red-50' : 'border-tccBorder'">
+                </div>
+
+                <div class="space-y-1">
+                    <label for="postcode" class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">
+                        Postcode
+                    </label>
+                    <input id="postcode" v-model="form.postcode" type="text" placeholder="e.g. NG24 1EZ"
+                        class="w-full rounded-lg border px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-tccNavy"
+                        :class="hasError('postcode') ? 'border-red-400 bg-red-50' : 'border-tccBorder'">
                 </div>
 
                 <div class="space-y-1">
