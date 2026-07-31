@@ -3,6 +3,15 @@ const isMobileMenuOpen = ref(false)
 const openChildMenuLabel = ref<string | null>(null)
 const desktopNavRef = ref<HTMLElement | null>(null)
 const route = useRoute()
+const { citizen_user, isCitizenLoggedIn } = citizenAuth()
+const currentUser = computed(() => getCitizenUserData(citizen_user.value))
+const profilePhoto = computed(() => currentUser.value?.user_info?.photo || currentUser.value?.photo || '/assets/images/user-placeholder.svg')
+const profileAlt = computed(() => {
+    const firstName = currentUser.value?.user_info?.first_name || ''
+    const lastName = currentUser.value?.user_info?.last_name || ''
+    const fullName = `${firstName} ${lastName}`.trim()
+    return fullName || 'Profile'
+})
 
 type NavLink = {
     label: string
@@ -130,14 +139,20 @@ onBeforeUnmount(() => {
             </div>
 
             <div class="hidden items-center space-x-3 xl:flex">
-                <a href="/profile" class="group relative" aria-label="Profile">
-                    <img src="/assets/images/user-placeholder.svg" alt="User"
+                <a v-if="isCitizenLoggedIn" href="/profile" class="group relative" aria-label="Profile">
+                    <img :src="profilePhoto" :alt="profileAlt"
                         class="h-8 w-8 rounded-full border border-white/30 transition-colors duration-300 group-hover:border-tccGold">
                 </a>
-                <a href="/login"
-                    class="rounded-full bg-tccGold px-5 py-2.5 font-poppins text-[11px] font-bold uppercase tracking-[0.18em] text-tccDarkNavy shadow-md shadow-tccGold/20 transition-all duration-300 hover:bg-tccLightGold">
-                    Login
-                </a>
+                <template v-else>
+                    <a href="/login"
+                        class="rounded-full border border-white/20 px-5 py-2.5 font-poppins text-[11px] font-bold uppercase tracking-[0.18em] text-white transition-all duration-300 hover:border-tccGold hover:text-tccGold">
+                        Login
+                    </a>
+                    <a href="/register"
+                        class="rounded-full bg-tccGold px-5 py-2.5 font-poppins text-[11px] font-bold uppercase tracking-[0.18em] text-tccDarkNavy shadow-md shadow-tccGold/20 transition-all duration-300 hover:bg-tccLightGold">
+                        Register
+                    </a>
+                </template>
             </div>
 
             <button type="button"
@@ -175,11 +190,24 @@ onBeforeUnmount(() => {
                     </a>
                 </template>
                 <div class="border-t border-white/10 pt-3">
-                    <a href="/login"
-                        class="block w-full rounded bg-tccGold px-4 py-2 text-center font-poppins text-sm font-semibold text-tccDarkNavy transition-colors hover:bg-tccLightGold"
+                    <a v-if="isCitizenLoggedIn" href="/profile"
+                        class="flex w-full items-center justify-center gap-2 rounded bg-tccGold px-4 py-2 text-center font-poppins text-sm font-semibold text-tccDarkNavy transition-colors hover:bg-tccLightGold"
                         @click="closeMobileMenu">
-                        Login / Register
+                        <img :src="profilePhoto" :alt="profileAlt" class="h-6 w-6 rounded-full">
+                        Profile
                     </a>
+                    <div v-else class="grid grid-cols-2 gap-3">
+                        <a href="/login"
+                            class="block w-full rounded border border-white/20 px-4 py-2 text-center font-poppins text-sm font-semibold text-white transition-colors hover:border-tccGold hover:text-tccGold"
+                            @click="closeMobileMenu">
+                            Login
+                        </a>
+                        <a href="/register"
+                            class="block w-full rounded bg-tccGold px-4 py-2 text-center font-poppins text-sm font-semibold text-tccDarkNavy transition-colors hover:bg-tccLightGold"
+                            @click="closeMobileMenu">
+                            Register
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 definePageMeta({
-  layout: 'portal'
+  layout: 'portal',
+  middleware: ['auth-citizen']
 })
 
 useHead({

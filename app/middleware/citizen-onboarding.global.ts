@@ -1,0 +1,18 @@
+export default defineNuxtRouteMiddleware(async (to) => {
+    if (to.path.startsWith('/admin') || to.path === '/admin-login') return;
+
+    const citizen_user = citizenUser();
+
+    if (citizen_user.value === undefined) {
+        citizen_user.value = await fetchCitizenCurrentUser();
+    }
+
+    if (!citizen_user.value) return;
+
+    const requiredRoute = getCustomerOnboardingRoute(citizen_user.value);
+    if (!requiredRoute) return;
+
+    if (to.fullPath !== requiredRoute) {
+        return navigateTo(requiredRoute, { replace: true });
+    }
+});

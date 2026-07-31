@@ -1,4 +1,7 @@
 const LOGIN = '/v1/customer/login';
+const REGISTER = '/v1/customer/register';
+const OTP_VERIFY = '/v1/customer/otp-verify';
+const OTP_RESEND = '/v1/customer/otp-resend';
 const LOGOUT = '/v1/customer/logout';
 const CURRENT_USER = '/v1/customer/user';
 
@@ -21,7 +24,29 @@ export const citizenAuth = () => {
             body: credentials
         });
         cookie.value = response.data?.token;
+        citizen_user.value = response;
         return response;
+    }
+
+    async function register(payload: any) {
+        return await $fetchCitizen(REGISTER, {
+            method: 'POST',
+            body: payload
+        });
+    }
+
+    async function otpVerify(payload: any) {
+        return await $fetchCitizen(OTP_VERIFY, {
+            method: 'POST',
+            body: payload
+        });
+    }
+
+    async function otpResend(payload: any) {
+        return await $fetchCitizen(OTP_RESEND, {
+            method: 'POST',
+            body: payload
+        });
     }
 
     async function logout() {
@@ -39,6 +64,9 @@ export const citizenAuth = () => {
         isCitizenLoggedIn,
         isLoadingLogout,
         login,
+        register,
+        otpVerify,
+        otpResend,
         logout,
     };
 };

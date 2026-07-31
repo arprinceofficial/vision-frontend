@@ -12,14 +12,42 @@ type NoticeTone = 'success' | 'warning' | 'error' | 'info'
 const email = ref('')
 const password = ref('')
 const showPassword = ref(false)
+const isSubmitting = ref(false)
 const notice = ref<{ title: string, message: string, tone: NoticeTone } | null>(null)
+const route = useRoute()
+const { login } = citizenAuth()
 const forgotPasswordUrl = computed(() => {
     const normalizedEmail = email.value.trim()
 
     return normalizedEmail ? `/forgot-password?email=${encodeURIComponent(normalizedEmail)}` : '/forgot-password'
 })
 
-const submitLogin = () => {
+onMounted(() => {
+    if (route.query.registered === 'success') {
+        notice.value = {
+            title: 'Signup Successful',
+            message: typeof route.query.message === 'string' ? route.query.message : 'Success.',
+            tone: 'success'
+        }
+    }
+})
+
+const applyLoginError = (error: any) => {
+    const message = error?.response?._data?.message || error?.data?.message || 'Login failed. Please try again.'
+    const errors = error?.response?._data?.errors || error?.response?._data?.data
+    const firstErrorKey = errors ? Object.keys(errors)[0] : ''
+    const firstError = firstErrorKey
+        ? Array.isArray(errors[firstErrorKey]) ? errors[firstErrorKey][0] : errors[firstErrorKey]
+        : ''
+
+    notice.value = {
+        title: 'Login Failed',
+        message: firstError || message,
+        tone: 'error'
+    }
+}
+
+const submitLogin = async () => {
     if (!email.value || !password.value) {
         notice.value = {
             title: 'Missing Credentials',
@@ -29,15 +57,40 @@ const submitLogin = () => {
         return
     }
 
-    notice.value = {
-        title: 'Login Successful',
-        message: 'Redirecting to your registration steps.',
-        tone: 'success'
-    }
+    try {
+        isSubmitting.value = true
+        notice.value = null
 
-    window.setTimeout(() => {
-        void navigateTo('/investor-classification')
-    }, 650)
+        const response: any = await login({
+            email: email.value.trim(),
+            password: password.value,
+        })
+
+        if (response?.status === true) {
+            const targetRoute = getCustomerOnboardingRoute(response) || '/profile'
+
+            notice.value = {
+                title: 'Login Successful',
+                message: response?.message || 'User Login successfully.',
+                tone: 'success'
+            }
+
+            window.setTimeout(() => {
+                void navigateTo(targetRoute)
+            }, 650)
+            return
+        }
+
+        notice.value = {
+            title: 'Login Failed',
+            message: response?.message || 'Login failed. Please try again.',
+            tone: 'error'
+        }
+    } catch (error: any) {
+        applyLoginError(error)
+    } finally {
+        isSubmitting.value = false
+    }
 }
 </script>
 
@@ -94,8 +147,10 @@ const submitLogin = () => {
                         </div>
 
                         <button type="submit"
-                            class="w-full rounded-lg bg-tccDarkNavy py-3.5 text-center font-poppins text-xs font-bold uppercase tracking-widest text-white shadow-lg transition-colors hover:bg-tccNavy">
-                            Sign In &rarr;
+                            class="w-full rounded-lg bg-tccDarkNavy py-3.5 text-center font-poppins text-xs font-bold uppercase tracking-widest text-white shadow-lg transition-colors hover:bg-tccNavy disabled:cursor-not-allowed disabled:opacity-70"
+                            :disabled="isSubmitting">
+                            <span v-if="isSubmitting">Signing In...</span>
+                            <span v-else>Sign In &rarr;</span>
                         </button>
 
                         <p class="pt-2 text-center text-xs font-light text-gray-500">

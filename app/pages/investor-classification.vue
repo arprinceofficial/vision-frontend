@@ -1,6 +1,7 @@
 <script setup lang="ts">
 definePageMeta({
-    layout: 'portal'
+    layout: 'portal',
+    middleware: ['auth-citizen']
 })
 
 useHead({
@@ -35,6 +36,16 @@ type CertificationQuestionResponse = {
 
 const activeView = ref<CertificationFlowView>('intro')
 const certificationQuestion = ref<CertificationQuestionResponse | null>(null)
+const citizen_user = citizenUser()
+
+if (citizen_user.value === undefined) {
+    citizen_user.value = await fetchCitizenCurrentUser()
+}
+
+const requiredOnboardingRoute = getCustomerOnboardingRoute(citizen_user.value)
+if (requiredOnboardingRoute && requiredOnboardingRoute !== '/investor-classification') {
+    await navigateTo(requiredOnboardingRoute, { replace: true })
+}
 
 const showOptions = () => {
     activeView.value = 'options'
