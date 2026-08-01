@@ -355,8 +355,8 @@ useHead(() => ({
   <div class="bg-tccDeepBlack text-white">
     <template v-if="shouldShowRetailCarSkeleton">
       <span class="sr-only">Loading retail car...</span>
-      <section class="relative overflow-hidden border-b border-white/10 bg-tccDeepBlack text-white">
-        <div class="absolute inset-0">
+      <section class="relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] w-screen max-w-none overflow-hidden border-b border-white/10 bg-tccDeepBlack text-white">
+        <div class="absolute left-1/2 top-0 h-full w-screen -translate-x-1/2" aria-hidden="true">
           <div class="h-full w-full animate-pulse bg-white/10 opacity-55" />
           <div class="absolute inset-0 bg-gradient-to-b from-tccDeepBlack/30 via-tccDeepBlack/70 to-tccDeepBlack" />
           <div class="absolute inset-0 bg-[radial-gradient(circle_at_66%_34%,transparent_0%,rgba(3,3,3,0.38)_34%,rgba(3,3,3,0.96)_100%)]" />
@@ -522,12 +522,15 @@ useHead(() => ({
     </template>
 
     <template v-else-if="car">
-    <section class="relative overflow-hidden border-b border-white/10 bg-tccDeepBlack text-white">
-      <div class="absolute inset-0">
-        <img :src="car.heroImage" :alt="car.title" class="h-full w-full object-cover opacity-55">
-        <div class="absolute inset-0 bg-gradient-to-b from-tccDeepBlack/30 via-tccDeepBlack/70 to-tccDeepBlack" />
-        <div class="absolute inset-0 bg-[radial-gradient(circle_at_66%_34%,transparent_0%,rgba(3,3,3,0.38)_34%,rgba(3,3,3,0.96)_100%)]" />
-      </div>
+      <section class="relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] w-screen max-w-none overflow-hidden border-b border-white/10 bg-tccDeepBlack text-white">
+        <div class="absolute left-1/2 top-0 h-full w-screen -translate-x-1/2" aria-hidden="true">
+          <div
+            class="h-full w-full bg-cover bg-center bg-no-repeat opacity-55"
+            :style="{ backgroundImage: `url('${car.heroImage}')` }"
+          />
+          <div class="absolute inset-0 bg-gradient-to-b from-tccDeepBlack/30 via-tccDeepBlack/70 to-tccDeepBlack" />
+          <div class="absolute inset-0 bg-[radial-gradient(circle_at_66%_34%,transparent_0%,rgba(3,3,3,0.38)_34%,rgba(3,3,3,0.96)_100%)]" />
+        </div>
 
       <div class="relative z-10 mx-auto max-w-7xl px-4 pb-16 pt-24 sm:px-6 lg:px-8 lg:pb-20 lg:pt-28">
         <NuxtLink
