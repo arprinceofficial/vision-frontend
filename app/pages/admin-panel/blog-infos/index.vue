@@ -58,6 +58,12 @@ watch(() => route.query, () => {
 const isActiveStatus = (value) => value == 1 || value === true;
 const displayTitle = (item) => item.blog_title || item.title || '';
 const displayReadTime = (item) => item.read_time || item.readTime || '';
+const displayCategory = (item) => {
+    if (item.category && typeof item.category === 'object') {
+        return item.category.name || item.category.title || item.category.slug || item.category.id || '';
+    }
+    return item.category || item.category_id || '';
+};
 const getImagePath = (value) => {
     if (!value) return '';
     if (typeof value === 'string') return value;
@@ -223,7 +229,7 @@ const onChangeHandler = () => {
                                                 class="w-16 h-16 object-cover rounded-md" />
                                         </td>
                                         <td class="text-gray-800 dark:text-gray-200">{{ displayTitle(item) }}</td>
-                                        <td class="text-gray-800 dark:text-gray-200 text-center">{{ item.category }}</td>
+                                        <td class="text-gray-800 dark:text-gray-200 text-center">{{ displayCategory(item) }}</td>
                                         <td class="text-gray-800 dark:text-gray-200 text-center">{{ item.date }}</td>
                                         <td class="text-gray-800 dark:text-gray-200 text-center">
                                             {{ displayReadTime(item) }}

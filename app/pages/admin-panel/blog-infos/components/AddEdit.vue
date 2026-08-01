@@ -37,6 +37,12 @@ const normalizeStringArray = (value) => {
     });
 };
 
+const normalizeCategoryValue = (value) => {
+    if (value === null || value === undefined || value === '') return '';
+    if (typeof value === 'object') return value?.id || '';
+    return value;
+};
+
 const getInitialFormData = () => ({
     id: null,
     blog_title: '',
@@ -66,7 +72,7 @@ watch(() => props.item, (value) => {
             blog_title: value.blog_title || value.title || '',
             slug: value.slug || '',
             details: value.details || '',
-            category: value.category || '',
+            category: normalizeCategoryValue(value.category),
             date: $parseDateValue(value.date),
             read_time: value.read_time || value.readTime || '',
             image: getImagePath(value.image),
@@ -101,6 +107,51 @@ const addListItem = (field) => {
 const removeListItem = (field, index) => {
     formData.value[field].splice(index, 1);
 };
+
+const isCategoryLoading = ref(false);
+const blogCategories = ref([]);
+
+const normalizeCategoriesResponse = (value) => {
+    if (Array.isArray(value?.data?.data)) return value.data.data;
+    if (Array.isArray(value?.data)) return value.data;
+    if (Array.isArray(value)) return value;
+    return [];
+};
+
+const loadBlogCategories = async () => {
+    isCategoryLoading.value = true;
+    try {
+        let getData;
+        try {
+            getData = await $fetchAdmin('v1/admin/blog-categories', {
+                method: 'GET',
+            });
+        } catch (getError) {
+            const statusCode = getError?.response?.status || getError?.statusCode || getError?.status;
+            if (![404, 405].includes(statusCode)) {
+                throw getError;
+            }
+
+            getData = await $fetchAdmin('v1/admin/blog-categories/all', {
+                method: 'POST',
+                body: {
+                    paginate: false,
+                    status: 1,
+                },
+            });
+        }
+
+        blogCategories.value = normalizeCategoriesResponse(getData);
+    } catch (e) {
+        blogCategories.value = [];
+    } finally {
+        isCategoryLoading.value = false;
+    }
+};
+
+onMounted(() => {
+    loadBlogCategories();
+});
 
 const requiredFields = [
     'blog_title',
@@ -258,8 +309,9 @@ const createHandler = async () => {
 
             <div>
                 <label class="font-semibold">Category</label>
-                <LazyInputText v-model="formData.category" class="w-full"
-                    :class="validations_errors.category ? 'border-[#f44336!important]' : ''" autocomplete="off"
+                <Select v-model="formData.category" :options="blogCategories" filter optionLabel="name" optionValue="id"
+                    placeholder="Select Category" class="w-full" :loading="isCategoryLoading"
+                    :class="validations_errors.category ? 'border-[#f44336!important]' : ''"
                     @focus="validations_errors.category = ''" />
                 <LazyInputError class="text-sm mt-1" :message="validations_errors.category" />
             </div>
