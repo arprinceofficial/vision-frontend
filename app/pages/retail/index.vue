@@ -45,10 +45,16 @@ type RetailCarCard = {
     excerpt: string
 }
 
-const fallbackCarImage = '/frontend/assets/images/porsche.jpeg'
+const fallbackCarImage = '/svg/not-found-img.svg'
 const { testimonials, expertiseCards, processSteps } = useRetailCars()
+const retailCarSkeletonCards = ['w-3/5', 'w-4/5', 'w-2/3', 'w-5/6']
 
-const { data: retailCarsData, error: retailCarsError } = await useAsyncData<CmsRetailCar[]>(
+const {
+    data: retailCarsData,
+    error: retailCarsError,
+    pending: retailCarsPending,
+    status: retailCarsStatus
+} = useAsyncData<CmsRetailCar[]>(
     'cms-retail-cars',
     async () => {
         const response = await $fetchCMS<CmsRetailCarsResponse>('v1/cms/retail-cars', {
@@ -57,7 +63,10 @@ const { data: retailCarsData, error: retailCarsError } = await useAsyncData<CmsR
 
         return Array.isArray(response?.data) ? response.data : []
     },
-    { default: () => [] }
+    {
+        default: () => [],
+        lazy: true,
+    }
 )
 
 const getFirstValue = (...values: Array<number | string | null | undefined>) => {
@@ -101,13 +110,17 @@ const cars = computed<RetailCarCard[]>(() => (
         .map(normalizeRetailCar)
         .filter((car): car is RetailCarCard => Boolean(car))
 ))
+
+const shouldShowRetailCarsSkeleton = computed(() => (
+    !cars.value.length && (retailCarsPending.value || retailCarsStatus.value === 'idle' || retailCarsStatus.value === 'pending')
+))
 </script>
 
 <template>
     <div class="bg-tccDeepBlack text-white">
         <section class="relative min-h-[620px] overflow-hidden bg-tccDeepBlack text-white">
             <div class="absolute inset-0">
-                <img src="/frontend/assets/images/porsche.jpeg" alt="Collector car on circuit"
+                <img src="/svg/not-found-img.svg" alt="Collector car on circuit"
                     class="h-full w-full object-cover opacity-70">
                 <div
                     class="absolute inset-0 bg-gradient-to-b from-tccDeepBlack/45 via-tccDeepBlack/55 to-tccDeepBlack" />
@@ -157,7 +170,33 @@ const cars = computed<RetailCarCard[]>(() => (
                     </p>
                 </div>
 
-                <div v-if="retailCarsError"
+                <div v-if="shouldShowRetailCarsSkeleton" class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
+                    <article v-for="titleWidth in retailCarSkeletonCards" :key="titleWidth"
+                        class="restomod-image-card flex h-full animate-pulse flex-col overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/5">
+                        <div class="relative h-56 overflow-hidden bg-tccDeepBlack">
+                            <div class="h-full w-full bg-white/10" />
+                            <div
+                                class="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-tccDeepBlack to-transparent" />
+                            <span
+                                class="absolute left-4 top-4 h-[26px] w-32 rounded-full border border-white/20 bg-white/10" />
+                        </div>
+                        <div class="flex flex-1 flex-col p-5">
+                            <span class="h-3 w-28 rounded-full bg-tccGold/25" />
+                            <span class="mt-4 h-5 rounded-full bg-white/10" :class="titleWidth" />
+                            <div class="mt-4 space-y-3">
+                                <span class="block h-3 w-full rounded-full bg-white/10" />
+                                <span class="block h-3 w-10/12 rounded-full bg-white/10" />
+                                <span class="block h-3 w-7/12 rounded-full bg-white/10" />
+                            </div>
+                            <div class="mt-auto flex items-center justify-between gap-3 border-t border-white/10 pt-5">
+                                <span class="h-3 w-24 rounded-full bg-white/10" />
+                                <span
+                                    class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-tccGold/25 bg-tccGold/10" />
+                            </div>
+                        </div>
+                    </article>
+                </div>
+                <div v-else-if="retailCarsError"
                     class="rounded-[1.25rem] border border-tccGold/30 bg-tccGold/10 px-5 py-6 text-sm leading-relaxed text-white/70 sm:px-6">
                     Retail cars are unavailable right now. Please refresh and try again.
                 </div>
