@@ -140,13 +140,8 @@ const shouldShowRetailCarsSkeleton = computed(() => (
                         Crowd network.
                     </p>
                     <div class="mt-9 flex flex-col gap-3 sm:flex-row">
-                        <NuxtLink to="/retail#cars-for-sale"
-                            class="inline-flex items-center justify-center gap-2 rounded-full bg-tccGold px-6 py-3 font-poppins text-xs font-bold uppercase tracking-[0.18em] text-tccDarkNavy transition-colors hover:bg-tccLightGold">
-                            View Stock
-                            <i class="pi pi-arrow-right text-[10px]" aria-hidden="true" />
-                        </NuxtLink>
                         <NuxtLink to="/contact"
-                            class="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 py-3 font-poppins text-xs font-bold uppercase tracking-[0.18em] text-white transition-colors hover:border-tccGold hover:text-tccGold">
+                            class="inline-flex items-center justify-center gap-2 rounded-full bg-tccGold px-6 py-3 font-poppins text-xs font-bold uppercase tracking-[0.18em] text-tccDarkNavy transition-colors hover:bg-tccLightGold">
                             Source a Car
                             <i class="pi pi-phone text-[10px]" aria-hidden="true" />
                         </NuxtLink>
