@@ -451,7 +451,6 @@ export const useRetailCars = () => {
   const getRelatedRetailCars = (slug: string) => retailCars.filter((car) => car.slug !== slug).slice(0, 3)
 
   return {
-    cars: retailCars,
     testimonials: retailTestimonials,
     expertiseCards: retailExpertiseCards,
     processSteps: retailProcessSteps,

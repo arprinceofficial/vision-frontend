@@ -14,7 +14,93 @@ useHead({
     ]
 })
 
-const { cars, testimonials, expertiseCards, processSteps } = useRetailCars()
+type CmsRetailCar = {
+    slug?: string | null
+    status?: string | null
+    title?: string | null
+    name?: string | null
+    description?: string | null
+    year?: number | string | null
+    make?: string | null
+    mileage?: number | string | null
+    heroImage?: string | null
+    hero_image?: string | null
+    cardImage?: string | null
+    card_image?: string | null
+    excerpt?: string | null
+}
+
+type CmsRetailCarsResponse = {
+    data?: CmsRetailCar[]
+}
+
+type RetailCarCard = {
+    slug: string
+    status: string
+    title: string
+    year: string
+    make: string
+    mileage: string
+    cardImage: string
+    excerpt: string
+}
+
+const fallbackCarImage = '/frontend/assets/images/porsche.jpeg'
+const { testimonials, expertiseCards, processSteps } = useRetailCars()
+
+const { data: retailCarsData, error: retailCarsError } = await useAsyncData<CmsRetailCar[]>(
+    'cms-retail-cars',
+    async () => {
+        const response = await $fetchCMS<CmsRetailCarsResponse>('v1/cms/retail-cars', {
+            method: 'POST',
+        })
+
+        return Array.isArray(response?.data) ? response.data : []
+    },
+    { default: () => [] }
+)
+
+const getFirstValue = (...values: Array<number | string | null | undefined>) => {
+    const value = values.find((item) => item !== null && item !== undefined && String(item).trim() !== '')
+    return value === undefined ? '' : String(value).trim()
+}
+
+const formatMileage = (mileage: number | string | null | undefined) => {
+    const value = getFirstValue(mileage)
+
+    if (!value) return 'Mileage on request'
+    if (/mile/i.test(value)) return value
+
+    const numericMileage = Number(value.replace(/,/g, ''))
+
+    if (!Number.isFinite(numericMileage)) return value
+
+    return `${new Intl.NumberFormat('en-GB', { maximumFractionDigits: 0 }).format(numericMileage)} miles`
+}
+
+const normalizeRetailCar = (car: CmsRetailCar): RetailCarCard | null => {
+    const slug = getFirstValue(car.slug)
+    const title = getFirstValue(car.title, car.name)
+
+    if (!slug || !title) return null
+
+    return {
+        slug,
+        status: getFirstValue(car.status) || 'Open to enquiries',
+        title,
+        year: getFirstValue(car.year),
+        make: getFirstValue(car.make),
+        mileage: formatMileage(car.mileage),
+        cardImage: getFirstValue(car.cardImage, car.card_image, car.heroImage, car.hero_image) || fallbackCarImage,
+        excerpt: getFirstValue(car.excerpt, car.description) || 'Contact The Car Crowd for the full ownership file and inspection details.',
+    }
+}
+
+const cars = computed<RetailCarCard[]>(() => (
+    (retailCarsData.value || [])
+        .map(normalizeRetailCar)
+        .filter((car): car is RetailCarCard => Boolean(car))
+))
 </script>
 
 <template>
@@ -71,7 +157,15 @@ const { cars, testimonials, expertiseCards, processSteps } = useRetailCars()
                     </p>
                 </div>
 
-                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
+                <div v-if="retailCarsError"
+                    class="rounded-[1.25rem] border border-tccGold/30 bg-tccGold/10 px-5 py-6 text-sm leading-relaxed text-white/70 sm:px-6">
+                    Retail cars are unavailable right now. Please refresh and try again.
+                </div>
+                <div v-else-if="!cars.length"
+                    class="rounded-[1.25rem] border border-white/10 bg-white/5 px-5 py-6 text-sm leading-relaxed text-white/60 sm:px-6">
+                    No retail cars are available right now.
+                </div>
+                <div v-else class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
                     <NuxtLink v-for="car in cars" :key="car.slug" :to="`/retail/${car.slug}`"
                         class="restomod-image-card group flex h-full flex-col overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/5 transition-all duration-300 hover:-translate-y-1 hover:border-tccGold/45">
                         <div class="relative h-56 overflow-hidden bg-tccDeepBlack">
