@@ -10,6 +10,9 @@ useHead({
 
 type NoticeTone = 'success' | 'warning' | 'error' | 'info'
 
+const citizen_user = citizenUser()
+const { submitOnboardingKyc, skipOnboardingKyc } = citizenAuth()
+
 const form = reactive({
     firstName: '',
     lastName: '',
@@ -27,6 +30,8 @@ const notice = ref<{ title: string, message: string, tone: NoticeTone } | null>(
 const fileName = ref('')
 const documentFile = ref<File | null>(null)
 const errors = ref<Set<string>>(new Set())
+const isSubmitting = ref(false)
+const isSkipping = ref(false)
 
 const hasError = (key: string) => errors.value.has(key)
 
@@ -37,31 +42,88 @@ const handleFile = (event: Event) => {
     errors.value.delete('documentFile')
 }
 
-const getKycPayload = () => ({
-    first_name: form.firstName.trim(),
-    last_name: form.lastName.trim(),
-    dob: form.dob.trim(),
-    gender: form.gender,
-    country: form.country,
-    building_no: form.buildingNo.trim(),
-    address_line: form.addressLine.trim(),
-    town: form.town.trim(),
-    postcode: form.postcode.trim(),
-    document_type: form.documentType,
-    document_file: documentFile.value,
+const getErrorMessage = (error: any, fallback: string) => (
+    error?.response?._data?.message ||
+    error?.data?.message ||
+    fallback
+)
+
+const getFileDataUrl = (file: File) => new Promise<string>((resolve, reject) => {
+    const reader = new FileReader()
+
+    reader.onload = () => resolve(String(reader.result || ''))
+    reader.onerror = () => reject(reader.error)
+    reader.readAsDataURL(file)
 })
 
-const kycPayload = ref<ReturnType<typeof getKycPayload> | null>(null)
-
-const skipKyc = () => {
-    notice.value = {
-        title: 'KYC Skipped',
-        message: 'Verification has been skipped for now. Full verification will still be required before final allocations can complete.',
-        tone: 'warning'
+const refreshCitizenUser = async () => {
+    const refreshedUser = await fetchCitizenCurrentUser()
+    if (refreshedUser) {
+        citizen_user.value = refreshedUser
     }
 }
 
-const submitKyc = () => {
+const navigateAfterKyc = () => {
+    window.setTimeout(() => {
+        void navigateTo('/profile')
+    }, 900)
+}
+
+const isSuccessfulResponse = (response: any) => response?.status === true || response?.success === true
+
+const getKycPayload = async () => ({
+    firstName: form.firstName.trim(),
+    lastName: form.lastName.trim(),
+    dob: form.dob.trim(),
+    gender: form.gender,
+    country: form.country,
+    buildingNo: form.buildingNo.trim(),
+    addressLine: form.addressLine.trim(),
+    town: form.town.trim(),
+    postcode: form.postcode.trim(),
+    documentType: form.documentType,
+    attachment: documentFile.value ? await getFileDataUrl(documentFile.value) : '',
+})
+
+const skipKyc = async () => {
+    if (isSkipping.value || isSubmitting.value) return
+
+    isSkipping.value = true
+    notice.value = null
+
+    try {
+        const response: any = await skipOnboardingKyc()
+
+        if (!isSuccessfulResponse(response)) {
+            notice.value = {
+                title: 'Unable To Skip KYC',
+                message: response?.message || 'Please try skipping KYC again.',
+                tone: 'error'
+            }
+            return
+        }
+
+        await refreshCitizenUser()
+        notice.value = {
+            title: 'KYC Skipped',
+            message: response?.message || 'Verification has been skipped for now.',
+            tone: 'warning'
+        }
+        navigateAfterKyc()
+    } catch (error: any) {
+        notice.value = {
+            title: 'Unable To Skip KYC',
+            message: getErrorMessage(error, 'Please try skipping KYC again.'),
+            tone: 'error'
+        }
+    } finally {
+        isSkipping.value = false
+    }
+}
+
+const submitKyc = async () => {
+    if (isSubmitting.value || isSkipping.value) return
+
     const nextErrors = new Set<string>()
 
     Object.entries(form).forEach(([key, value]) => {
@@ -85,17 +147,37 @@ const submitKyc = () => {
         return
     }
 
-    kycPayload.value = getKycPayload()
+    isSubmitting.value = true
+    notice.value = null
 
-    notice.value = {
-        title: 'Identity Verified',
-        message: 'Your mock AML database checks returned successfully. Redirecting to the dashboard.',
-        tone: 'success'
+    try {
+        const response: any = await submitOnboardingKyc(await getKycPayload())
+
+        if (!isSuccessfulResponse(response)) {
+            notice.value = {
+                title: 'Unable To Submit',
+                message: response?.message || 'Please try submitting your KYC again.',
+                tone: 'error'
+            }
+            return
+        }
+
+        await refreshCitizenUser()
+        notice.value = {
+            title: 'Identity Verification Submitted',
+            message: response?.message || 'Your KYC information has been submitted successfully.',
+            tone: 'success'
+        }
+        navigateAfterKyc()
+    } catch (error: any) {
+        notice.value = {
+            title: 'Unable To Submit',
+            message: getErrorMessage(error, 'Please try submitting your KYC again.'),
+            tone: 'error'
+        }
+    } finally {
+        isSubmitting.value = false
     }
-
-    window.setTimeout(() => {
-        void navigateTo('/profile')
-    }, 900)
 }
 </script>
 
@@ -133,7 +215,7 @@ const submitKyc = () => {
                         <label for="dob" class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">
                             Date of Birth
                         </label>
-                        <input id="dob" v-model="form.dob" type="text" placeholder="DD/MM/YYYY"
+                        <input id="dob" v-model="form.dob" type="date"
                             class="w-full rounded-lg border px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-tccNavy"
                             :class="hasError('dob') ? 'border-red-400 bg-red-50' : 'border-tccBorder'">
                     </div>
@@ -145,8 +227,8 @@ const submitKyc = () => {
                             class="w-full rounded-lg border bg-white px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-tccNavy"
                             :class="hasError('gender') ? 'border-red-400 bg-red-50' : 'border-tccBorder'">
                             <option value="">Select Gender</option>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
                         </select>
                     </div>
 
@@ -213,9 +295,9 @@ const submitKyc = () => {
                             class="w-full rounded-lg border bg-white px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-tccNavy"
                             :class="hasError('documentType') ? 'border-red-400 bg-red-50' : 'border-tccBorder'">
                             <option value="">Select ID Type</option>
-                            <option value="passport">Passport</option>
-                            <option value="driving-licence">Driving Licence</option>
-                            <option value="national-id">National ID Card</option>
+                            <option value="Passport">Passport</option>
+                            <option value="Driving Licence">Driving Licence</option>
+                            <option value="National ID Card">National ID Card</option>
                         </select>
                     </div>
 
@@ -240,14 +322,18 @@ const submitKyc = () => {
 
                 <div class="flex flex-col items-center gap-4 border-t border-tccBorder pt-4 sm:flex-row">
                     <button type="button"
-                        class="w-full rounded-lg border border-tccBorder px-6 py-3 font-poppins text-xs font-bold uppercase tracking-wider text-tccNavy transition-colors hover:bg-stone-50 sm:w-auto"
+                        class="w-full rounded-lg border border-tccBorder px-6 py-3 font-poppins text-xs font-bold uppercase tracking-wider text-tccNavy transition-colors hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
+                        :disabled="isSubmitting || isSkipping"
                         @click="skipKyc">
                         <i class="pi pi-forward mr-1 text-[10px]" aria-hidden="true" />
-                        Skip KYC for 2 weeks
+                        <span v-if="isSkipping">Skipping...</span>
+                        <span v-else>Skip KYC for 2 weeks</span>
                     </button>
                     <button type="submit"
-                        class="w-full rounded-lg bg-tccGold py-3.5 text-center font-poppins text-xs font-bold uppercase tracking-widest text-tccDarkNavy shadow transition-colors hover:bg-tccLightGold sm:flex-grow">
-                        Complete KYC Verification
+                        class="w-full rounded-lg bg-tccGold py-3.5 text-center font-poppins text-xs font-bold uppercase tracking-widest text-tccDarkNavy shadow transition-colors hover:bg-tccLightGold disabled:cursor-not-allowed disabled:opacity-70 sm:flex-grow"
+                        :disabled="isSubmitting || isSkipping">
+                        <span v-if="isSubmitting">Submitting KYC...</span>
+                        <span v-else>Complete KYC Verification</span>
                     </button>
                 </div>
             </form>

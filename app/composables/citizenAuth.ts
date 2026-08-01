@@ -7,6 +7,8 @@ const CURRENT_USER = '/v1/customer/user';
 const ONBOARDING_QUIZ_QUESTIONS = '/v1/customer/onboarding/quiz/questions';
 const ONBOARDING_CERTIFICATION = '/v1/customer/onboarding/certification';
 const ONBOARDING_QUIZ = '/v1/customer/onboarding/quiz';
+const ONBOARDING_KYC = '/v1/customer/onboarding/kyc';
+const ONBOARDING_KYC_SKIP = '/v1/customer/onboarding/kyc/skip';
 
 export const citizenUser = () => {
     return useState('citizen_user', () => undefined);
@@ -77,6 +79,19 @@ export const citizenAuth = () => {
         });
     }
 
+    async function submitOnboardingKyc(payload: any) {
+        return await $fetchCitizen(ONBOARDING_KYC, {
+            method: 'POST',
+            body: payload,
+        });
+    }
+
+    async function skipOnboardingKyc() {
+        return await $fetchCitizen(ONBOARDING_KYC_SKIP, {
+            method: 'POST',
+        });
+    }
+
     async function logout() {
         isLoadingLogout.value = true;
         try {
@@ -102,6 +117,8 @@ export const citizenAuth = () => {
         onboardingQuizQuestions,
         submitOnboardingCertification,
         submitOnboardingQuiz,
+        submitOnboardingKyc,
+        skipOnboardingKyc,
         logout,
     };
 };
