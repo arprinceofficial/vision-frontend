@@ -79,8 +79,35 @@ type RetailExpertiseCard = {
     text: string
 }
 
+type RetailProcessStep = {
+    number: string
+    title: string
+    text: string
+}
+
 const fallbackCarImage = '/svg/not-found-img.svg'
-const { processSteps } = useRetailCars()
+const processSteps: RetailProcessStep[] = [
+    {
+        number: '01',
+        title: 'Vision and strategy',
+        text: 'We define budget, intended use, desired holding period, and the level of originality or usability required before sourcing starts.'
+    },
+    {
+        number: '02',
+        title: 'Market intelligence',
+        text: 'We activate private conversations and benchmark candidates against recent public and off-market evidence.'
+    },
+    {
+        number: '03',
+        title: 'Due diligence',
+        text: 'Shortlisted cars are reviewed through inspection, history analysis, ownership checks, and specialist input.'
+    },
+    {
+        number: '04',
+        title: 'Secure the asset',
+        text: 'We support negotiation, collection, storage, and post-purchase planning so the asset is handled properly.'
+    }
+]
 const retailCarSkeletonCards = ['w-3/5', 'w-4/5', 'w-2/3', 'w-5/6']
 const testimonialSkeletonCards = [
     { nameWidth: 'w-28', quoteWidths: ['w-full', 'w-11/12', 'w-4/5'] },
