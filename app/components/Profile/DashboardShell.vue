@@ -6,6 +6,11 @@ defineProps<{
 }>()
 
 const { profileSummary, navItems } = useProfileDashboard()
+const { isLoadingLogout, logout } = citizenAuth()
+
+const handleLogout = async () => {
+  await logout()
+}
 </script>
 
 <template>
@@ -46,13 +51,15 @@ const { profileSummary, navItems } = useProfileDashboard()
             {{ item.label }}
           </NuxtLink>
 
-          <NuxtLink
-            to="/login"
-            class="mt-2 flex min-h-11 items-center gap-3 rounded-xl px-3.5 py-2.5 font-poppins text-[13px] font-semibold text-red-400 transition-colors hover:bg-red-500/10 hover:text-red-300"
+          <button
+            type="button"
+            class="mt-2 flex min-h-11 w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-left font-poppins text-[13px] font-semibold text-red-400 transition-colors hover:bg-red-500/10 hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-70"
+            :disabled="isLoadingLogout"
+            @click="handleLogout"
           >
             <i class="pi pi-sign-out text-xs" aria-hidden="true" />
-            Logout
-          </NuxtLink>
+            {{ isLoadingLogout ? 'Logging Out...' : 'Logout' }}
+          </button>
         </nav>
       </aside>
 
