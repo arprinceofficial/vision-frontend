@@ -59,10 +59,13 @@ const isActiveStatus = (value) => value == 1 || value === true;
 const displayTitle = (item) => item.blog_title || item.title || '';
 const displayReadTime = (item) => item.read_time || item.readTime || '';
 const displayCategory = (item) => {
+    if (item.category_info && typeof item.category_info === 'object') {
+        return item.category_info.name || item.category_info.title || item.category_info.slug || item.category_info.id || '';
+    }
     if (item.category && typeof item.category === 'object') {
         return item.category.name || item.category.title || item.category.slug || item.category.id || '';
     }
-    return item.category || item.category_id || '';
+    return item.category || item.category_id || item.cat_id || '';
 };
 const getImagePath = (value) => {
     if (!value) return '';
