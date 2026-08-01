@@ -27,10 +27,17 @@ const processQueue = (error: any, token: string | null = null) => {
     failedQueue = [];
 };
 
+const getCmsAuthToken = (response: any) => response?.data?.token || response?.login?.data?.token;
+
 async function refreshToken() {
     try {
         const response = await $fetch('/api/auth');
-        const newToken = response.login.data.token;
+        const newToken = getCmsAuthToken(response);
+
+        if (!newToken) {
+            throw new Error('CMS auth response did not include a token.');
+        }
+
         useCookie($XCMS_TOKEN).value = newToken;
         return newToken;
     } catch (error) {

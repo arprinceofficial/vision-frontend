@@ -26,7 +26,7 @@ const loginHandler = async () => {
     }
 };
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async () => {
     const login = await loginHandler();
-    return { login };
+    return login;
 });
