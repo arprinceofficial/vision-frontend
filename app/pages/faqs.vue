@@ -13,158 +13,117 @@ useHead({
     ]
 })
 
-type FaqTab = 'syndicate' | 'retail'
-
 type FaqItem = {
+    id: number | string
     question: string
-    answer: string[]
+    answerHtml: string
 }
 
-const activeTab = ref<FaqTab>('syndicate')
+type FaqTab = {
+    label: string
+    value: string
+    faqs: FaqItem[]
+}
+
+type CmsFaqCategory = {
+    id?: number | string | null
+    title?: string | null
+}
+
+type CmsFaq = {
+    id?: number | string | null
+    title?: string | null
+    description?: string | null
+    status?: number | string | null
+    cat_id?: number | string | null
+    category?: CmsFaqCategory | null
+}
+
+type CmsFaqsResponse = {
+    data?: {
+        data?: CmsFaq[]
+    }
+}
+
+const activeTab = ref('')
 const openIndex = ref(0)
+const faqSkeletonTabs = ['w-40', 'w-32']
+const faqSkeletonRows = ['w-4/5', 'w-3/5', 'w-2/3', 'w-11/12', 'w-3/4', 'w-7/12']
+const faqSkeletonAnswerRows = ['w-full', 'w-11/12', 'w-4/5']
 
-const syndicateFaqs: FaqItem[] = [
-    {
-        question: 'What is a Bear Trust Syndicate?',
-        answer: [
-            'A bear trust syndicate refers to a financial arrangement where assets, typically shares or property, are held by a trustee on behalf of a beneficiary without the trustee having any discretionary powers. The beneficiary is the true owner, and the trustee merely holds the asset in their name until it can be transferred to the beneficiary.',
-            'In the context of a syndicate, multiple people or parties may come together to pool their resources to buy or hold an asset under a bear trust structure. The trust ensures that the syndicate members (or beneficiaries) retain ownership, while the trustee is responsible for managing the asset until it’s transferred to the rightful owners.',
-            'This structure is commonly used in arrangements to streamline the holding of assets for a group.'
-        ]
+const { data: cmsFaqs, error: faqsError, pending: faqsPending, status: faqsStatus } = useAsyncData<CmsFaq[]>(
+    'cms-faqs',
+    async () => {
+        const response = await $fetchCMS<CmsFaqsResponse>('v1/cms/faqs', {
+            method: 'POST',
+        })
+
+        return Array.isArray(response?.data?.data) ? response.data.data : []
     },
     {
-        question: 'Who owns the asset?',
-        answer: [
-            'The syndicate members are the beneficial owners of the asset. The trustee or manager holds and administers the asset on behalf of the group in line with the syndicate terms.'
-        ]
-    },
-    {
-        question: 'What are the eligibility requirements?',
-        answer: [
-            'Members must complete the required investor classification, onboarding checks, and any compliance steps before they can participate in a syndicate.'
-        ]
-    },
-    {
-        question: 'Can I exit a syndicate before the asset is sold?',
-        answer: [
-            'Exit options depend on the syndicate terms and available demand from other qualified buyers. The Car Crowd can help explain the available process when an exit request is made.'
-        ]
-    },
-    {
-        question: 'How does the selling process work/how can I exit?',
-        answer: [
-            'The selling process is normally managed through a structured decision, valuation, member communication, and sale process so the asset can move to the next custodian in an orderly way.'
-        ]
-    },
-    {
-        question: 'Personal tax and legal info',
-        answer: [
-            'Members should take their own independent tax, legal, and financial advice before joining or exiting any syndicate.'
-        ]
-    },
-    {
-        question: 'What are the fees?',
-        answer: [
-            'Fees are set out before participation and may include management, custody, transaction, storage, insurance, or sale-related costs depending on the syndicate.'
-        ]
-    },
-    {
-        question: 'What happens once the asset is sold?',
-        answer: [
-            'Once an asset is sold, the sale proceeds are reconciled against costs and then distributed to members in line with the syndicate terms.'
-        ]
-    },
-    {
-        question: 'What if the asset never sells?',
-        answer: [
-            'If an asset does not sell, the syndicate can review pricing, timing, storage, and future options with members before deciding the next step.'
-        ]
-    },
-    {
-        question: 'What if all the syndicate fails to sell all of its memberships, will I get my money back?',
-        answer: [
-            'If a syndicate does not complete as planned, the outcome depends on the terms of that specific offer and the stage reached in the process.'
-        ]
+        default: () => [],
+        lazy: true,
     }
-]
+)
 
-const retailFaqs: FaqItem[] = [
-    {
-        question: 'Why are these cars for sale if they were previously funded as investments?',
-        answer: [
-            'These cars have been held by a group of investors or syndicate members who collectively decided to sell the asset. Once a majority vote is passed at the most recent valuation, the asset is offered for sale to the public. This ensures that investors realise the value of their investment and the vehicles move on to their next custodian.'
-        ]
-    },
-    {
-        question: 'Are all of the cars for sale previous investment vehicles?',
-        answer: [
-            'Some cars may come from previous investment structures, while others may be sourced privately through The Car Crowd network.'
-        ]
-    },
-    {
-        question: 'Do the cars come with a warranty?',
-        answer: [
-            'Warranty availability depends on the individual car, age, condition, and sale terms. Any warranty information will be made clear before purchase.'
-        ]
-    },
-    {
-        question: 'Can I test drive the cars?',
-        answer: [
-            'Test drives may be available by appointment for serious buyers, subject to insurance, identity checks, and the vehicle owner’s approval.'
-        ]
-    },
-    {
-        question: 'How have the cars been stored and maintained?',
-        answer: [
-            'Cars are presented with available history, storage, and maintenance records so buyers can understand how each vehicle has been looked after.'
-        ]
-    },
-    {
-        question: 'Are these cars road-ready?',
-        answer: [
-            'Road-readiness depends on each car. The listing, inspection notes, and sale file will explain the current condition and any known preparation requirements.'
-        ]
-    },
-    {
-        question: 'Can I have the vehicle inspected by a third party?',
-        answer: [
-            'Yes, third-party inspections can usually be arranged for serious buyers before completion.'
-        ]
-    },
-    {
-        question: 'Do you offer finance?',
-        answer: [
-            'Finance options may be available through specialist partners depending on the car, buyer profile, and jurisdiction.'
-        ]
-    },
-    {
-        question: 'Do you offer delivery?',
-        answer: [
-            'Delivery and transport can be arranged with specialist partners after purchase.'
-        ]
-    },
-    {
-        question: 'Are these cars suitable for daily use?',
-        answer: [
-            'Suitability for daily use depends on the vehicle, age, maintenance condition, and intended usage. The team can advise on each car individually.'
-        ]
-    },
-    {
-        question: 'Can you help source a specific car if it’s not listed?',
-        answer: [
-            'Yes, The Car Crowd can help source specific collector cars through its private network.'
-        ]
+const getCategorySortValue = (value: string) => {
+    const numericValue = Number(value)
+    return Number.isFinite(numericValue) ? numericValue : Number.MAX_SAFE_INTEGER
+}
+
+const tabs = computed<FaqTab[]>(() => {
+    const groupedFaqs = new Map<string, FaqTab>()
+
+    for (const faq of cmsFaqs.value || []) {
+        if (Number(faq?.status ?? 1) !== 1) continue
+
+        const categoryId = faq.cat_id ?? faq.category?.id
+        const question = faq.title?.trim()
+
+        if (categoryId === null || categoryId === undefined || categoryId === '' || !question) continue
+
+        const value = String(categoryId)
+
+        if (!groupedFaqs.has(value)) {
+            groupedFaqs.set(value, {
+                label: faq.category?.title?.trim() || `Category ${value}`,
+                value,
+                faqs: [],
+            })
+        }
+
+        groupedFaqs.get(value)?.faqs.push({
+            id: faq.id ?? `${value}-${groupedFaqs.get(value)?.faqs.length ?? 0}`,
+            question,
+            answerHtml: faq.description || '',
+        })
     }
-]
 
-const tabs: Array<{ label: string, value: FaqTab, faqs: FaqItem[] }> = [
-    { label: 'Syndicate FAQ', value: 'syndicate', faqs: syndicateFaqs },
-    { label: 'Retail FAQ', value: 'retail', faqs: retailFaqs }
-]
+    return Array.from(groupedFaqs.values())
+        .filter((tab) => tab.faqs.length > 0)
+        .sort((a, b) => getCategorySortValue(a.value) - getCategorySortValue(b.value))
+})
 
-const activeFaqs = computed(() => tabs.find((tab) => tab.value === activeTab.value)?.faqs || syndicateFaqs)
+const activeTabValue = computed(() => activeTab.value || tabs.value[0]?.value || '')
+const activeFaqs = computed(() => tabs.value.find((tab) => tab.value === activeTabValue.value)?.faqs || [])
+const shouldShowFaqSkeleton = computed(() => (
+    !tabs.value.length && (faqsPending.value || faqsStatus.value === 'idle' || faqsStatus.value === 'pending')
+))
 
-const selectTab = (tab: FaqTab) => {
+watch(tabs, (newTabs) => {
+    if (!newTabs.length) {
+        activeTab.value = ''
+        openIndex.value = -1
+        return
+    }
+
+    if (!newTabs.some((tab) => tab.value === activeTab.value)) {
+        activeTab.value = newTabs[0].value
+        openIndex.value = 0
+    }
+}, { immediate: true })
+
+const selectTab = (tab: string) => {
     activeTab.value = tab
     openIndex.value = 0
 }
@@ -209,40 +168,78 @@ const toggleFaq = (index: number) => {
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div
                     class="mb-10 flex flex-wrap items-center justify-center gap-2 border-b border-white/10 pb-4 sm:justify-start">
-                    <button v-for="tab in tabs" :key="tab.value" type="button"
-                        class="rounded-full border px-5 py-3 font-poppins text-[10px] font-bold uppercase tracking-[0.2em] transition-colors"
-                        :class="activeTab === tab.value ? 'border-tccGold bg-tccGold text-tccDarkNavy' : 'border-white/15 bg-white/5 text-white/60 hover:border-tccGold/60 hover:text-tccGold'"
-                        @click="selectTab(tab.value)">
-                        {{ tab.label }}
-                    </button>
+                    <template v-if="shouldShowFaqSkeleton">
+                        <span v-for="tabWidth in faqSkeletonTabs" :key="tabWidth"
+                            class="h-[42px] animate-pulse rounded-full border border-white/15 bg-white/5"
+                            :class="tabWidth" />
+                    </template>
+                    <template v-else>
+                        <button v-for="tab in tabs" :key="tab.value" type="button"
+                            class="rounded-full border px-5 py-3 font-poppins text-[10px] font-bold uppercase tracking-[0.2em] transition-colors"
+                            :class="activeTabValue === tab.value ? 'border-tccGold bg-tccGold text-tccDarkNavy' : 'border-white/15 bg-white/5 text-white/60 hover:border-tccGold/60 hover:text-tccGold'"
+                            @click="selectTab(tab.value)">
+                            {{ tab.label }}
+                        </button>
+                    </template>
                 </div>
 
                 <div
                     class="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,0.56fr)_minmax(360px,0.44fr)] lg:items-start">
                     <div class="space-y-4">
-                        <article v-for="(faq, index) in activeFaqs" :key="faq.question"
-                            class="overflow-hidden rounded-[1.25rem] border bg-white/5 transition-colors"
-                            :class="openIndex === index ? 'border-tccGold/45' : 'border-white/10 hover:border-white/20'">
-                            <button type="button"
-                                class="flex w-full items-center justify-between gap-4 px-5 py-5 text-left sm:px-6"
-                                :aria-expanded="openIndex === index" @click="toggleFaq(index)">
-                                <span class="text-base font-medium leading-relaxed text-white sm:text-lg">{{
-                                    faq.question }}</span>
-                                <span
-                                    class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/15 text-tccGold"
-                                    aria-hidden="true">
-                                    <i :class="openIndex === index ? 'pi pi-minus' : 'pi pi-plus'" class="text-xs" />
-                                </span>
-                            </button>
-
-                            <div v-show="openIndex === index" class="border-t border-white/10 px-5 py-5 sm:px-6">
-                                <div class="space-y-4 text-sm leading-relaxed text-white/70 sm:text-base">
-                                    <p v-for="paragraph in faq.answer" :key="paragraph">
-                                        {{ paragraph }}
-                                    </p>
+                        <template v-if="shouldShowFaqSkeleton">
+                            <span class="sr-only">Loading FAQs...</span>
+                            <article v-for="(questionWidth, index) in faqSkeletonRows" :key="`${questionWidth}-${index}`"
+                                class="overflow-hidden rounded-[1.25rem] border bg-white/5 transition-colors"
+                                :class="index === 0 ? 'border-tccGold/45' : 'border-white/10'">
+                                <div class="flex w-full items-center justify-between gap-4 px-5 py-5 sm:px-6">
+                                    <span class="h-5 animate-pulse rounded-full bg-white/10" :class="questionWidth" />
+                                    <span
+                                        class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/15"
+                                        aria-hidden="true">
+                                        <span class="h-3 w-3 animate-pulse rounded-full bg-tccGold/35" />
+                                    </span>
                                 </div>
-                            </div>
-                        </article>
+
+                                <div v-if="index === 0" class="border-t border-white/10 px-5 py-5 sm:px-6">
+                                    <div class="space-y-4">
+                                        <span v-for="answerWidth in faqSkeletonAnswerRows" :key="answerWidth"
+                                            class="block h-3 animate-pulse rounded-full bg-white/10"
+                                            :class="answerWidth" />
+                                    </div>
+                                </div>
+                            </article>
+                        </template>
+                        <div v-else-if="faqsError"
+                            class="rounded-[1.25rem] border border-tccGold/30 bg-tccGold/10 px-5 py-6 text-sm leading-relaxed text-white/70 sm:px-6">
+                            FAQs are unavailable right now. Please refresh and try again.
+                        </div>
+                        <div v-else-if="!activeFaqs.length"
+                            class="rounded-[1.25rem] border border-white/10 bg-white/5 px-5 py-6 text-sm leading-relaxed text-white/60 sm:px-6">
+                            No FAQs available for this category.
+                        </div>
+                        <template v-else>
+                            <article v-for="(faq, index) in activeFaqs" :key="faq.id"
+                                class="overflow-hidden rounded-[1.25rem] border bg-white/5 transition-colors"
+                                :class="openIndex === index ? 'border-tccGold/45' : 'border-white/10 hover:border-white/20'">
+                                <button type="button"
+                                    class="flex w-full items-center justify-between gap-4 px-5 py-5 text-left sm:px-6"
+                                    :aria-expanded="openIndex === index" @click="toggleFaq(index)">
+                                    <span class="text-base font-medium leading-relaxed text-white sm:text-lg">{{
+                                        faq.question }}</span>
+                                    <span
+                                        class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/15 text-tccGold"
+                                        aria-hidden="true">
+                                        <i :class="openIndex === index ? 'pi pi-minus' : 'pi pi-plus'"
+                                            class="text-xs" />
+                                    </span>
+                                </button>
+
+                                <div v-show="openIndex === index" class="border-t border-white/10 px-5 py-5 sm:px-6">
+                                    <div class="space-y-4 text-sm leading-relaxed text-white/70 sm:text-base"
+                                        v-html="faq.answerHtml" />
+                                </div>
+                            </article>
+                        </template>
                     </div>
 
                     <aside class="lg:sticky lg:top-24">
