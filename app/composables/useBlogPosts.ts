@@ -216,24 +216,6 @@ const blogPosts: BlogPost[] = [
   }
 ]
 
-const blogIssueNotes = [
-  {
-    label: 'Watchlist',
-    value: 'Manual V12s',
-    detail: 'Supply is thin, but buyer discipline still matters.'
-  },
-  {
-    label: 'Build Desk',
-    value: 'Archive quality',
-    detail: 'Documentation is moving from nice-to-have to value signal.'
-  },
-  {
-    label: 'Members',
-    value: 'Drive access',
-    detail: 'Smaller sessions are performing better than large-format events.'
-  }
-]
-
 export const useBlogPosts = () => {
   const getBlogPostBySlug = (slug: string) => blogPosts.find((post) => post.slug === slug)
   const getBlogArticleBySlug = (slug: string): BlogArticle | undefined => {
@@ -255,7 +237,6 @@ export const useBlogPosts = () => {
     categories: blogCategories,
     featuredPost: featuredBlogPost,
     posts: blogPosts,
-    issueNotes: blogIssueNotes,
     getBlogPostBySlug,
     getBlogArticleBySlug,
     getRelatedBlogPosts

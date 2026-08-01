@@ -14,11 +14,77 @@ useHead({
     ]
 })
 
-const { categories, featuredPost, posts, issueNotes } = useBlogPosts()
+const { categories, featuredPost, posts } = useBlogPosts()
 
 type Category = (typeof categories)[number]
 
+type CmsBlogIssueNote = {
+    id?: number | string | null
+    label?: string | null
+    value?: string | null
+    detail?: string | null
+}
+
+type CmsBlogIssueNotesResponse = {
+    data?: {
+        data?: CmsBlogIssueNote[]
+    }
+}
+
+type BlogIssueNote = {
+    id: string
+    label: string
+    value: string
+    detail: string
+}
+
 const selectedCategory = ref<Category>('All')
+const issueNoteSkeletonRows = [
+    { labelWidth: 'w-20', valueWidth: 'w-32', detailWidths: ['w-full', 'w-4/5'] },
+    { labelWidth: 'w-24', valueWidth: 'w-40', detailWidths: ['w-11/12', 'w-3/4'] },
+    { labelWidth: 'w-16', valueWidth: 'w-28', detailWidths: ['w-full', 'w-5/6'] },
+]
+
+const {
+    data: issueNotesData,
+    error: issueNotesError,
+    pending: issueNotesPending,
+    status: issueNotesStatus
+} = useAsyncData<CmsBlogIssueNote[]>(
+    'cms-blog-issue-notes',
+    async () => {
+        const response = await $fetchCMS<CmsBlogIssueNotesResponse>('v1/cms/blog-issue-notes', {
+            method: 'POST',
+        })
+
+        return Array.isArray(response?.data?.data) ? response.data.data : []
+    },
+    {
+        default: () => [],
+        lazy: true,
+        server: false,
+    }
+)
+
+const getFirstValue = (...values: Array<number | string | null | undefined>) => {
+    const value = values.find((item) => item !== null && item !== undefined && String(item).trim() !== '')
+    return value === undefined ? '' : String(value).trim()
+}
+
+const normalizeIssueNote = (note: CmsBlogIssueNote, index: number): BlogIssueNote | null => {
+    const label = getFirstValue(note.label)
+    const value = getFirstValue(note.value)
+    const detail = getFirstValue(note.detail)
+
+    if (!label || !value || !detail) return null
+
+    return {
+        id: getFirstValue(note.id) || `${label}-${index}`,
+        label,
+        value,
+        detail,
+    }
+}
 
 const filteredPosts = computed(() => {
     if (selectedCategory.value === 'All') {
@@ -27,6 +93,16 @@ const filteredPosts = computed(() => {
 
     return posts.filter((post) => post.category === selectedCategory.value)
 })
+
+const issueNotes = computed<BlogIssueNote[]>(() => (
+    (issueNotesData.value || [])
+        .map(normalizeIssueNote)
+        .filter((note): note is BlogIssueNote => Boolean(note))
+))
+
+const shouldShowIssueNotesSkeleton = computed(() => (
+    !issueNotes.value.length && (issueNotesPending.value || issueNotesStatus.value === 'idle' || issueNotesStatus.value === 'pending')
+))
 </script>
 
 <template>
@@ -122,13 +198,37 @@ const filteredPosts = computed(() => {
                     <h2 class="mt-4 font-poppins text-2xl font-black leading-tight text-white">This month in the garage
                     </h2>
                     <div class="mt-7 space-y-5">
-                        <div v-for="note in issueNotes" :key="note.label"
-                            class="border-t border-white/10 pt-5 first:border-t-0 first:pt-0">
-                            <span class="font-poppins text-[9px] font-bold uppercase tracking-[0.22em] text-white/35">{{
-                                note.label }}</span>
-                            <strong class="mt-1 block text-lg font-bold text-white">{{ note.value }}</strong>
-                            <p class="mt-2 text-sm leading-relaxed text-white/60">{{ note.detail }}</p>
+                        <template v-if="shouldShowIssueNotesSkeleton">
+                            <div v-for="(noteSkeleton, skeletonIndex) in issueNoteSkeletonRows"
+                                :key="`issue-note-skeleton-${skeletonIndex}`"
+                                class="animate-pulse border-t border-white/10 pt-5 first:border-t-0 first:pt-0">
+                                <span class="block h-3 rounded-full bg-white/10" :class="noteSkeleton.labelWidth" />
+                                <span class="mt-2 block h-5 rounded-full bg-white/10"
+                                    :class="noteSkeleton.valueWidth" />
+                                <div class="mt-3 space-y-2">
+                                    <span v-for="detailWidth in noteSkeleton.detailWidths" :key="detailWidth"
+                                        class="block h-3 rounded-full bg-white/10" :class="detailWidth" />
+                                </div>
+                            </div>
+                        </template>
+                        <div v-else-if="issueNotesError"
+                            class="rounded-[1.25rem] border border-tccGold/30 bg-tccGold/10 px-5 py-5 text-sm leading-relaxed text-white/70">
+                            Editor notes are unavailable right now. Please refresh and try again.
                         </div>
+                        <div v-else-if="!issueNotes.length"
+                            class="rounded-[1.25rem] border border-white/10 bg-white/5 px-5 py-5 text-sm leading-relaxed text-white/60">
+                            Editor notes are unavailable right now.
+                        </div>
+                        <template v-else>
+                            <div v-for="note in issueNotes" :key="note.id"
+                                class="border-t border-white/10 pt-5 first:border-t-0 first:pt-0">
+                                <span
+                                    class="font-poppins text-[9px] font-bold uppercase tracking-[0.22em] text-white/35">{{
+                                        note.label }}</span>
+                                <strong class="mt-1 block text-lg font-bold text-white">{{ note.value }}</strong>
+                                <p class="mt-2 text-sm leading-relaxed text-white/60">{{ note.detail }}</p>
+                            </div>
+                        </template>
                     </div>
                 </aside>
             </div>
