@@ -384,27 +384,6 @@ const retailCars: RetailCar[] = [
   }
 ]
 
-const retailTestimonials = [
-  {
-    name: 'Harry',
-    role: 'Investor',
-    quote:
-      'The team sourced multiple cars for our shortlist, explained the trade-offs clearly, and kept the process disciplined from first call to final inspection.'
-  },
-  {
-    name: 'Adam',
-    role: 'Investor',
-    quote:
-      'The due-diligence pack made the decision easier. It covered condition, provenance, storage, and the realistic ownership costs before we moved forward.'
-  },
-  {
-    name: 'Liam',
-    role: 'Investor',
-    quote:
-      'Access to off-market conversations was the difference. The Car Crowd knew which cars were worth inspecting and which ones to leave alone.'
-  }
-]
-
 const retailExpertiseCards = [
   {
     title: 'Network',
@@ -451,7 +430,6 @@ export const useRetailCars = () => {
   const getRelatedRetailCars = (slug: string) => retailCars.filter((car) => car.slug !== slug).slice(0, 3)
 
   return {
-    testimonials: retailTestimonials,
     expertiseCards: retailExpertiseCards,
     processSteps: retailProcessSteps,
     getRetailCarBySlug,

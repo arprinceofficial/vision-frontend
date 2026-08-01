@@ -34,6 +34,16 @@ type CmsRetailCarsResponse = {
     data?: CmsRetailCar[]
 }
 
+type CmsTestimonial = {
+    name?: string | null
+    role?: string | null
+    quote?: string | null
+}
+
+type CmsTestimonialsResponse = {
+    data?: CmsTestimonial[]
+}
+
 type RetailCarCard = {
     slug: string
     status: string
@@ -45,9 +55,21 @@ type RetailCarCard = {
     excerpt: string
 }
 
+type RetailTestimonial = {
+    name: string
+    role: string
+    quote: string
+}
+
 const fallbackCarImage = '/svg/not-found-img.svg'
-const { testimonials, expertiseCards, processSteps } = useRetailCars()
+const { expertiseCards, processSteps } = useRetailCars()
 const retailCarSkeletonCards = ['w-3/5', 'w-4/5', 'w-2/3', 'w-5/6']
+const testimonialSkeletonCards = [
+    { nameWidth: 'w-28', quoteWidths: ['w-full', 'w-11/12', 'w-4/5'] },
+    { nameWidth: 'w-24', quoteWidths: ['w-full', 'w-10/12', 'w-5/6'] },
+    { nameWidth: 'w-32', quoteWidths: ['w-11/12', 'w-full', 'w-3/4'] },
+    { nameWidth: 'w-24', quoteWidths: ['w-full', 'w-4/5', 'w-2/3'] },
+]
 
 const {
     data: retailCarsData,
@@ -66,6 +88,27 @@ const {
     {
         default: () => [],
         lazy: true,
+    }
+)
+
+const {
+    data: testimonialsData,
+    error: testimonialsError,
+    pending: testimonialsPending,
+    status: testimonialsStatus
+} = useAsyncData<CmsTestimonial[]>(
+    'cms-testimonials',
+    async () => {
+        const response = await $fetchCMS<CmsTestimonialsResponse>('v1/cms/testimonials', {
+            method: 'POST',
+        })
+
+        return Array.isArray(response?.data) ? response.data : []
+    },
+    {
+        default: () => [],
+        lazy: true,
+        server: false,
     }
 )
 
@@ -105,14 +148,37 @@ const normalizeRetailCar = (car: CmsRetailCar): RetailCarCard | null => {
     }
 }
 
+const normalizeTestimonial = (testimonial: CmsTestimonial): RetailTestimonial | null => {
+    const name = getFirstValue(testimonial.name)
+    const quote = getFirstValue(testimonial.quote)
+
+    if (!name || !quote) return null
+
+    return {
+        name,
+        role: getFirstValue(testimonial.role) || 'Client',
+        quote,
+    }
+}
+
 const cars = computed<RetailCarCard[]>(() => (
     (retailCarsData.value || [])
         .map(normalizeRetailCar)
         .filter((car): car is RetailCarCard => Boolean(car))
 ))
 
+const testimonials = computed<RetailTestimonial[]>(() => (
+    (testimonialsData.value || [])
+        .map(normalizeTestimonial)
+        .filter((testimonial): testimonial is RetailTestimonial => Boolean(testimonial))
+))
+
 const shouldShowRetailCarsSkeleton = computed(() => (
     !cars.value.length && (retailCarsPending.value || retailCarsStatus.value === 'idle' || retailCarsStatus.value === 'pending')
+))
+
+const shouldShowTestimonialsSkeleton = computed(() => (
+    !testimonials.value.length && (testimonialsPending.value || testimonialsStatus.value === 'idle' || testimonialsStatus.value === 'pending')
 ))
 </script>
 
@@ -236,28 +302,6 @@ const shouldShowRetailCarsSkeleton = computed(() => (
 
         <section class="bg-tccDeepBlack text-white">
             <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-                <div class="relative overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/5">
-                    <img src="/frontend/assets/images/first_car_carousel.jpg" alt="Private collector car database"
-                        class="absolute inset-0 h-full w-full object-cover opacity-55">
-                    <div
-                        class="absolute inset-0 bg-gradient-to-r from-tccDeepBlack via-tccDeepBlack/75 to-tccDeepBlack/30" />
-                    <div class="relative z-10 max-w-3xl px-6 py-14 sm:px-8 lg:px-10">
-                        <span class="restomod-eyebrow">Private Database</span>
-                        <h2 class="mt-6 font-poppins text-3xl font-black leading-tight text-white sm:text-5xl">
-                            Join the TCC sales private database.
-                        </h2>
-                        <p class="mt-5 text-sm leading-relaxed text-white/65 sm:text-base">
-                            Add your collectible car to a secure buyer network for private placement, discreet
-                            introductions, and quality-controlled sale preparation.
-                        </p>
-                        <NuxtLink to="/contact"
-                            class="mt-8 inline-flex items-center gap-2 rounded-full bg-tccGold px-5 py-3 font-poppins text-xs font-bold uppercase tracking-[0.18em] text-tccDarkNavy transition-colors hover:bg-tccLightGold">
-                            Add Your Car
-                            <i class="pi pi-plus text-[10px]" aria-hidden="true" />
-                        </NuxtLink>
-                    </div>
-                </div>
-
                 <div class="relative mt-6 overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/5">
                     <img src="/frontend/assets/images/ferrari_berlinetta.png" alt="The Car Crowd syndicate event"
                         class="absolute inset-0 h-full w-full object-cover opacity-45">
@@ -288,7 +332,26 @@ const shouldShowRetailCarsSkeleton = computed(() => (
                 <h2 class="mt-5 font-poppins text-4xl font-black leading-tight text-white sm:text-5xl">
                     What others have to say.
                 </h2>
-                <div class="mt-9 grid grid-cols-1 gap-6 md:grid-cols-3">
+                <div v-if="shouldShowTestimonialsSkeleton" class="mt-9 grid grid-cols-1 gap-6 md:grid-cols-3">
+                    <article v-for="(testimonialSkeleton, skeletonIndex) in testimonialSkeletonCards"
+                        :key="`testimonial-skeleton-${skeletonIndex}`"
+                        class="animate-pulse rounded-[1.5rem] border border-white/10 bg-white/5 p-6">
+                        <div class="flex gap-1 text-tccGold/35" aria-hidden="true">
+                            <i v-for="star in 5" :key="star" class="pi pi-star-fill text-xs" />
+                        </div>
+                        <div class="mt-5 space-y-3">
+                            <span v-for="quoteWidth in testimonialSkeleton.quoteWidths" :key="quoteWidth"
+                                class="block h-3 rounded-full bg-white/10" :class="quoteWidth" />
+                        </div>
+                        <span class="mt-6 block h-4 rounded-full bg-white/10"
+                            :class="testimonialSkeleton.nameWidth" />
+                    </article>
+                </div>
+                <div v-else-if="testimonialsError"
+                    class="mt-9 rounded-[1.5rem] border border-tccGold/30 bg-tccGold/10 px-5 py-6 text-sm leading-relaxed text-white/70 sm:px-6">
+                    Client notes are unavailable right now. Please refresh and try again.
+                </div>
+                <div v-else class="mt-9 grid grid-cols-1 gap-6 md:grid-cols-3">
                     <article v-for="testimonial in testimonials" :key="testimonial.name"
                         class="rounded-[1.5rem] border border-white/10 bg-white/5 p-6">
                         <div class="flex gap-1 text-tccGold" aria-label="Five star review">
