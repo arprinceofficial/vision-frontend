@@ -384,24 +384,6 @@ const retailCars: RetailCar[] = [
   }
 ]
 
-const retailExpertiseCards = [
-  {
-    title: 'Network',
-    image: '/frontend/assets/images/AstonMartin.jpg',
-    text: 'Relationships with collectors, specialists, storage providers, and private sellers help uncover cars before they reach public channels.'
-  },
-  {
-    title: 'Curation',
-    image: '/frontend/assets/images/ferrari_berlinetta.png',
-    text: 'Every candidate is filtered through provenance, condition, specification, cost basis, and the long-term ownership case.'
-  },
-  {
-    title: 'Expectations',
-    image: '/frontend/assets/images/porsche.png',
-    text: 'Clear guidance keeps buyers focused on suitable cars, realistic budgets, and the standards required for investment-grade ownership.'
-  }
-]
-
 const retailProcessSteps = [
   {
     number: '01',
@@ -430,7 +412,6 @@ export const useRetailCars = () => {
   const getRelatedRetailCars = (slug: string) => retailCars.filter((car) => car.slug !== slug).slice(0, 3)
 
   return {
-    expertiseCards: retailExpertiseCards,
     processSteps: retailProcessSteps,
     getRetailCarBySlug,
     getRelatedRetailCars

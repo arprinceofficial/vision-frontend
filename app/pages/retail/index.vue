@@ -44,6 +44,17 @@ type CmsTestimonialsResponse = {
     data?: CmsTestimonial[]
 }
 
+type CmsInvestmentCard = {
+    title?: string | null
+    image?: string | null
+    alt?: string | null
+    body?: string | null
+}
+
+type CmsInvestmentCardsResponse = {
+    data?: CmsInvestmentCard[]
+}
+
 type RetailCarCard = {
     slug: string
     status: string
@@ -61,14 +72,26 @@ type RetailTestimonial = {
     quote: string
 }
 
+type RetailExpertiseCard = {
+    title: string
+    image: string
+    alt: string
+    text: string
+}
+
 const fallbackCarImage = '/svg/not-found-img.svg'
-const { expertiseCards, processSteps } = useRetailCars()
+const { processSteps } = useRetailCars()
 const retailCarSkeletonCards = ['w-3/5', 'w-4/5', 'w-2/3', 'w-5/6']
 const testimonialSkeletonCards = [
     { nameWidth: 'w-28', quoteWidths: ['w-full', 'w-11/12', 'w-4/5'] },
     { nameWidth: 'w-24', quoteWidths: ['w-full', 'w-10/12', 'w-5/6'] },
     { nameWidth: 'w-32', quoteWidths: ['w-11/12', 'w-full', 'w-3/4'] },
     { nameWidth: 'w-24', quoteWidths: ['w-full', 'w-4/5', 'w-2/3'] },
+]
+const expertiseCardSkeletonCards = [
+    { titleWidth: 'w-44', bodyWidths: ['w-full', 'w-11/12', 'w-4/5'] },
+    { titleWidth: 'w-36', bodyWidths: ['w-full', 'w-10/12', 'w-5/6'] },
+    { titleWidth: 'w-48', bodyWidths: ['w-11/12', 'w-full', 'w-3/4'] },
 ]
 
 const {
@@ -100,6 +123,27 @@ const {
     'cms-testimonials',
     async () => {
         const response = await $fetchCMS<CmsTestimonialsResponse>('v1/cms/testimonials', {
+            method: 'POST',
+        })
+
+        return Array.isArray(response?.data) ? response.data : []
+    },
+    {
+        default: () => [],
+        lazy: true,
+        server: false,
+    }
+)
+
+const {
+    data: investmentCardsData,
+    error: investmentCardsError,
+    pending: investmentCardsPending,
+    status: investmentCardsStatus
+} = useAsyncData<CmsInvestmentCard[]>(
+    'cms-investment-cards',
+    async () => {
+        const response = await $fetchCMS<CmsInvestmentCardsResponse>('v1/cms/investment-cards', {
             method: 'POST',
         })
 
@@ -161,6 +205,20 @@ const normalizeTestimonial = (testimonial: CmsTestimonial): RetailTestimonial | 
     }
 }
 
+const normalizeInvestmentCard = (card: CmsInvestmentCard): RetailExpertiseCard | null => {
+    const title = getFirstValue(card.title)
+    const text = getFirstValue(card.body)
+
+    if (!title || !text) return null
+
+    return {
+        title,
+        image: getFirstValue(card.image) || fallbackCarImage,
+        alt: getFirstValue(card.alt) || title,
+        text,
+    }
+}
+
 const cars = computed<RetailCarCard[]>(() => (
     (retailCarsData.value || [])
         .map(normalizeRetailCar)
@@ -173,12 +231,22 @@ const testimonials = computed<RetailTestimonial[]>(() => (
         .filter((testimonial): testimonial is RetailTestimonial => Boolean(testimonial))
 ))
 
+const expertiseCards = computed<RetailExpertiseCard[]>(() => (
+    (investmentCardsData.value || [])
+        .map(normalizeInvestmentCard)
+        .filter((card): card is RetailExpertiseCard => Boolean(card))
+))
+
 const shouldShowRetailCarsSkeleton = computed(() => (
     !cars.value.length && (retailCarsPending.value || retailCarsStatus.value === 'idle' || retailCarsStatus.value === 'pending')
 ))
 
 const shouldShowTestimonialsSkeleton = computed(() => (
     !testimonials.value.length && (testimonialsPending.value || testimonialsStatus.value === 'idle' || testimonialsStatus.value === 'pending')
+))
+
+const shouldShowExpertiseCardsSkeleton = computed(() => (
+    !expertiseCards.value.length && (investmentCardsPending.value || investmentCardsStatus.value === 'idle' || investmentCardsStatus.value === 'pending')
 ))
 </script>
 
@@ -419,11 +487,33 @@ const shouldShowTestimonialsSkeleton = computed(() => (
                     </p>
                 </div>
 
-                <div class="mt-9 grid grid-cols-1 gap-6 md:grid-cols-3">
+                <div v-if="shouldShowExpertiseCardsSkeleton" class="mt-9 grid grid-cols-1 gap-6 md:grid-cols-3">
+                    <article v-for="(cardSkeleton, skeletonIndex) in expertiseCardSkeletonCards"
+                        :key="`expertise-card-skeleton-${skeletonIndex}`"
+                        class="restomod-image-card animate-pulse overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/5">
+                        <div class="h-48 overflow-hidden bg-white/10" />
+                        <div class="p-6">
+                            <span class="block h-5 rounded-full bg-white/10" :class="cardSkeleton.titleWidth" />
+                            <div class="mt-4 space-y-3">
+                                <span v-for="bodyWidth in cardSkeleton.bodyWidths" :key="bodyWidth"
+                                    class="block h-3 rounded-full bg-white/10" :class="bodyWidth" />
+                            </div>
+                        </div>
+                    </article>
+                </div>
+                <div v-else-if="investmentCardsError"
+                    class="mt-9 rounded-[1.5rem] border border-tccGold/30 bg-tccGold/10 px-5 py-6 text-sm leading-relaxed text-white/70 sm:px-6">
+                    Investment cards are unavailable right now. Please refresh and try again.
+                </div>
+                <div v-else-if="!expertiseCards.length"
+                    class="mt-9 rounded-[1.5rem] border border-white/10 bg-white/5 px-5 py-6 text-sm leading-relaxed text-white/60 sm:px-6">
+                    Investment cards are unavailable right now.
+                </div>
+                <div v-else class="mt-9 grid grid-cols-1 gap-6 md:grid-cols-3">
                     <article v-for="card in expertiseCards" :key="card.title"
                         class="restomod-image-card overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/5">
                         <div class="h-48 overflow-hidden">
-                            <img :src="card.image" :alt="card.title" class="h-full w-full object-cover">
+                            <img :src="card.image" :alt="card.alt" class="h-full w-full object-cover">
                         </div>
                         <div class="p-6">
                             <h3 class="font-poppins text-lg font-bold text-white">{{ card.title }}</h3>
