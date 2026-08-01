@@ -27,9 +27,9 @@ const loadData = async () => {
         const getData = await $fetchAdmin(`v1/admin/faqs/all`, {
             method: 'POST',
             body: {
-                paginate: true,
-                page: route.query.page ? route.query.page : 1,
-                length: 10,
+                // paginate: true,
+                // page: route.query.page ? route.query.page : 1,
+                // length: 10,
                 search: search.value,
                 status: status.value.key == 'status' ? status.value.value : '',
                 trashed: status.value.key == 'trashed' ? 'only' : '',
