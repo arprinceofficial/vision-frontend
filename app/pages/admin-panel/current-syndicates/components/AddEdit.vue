@@ -7,6 +7,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['add_emit', 'close']);
+const { $slugify } = useNuxtApp();
 
 const visible = computed({
     get: () => props.isOpenModal,
@@ -23,10 +24,39 @@ const getImagePath = (value) => {
     return value?.image || value?.url || value?.path || '';
 };
 
+const toInputValue = (value) => {
+    if (value === null || value === undefined) return '';
+    return String(value);
+};
+
+const normalizeImageArray = (value) => {
+    if (!Array.isArray(value)) return [];
+    return value.map(getImagePath).filter(Boolean);
+};
+
+const normalizeMetrics = (value) => {
+    if (!Array.isArray(value)) return [];
+    return value.map((item) => {
+        if (typeof item === 'string') {
+            return { label: item, value: '' };
+        }
+
+        return {
+            label: toInputValue(item?.label ?? item?.title ?? item?.name ?? item?.key),
+            value: toInputValue(item?.value ?? item?.amount ?? item?.text ?? item?.description),
+        };
+    });
+};
+
 const getInitialFormData = () => ({
     id: null,
     status_label: '',
     title: '',
+    slug: '',
+    eyebrow: '',
+    description: '',
+    metrics: [],
+    gallery: [],
     marque: '',
     image: '',
     alt: '',
@@ -46,6 +76,11 @@ watch(() => props.item, (value) => {
             id: value.id || null,
             status_label: value.status_label || '',
             title: value.title || '',
+            slug: value.slug || '',
+            eyebrow: value.eyebrow || '',
+            description: value.description || '',
+            metrics: normalizeMetrics(value.metrics),
+            gallery: normalizeImageArray(value.gallery),
             marque: value.marque || '',
             image: getImagePath(value.image),
             alt: value.alt || '',
@@ -59,13 +94,35 @@ watch(() => props.item, (value) => {
     }
 }, { immediate: true });
 
+watch(() => formData.value.title, (value) => {
+    if (!value) return;
+    if (props.modalTitle === 'Create' || !formData.value.slug) {
+        formData.value.slug = $slugify(value);
+    }
+});
+
 const setImage = (photo) => {
     formData.value.image = getImagePath(photo);
+};
+
+const setGallery = (photos) => {
+    formData.value.gallery = normalizeImageArray(photos);
+};
+
+const addMetric = () => {
+    formData.value.metrics.push({ label: '', value: '' });
+};
+
+const removeMetric = (index) => {
+    formData.value.metrics.splice(index, 1);
 };
 
 const requiredFields = [
     'status_label',
     'title',
+    'slug',
+    'eyebrow',
+    'description',
     'marque',
     'image',
     'alt',
@@ -92,6 +149,11 @@ const validateForm = () => {
 const serializeSubmitData = () => ({
     status_label: formData.value.status_label,
     title: formData.value.title,
+    slug: formData.value.slug,
+    eyebrow: formData.value.eyebrow,
+    description: formData.value.description,
+    metrics: formData.value.metrics.filter((item) => item.label || item.value),
+    gallery: normalizeImageArray(formData.value.gallery),
     marque: formData.value.marque,
     image: formData.value.image,
     alt: formData.value.alt,
@@ -176,20 +238,30 @@ const createHandler = async () => {
 </script>
 
 <template>
-    <Dialog v-model:visible="visible" modal :closable="false" :style="{ width: '48rem', maxWidth: 'calc(100vw - 2rem)' }">
+    <Dialog v-model:visible="visible" modal :closable="false" :style="{ width: '76rem', maxWidth: 'calc(100vw - 2rem)' }">
         <template #header>
             <div class="flex items-center justify-center w-full gap-2">
                 <h4 class="text-xl font-semibold">{{ modalTitle }} Current Syndicate</h4>
             </div>
         </template>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div class="sm:col-span-2">
-                <label class="font-semibold">Image</label>
-                <div class="w-full mt-2">
-                    <MediaGallery :getPhoto="formData.image" @set_photo="setImage" />
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="sm:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-4 border border-gray-200 rounded-lg p-4">
+                <div>
+                    <label class="font-semibold">Image</label>
+                    <div class="w-full mt-2">
+                        <MediaGallery :getPhoto="formData.image" @set_photo="setImage" />
+                    </div>
+                    <LazyInputError class="text-sm mt-1" :message="validations_errors.image" />
                 </div>
-                <LazyInputError class="text-sm mt-1" :message="validations_errors.image" />
+
+                <div>
+                    <label class="font-semibold">Gallery</label>
+                    <div class="w-full mt-2">
+                        <MediaGallery :getPhoto="formData.gallery" :multiple="true" @set_photo="setGallery" />
+                    </div>
+                    <LazyInputError class="text-sm mt-1" :message="validations_errors.gallery" />
+                </div>
             </div>
 
             <div>
@@ -198,6 +270,22 @@ const createHandler = async () => {
                     :class="validations_errors.title ? 'border-[#f44336!important]' : ''" autocomplete="off"
                     @focus="validations_errors.title = ''" />
                 <LazyInputError class="text-sm mt-1" :message="validations_errors.title" />
+            </div>
+
+            <div>
+                <label class="font-semibold">Slug</label>
+                <LazyInputText v-model="formData.slug" class="w-full"
+                    :class="validations_errors.slug ? 'border-[#f44336!important]' : ''" autocomplete="off"
+                    @focus="validations_errors.slug = ''" />
+                <LazyInputError class="text-sm mt-1" :message="validations_errors.slug" />
+            </div>
+
+            <div>
+                <label class="font-semibold">Eyebrow</label>
+                <LazyInputText v-model="formData.eyebrow" class="w-full"
+                    :class="validations_errors.eyebrow ? 'border-[#f44336!important]' : ''" autocomplete="off"
+                    @focus="validations_errors.eyebrow = ''" />
+                <LazyInputError class="text-sm mt-1" :message="validations_errors.eyebrow" />
             </div>
 
             <div>
@@ -238,6 +326,31 @@ const createHandler = async () => {
                     :class="validations_errors.to ? 'border-[#f44336!important]' : ''" autocomplete="off"
                     @focus="validations_errors.to = ''" />
                 <LazyInputError class="text-sm mt-1" :message="validations_errors.to" />
+            </div>
+
+            <div class="sm:col-span-3">
+                <label class="font-semibold">Description</label>
+                <Textarea v-model="formData.description" class="w-full" rows="4"
+                    :class="validations_errors.description ? 'border-[#f44336!important]' : ''" autocomplete="off"
+                    @focus="validations_errors.description = ''" />
+                <LazyInputError class="text-sm mt-1" :message="validations_errors.description" />
+            </div>
+
+            <div class="sm:col-span-3 border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center justify-between gap-3 mb-3">
+                    <h5 class="font-semibold text-gray-800 dark:text-gray-100">Metrics</h5>
+                    <Button type="button" label="Add Metric" class="text-xs" @click="addMetric" />
+                </div>
+                <div class="space-y-3">
+                    <div v-for="(metric, index) in formData.metrics" :key="`metric-${index}`"
+                        class="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-3 items-center">
+                        <LazyInputText v-model="metric.label" class="w-full" placeholder="Label" autocomplete="off" />
+                        <LazyInputText v-model="metric.value" class="w-full" placeholder="Value" autocomplete="off" />
+                        <i @click="removeMetric(index)"
+                            class="fa-solid fa-trash text-red-500 hover:text-red-800 cursor-pointer transition duration-150 ease-in-out"></i>
+                    </div>
+                </div>
+                <LazyInputError class="text-sm mt-1" :message="validations_errors.metrics" />
             </div>
 
             <div class="flex items-center gap-4">
