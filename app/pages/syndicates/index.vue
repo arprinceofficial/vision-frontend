@@ -29,6 +29,7 @@ type CmsCurrentSyndicatesResponse = {
 
 type CmsFundedSyndicate = {
     title?: string | null
+    slug?: string | null
     model?: string | null
     image?: string | null
     alt?: string | null
@@ -180,11 +181,7 @@ const isTruthy = (value: boolean | number | string | null | undefined) => {
 }
 
 const createSyndicateSlug = (...values: Array<number | string | null | undefined>) => {
-    const textValue = values
-        .map((value) => getFirstValue(value))
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase()
+    const textValue = getFirstValue(...values).toLowerCase()
 
     return textValue
         .replace(/&/g, 'and')
@@ -192,33 +189,9 @@ const createSyndicateSlug = (...values: Array<number | string | null | undefined
         .replace(/^-+|-+$/g, '') || 'detail'
 }
 
-const normalizeCurrentSyndicateRoute = (
-    item: CmsCurrentSyndicate,
-    title: string,
-    marque: string,
-    isLive: boolean
-) => {
-    const rawRoute = getFirstValue(item.to)
-    const detailSlug = createSyndicateSlug(item.slug, title, marque)
-
-    if (!rawRoute) {
-        return isLive ? `/syndicates/car-detail/${detailSlug}` : '/coming-soon-details'
-    }
-
-    if (rawRoute === '/car-detail' || rawRoute === 'car-detail') {
-        return `/syndicates/car-detail/${detailSlug}`
-    }
-
-    if (rawRoute.startsWith('/car-detail/')) {
-        return `/syndicates${rawRoute}`
-    }
-
-    if (rawRoute.startsWith('car-detail/')) {
-        return `/syndicates/${rawRoute}`
-    }
-
-    return rawRoute
-}
+const createSyndicateDetailRoute = (source: 'current' | 'funded', slug: string) => (
+    `/syndicates/car-detail/${slug}?source=${source}`
+)
 
 const normalizeCurrentSyndicate = (item: CmsCurrentSyndicate): CurrentSyndicate | null => {
     const title = getFirstValue(item.title)
@@ -234,8 +207,8 @@ const normalizeCurrentSyndicate = (item: CmsCurrentSyndicate): CurrentSyndicate 
         marque,
         image: getFirstValue(item.image) || fallbackSyndicateImage,
         alt: getFirstValue(item.alt) || title,
-        action: getFirstValue(item.action) || (isLive ? 'Find Out More' : 'Register Interest'),
-        to: normalizeCurrentSyndicateRoute(item, title, marque, isLive),
+        action: 'View',
+        to: createSyndicateDetailRoute('current', createSyndicateSlug(item.slug, title)),
         isLive,
     }
 }
@@ -250,7 +223,7 @@ const normalizeFundedSyndicate = (item: CmsFundedSyndicate): FundedSyndicate | n
         model: getFirstValue(item.model),
         image: getFirstValue(item.image) || fallbackSyndicateImage,
         alt: getFirstValue(item.alt) || title,
-        to: getFirstValue(item.to) || '/funded-details',
+        to: createSyndicateDetailRoute('funded', createSyndicateSlug(item.slug, `${title} ${getFirstValue(item.model)}`, title)),
     }
 }
 
@@ -348,13 +321,13 @@ const shouldShowExpertPanelsSkeleton = computed(() => (
                         Our syndicates allow you to join together with other like minded individuals and benefit from
                         potential future appreciation.
                     </p>
-                    <a href="#current-syndicates"
+                    <!-- <a href="#current-syndicates"
                         class="mt-7 inline-flex items-center gap-3 rounded-full bg-tccGold px-5 py-3 text-[13px] font-bold text-tccDarkNavy transition-colors hover:bg-tccLightGold">
                         Join Syndicate
                         <span class="grid h-5 w-5 place-items-center rounded-full bg-tccDarkNavy text-white">
                             <i class="fa-solid fa-arrow-right text-[10px]" aria-hidden="true" />
                         </span>
-                    </a>
+                    </a> -->
                 </div>
             </div>
         </section>
@@ -478,7 +451,7 @@ const shouldShowExpertPanelsSkeleton = computed(() => (
                                 <span class="grid h-8 w-8 place-items-center bg-tccGold text-tccDarkNavy">
                                     <i class="fa-solid fa-arrow-right text-sm" aria-hidden="true" />
                                 </span>
-                                Find Out More
+                                View
                             </a>
                         </div>
                     </article>

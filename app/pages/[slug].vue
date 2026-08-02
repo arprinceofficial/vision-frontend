@@ -18,7 +18,7 @@ type PageConfig = {
 
 const route = useRoute()
 const slug = computed(() => String(route.params.slug || ''))
-const legacyCarDetailRoute = '/syndicates/car-detail/aston-martin-vanquish-s'
+const legacyCarDetailRoute = '/syndicates/car-detail/aston-martin-vanquish-s?source=current'
 
 if (slug.value === 'car-detail') {
     await navigateTo(legacyCarDetailRoute, { replace: true })
