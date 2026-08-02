@@ -5,8 +5,37 @@ defineProps<{
   activeSection: ProfileSection
 }>()
 
-const { profileSummary, navItems } = useProfileDashboard()
-const { isLoadingLogout, logout } = citizenAuth()
+const { navItems } = useProfileDashboard()
+const { citizen_user, isLoadingLogout, logout } = citizenAuth()
+
+const getProfileDisplayName = (user: any) => {
+  const info = user?.user_info || {}
+  return [info.first_name, info.middle_name, info.last_name]
+    .filter(Boolean)
+    .join(' ')
+    || user?.username
+    || user?.email
+    || 'Member'
+}
+
+const getProfileInitials = (name: string) => {
+  const words = name.trim().split(/\s+/).filter(Boolean)
+  if (!words.length) return 'TC'
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase()
+  return `${words[0][0]}${words[words.length - 1][0]}`.toUpperCase()
+}
+
+const profileSummary = computed(() => {
+  const user = getCitizenUserData(citizen_user.value)
+  const name = getProfileDisplayName(user)
+
+  return {
+    name,
+    initials: getProfileInitials(name),
+    email: user?.email || '',
+    completion: 100
+  }
+})
 
 const handleLogout = async () => {
   await logout()

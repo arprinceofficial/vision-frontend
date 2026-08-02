@@ -16,6 +16,8 @@ const navWidths: Record<ProfileSection, string> = {
 }
 
 const inputSkeletons = Array.from({ length: 4 }, (_, index) => index)
+const accountInputSkeletons = Array.from({ length: 7 }, (_, index) => index)
+const addressInputSkeletons = Array.from({ length: 5 }, (_, index) => index)
 const allocationRows = Array.from({ length: 2 }, (_, index) => index)
 const transactionRows = Array.from({ length: 3 }, (_, index) => index)
 </script>
@@ -77,6 +79,11 @@ const transactionRows = Array.from({ length: 3 }, (_, index) => index)
           </div>
 
           <div class="space-y-5">
+            <div class="space-y-2">
+              <div class="h-4 w-36 animate-pulse rounded-full bg-white/14" />
+              <div class="h-[210px] w-full max-w-[250px] animate-pulse rounded-md border border-white/40 bg-white/10" />
+            </div>
+
             <div class="grid gap-4 md:grid-cols-2">
               <div v-for="field in inputSkeletons" :key="`profile-field-${field}`" class="space-y-2">
                 <div class="h-2.5 w-28 animate-pulse rounded-full bg-white/10" />
@@ -85,9 +92,19 @@ const transactionRows = Array.from({ length: 3 }, (_, index) => index)
             </div>
 
             <div class="space-y-4 border-t border-white/10 pt-5">
+              <div class="h-3 w-32 animate-pulse rounded-full bg-tccGold/35" />
+              <div class="grid gap-4 md:grid-cols-2">
+                <div v-for="field in accountInputSkeletons" :key="`account-field-${field}`" class="space-y-2">
+                  <div class="h-2.5 w-24 animate-pulse rounded-full bg-white/10" />
+                  <div class="h-11 w-full animate-pulse rounded-xl border border-white/14 bg-white/10" />
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-4 border-t border-white/10 pt-5">
               <div class="h-3 w-36 animate-pulse rounded-full bg-tccGold/35" />
               <div class="grid gap-4 md:grid-cols-2">
-                <div v-for="field in inputSkeletons" :key="`address-field-${field}`" class="space-y-2">
+                <div v-for="field in addressInputSkeletons" :key="`address-field-${field}`" class="space-y-2">
                   <div class="h-2.5 w-24 animate-pulse rounded-full bg-white/10" />
                   <div class="h-11 w-full animate-pulse rounded-xl border border-white/14 bg-white/10" />
                 </div>
@@ -107,9 +124,15 @@ const transactionRows = Array.from({ length: 3 }, (_, index) => index)
           </div>
 
           <div class="mt-6 max-w-lg space-y-5">
-            <div v-for="field in 3" :key="`security-field-${field}`" class="space-y-2">
+            <div v-for="field in 2" :key="`security-field-${field}`" class="space-y-2">
               <div class="h-2.5 w-32 animate-pulse rounded-full bg-white/10" />
               <div class="h-11 w-full animate-pulse rounded-xl border border-white/14 bg-white/10" />
+            </div>
+            <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              <div v-for="requirement in 5" :key="`security-requirement-${requirement}`" class="flex items-center gap-2">
+                <div class="h-2.5 w-2.5 animate-pulse rounded-full bg-tccGold/35" />
+                <div class="h-2.5 w-28 animate-pulse rounded-full bg-white/10" />
+              </div>
             </div>
             <div class="h-11 w-full animate-pulse rounded-full bg-tccGold/70" />
           </div>
