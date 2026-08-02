@@ -35,7 +35,7 @@ const heroStats = [
 
         <div class="flex flex-col justify-center gap-4 pt-2 sm:flex-row">
           <a
-            href="/car-detail"
+            href="/syndicates/car-detail/aston-martin-vanquish-s"
             class="rounded-full bg-tccGold px-8 py-4 font-poppins text-xs font-bold uppercase tracking-[0.22em] text-tccDarkNavy shadow-xl shadow-tccGold/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-tccLightGold"
           >
             Apply For Allocation

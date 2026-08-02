@@ -380,7 +380,7 @@ useHead(() => ({
                             <div v-for="spec in syndicate.specs" :key="spec.label"
                                 class="border-b border-white/12 px-3 py-3 text-center last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0">
                                 <strong class="block font-poppins text-lg font-black text-white">{{ spec.value
-                                }}</strong>
+                                    }}</strong>
                                 <span
                                     class="mt-2 block text-[9px] font-bold uppercase tracking-[0.18em] text-white/38">{{
                                         spec.label }}</span>
@@ -608,7 +608,8 @@ useHead(() => ({
                     <div class="mt-8 flex flex-wrap gap-x-5 gap-y-2 border-b border-white/12" role="tablist"
                         aria-label="Investment analysis tabs">
                         <button v-for="(tab, key) in syndicate.analysisTabs" :key="key" type="button" role="tab"
-                            :aria-selected="activeAnalysisTab === key" class="border-b-2 px-1 pb-4 text-left text-[10px] font-black uppercase tracking-[0.22em] transition-colors"
+                            :aria-selected="activeAnalysisTab === key"
+                            class="border-b-2 px-1 pb-4 text-left text-[10px] font-black uppercase tracking-[0.22em] transition-colors"
                             :class="activeAnalysisTab === key
                                 ? 'border-tccGold text-tccGold'
                                 : 'border-transparent text-white/40 hover:border-white/20 hover:text-white/75'"
@@ -627,10 +628,10 @@ useHead(() => ({
                             </p>
 
                             <div class="mt-5 grid gap-3 sm:grid-cols-3">
-                                <div v-for="metric in currentAnalysisTab.metrics" :key="`${activeAnalysisTab}-${metric.label}`"
+                                <div v-for="metric in currentAnalysisTab.metrics"
+                                    :key="`${activeAnalysisTab}-${metric.label}`"
                                     class="rounded-md border border-white/10 bg-tccDeepBlack/45 p-4">
-                                    <span
-                                        class="block text-[9px] font-black uppercase tracking-[0.18em] text-white/38">
+                                    <span class="block text-[9px] font-black uppercase tracking-[0.18em] text-white/38">
                                         {{ metric.label }}
                                     </span>
                                     <strong class="mt-2 block text-sm font-black text-white">{{ metric.value }}</strong>
@@ -639,7 +640,8 @@ useHead(() => ({
                         </div>
 
                         <div class="mt-6 space-y-4 text-sm leading-relaxed text-white/64">
-                            <p v-for="paragraph in currentAnalysisTab.paragraphs" :key="`${activeAnalysisTab}-${paragraph}`">
+                            <p v-for="paragraph in currentAnalysisTab.paragraphs"
+                                :key="`${activeAnalysisTab}-${paragraph}`">
                                 {{ paragraph }}
                             </p>
                             <p class="font-bold text-white/88">{{ currentAnalysisTab.conclusion }}</p>
@@ -737,7 +739,7 @@ useHead(() => ({
                                         class="h-9 w-9 shrink-0 rounded-full border border-white/20">
                                     <div class="min-w-0">
                                         <span class="block truncate text-xs font-bold text-white/75">{{ post.author
-                                        }}</span>
+                                            }}</span>
                                         <span class="block text-[10px] text-white/40">{{ post.date }}</span>
                                     </div>
                                 </div>
@@ -757,8 +759,8 @@ useHead(() => ({
         </section>
 
         <ClientOnly>
-            <CitizenSyndicatesIncompleteAllocationModal :is-open-modal="isAllocationModalVisible" :title="syndicate.title"
-                :slots="allocationCount" :allocation-cost="syndicate.allocationCost"
+            <CitizenSyndicatesIncompleteAllocationModal :is-open-modal="isAllocationModalVisible"
+                :title="syndicate.title" :slots="allocationCount" :allocation-cost="syndicate.allocationCost"
                 :progress="allocationRecoveryProgress" @close="closeAllocationModal" @start-fresh="selectAllocationFlow"
                 @continue-existing="selectAllocationFlow" />
         </ClientOnly>
