@@ -67,7 +67,7 @@ const submitLogin = async () => {
         })
 
         if (response?.status === true) {
-            const targetRoute = getCustomerOnboardingRoute(response) || '/profile'
+            const targetRoute = getCustomerOnboardingRoute(response) || '/'
 
             notice.value = {
                 title: 'Login Successful',

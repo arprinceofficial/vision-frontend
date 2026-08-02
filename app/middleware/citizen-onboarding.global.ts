@@ -1,7 +1,7 @@
 export default defineNuxtRouteMiddleware(async (to) => {
     if (to.path.startsWith('/admin') || to.path === '/admin-login') return;
 
-    const publicAuthRoutes = ['/login', '/register'];
+    const publicAuthRoutes = ['/login', '/register', '/forgot-password', '/otp-verification', '/reset-password'];
     const citizen_user = citizenUser();
 
     if (citizen_user.value === undefined) {
