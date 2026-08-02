@@ -145,20 +145,20 @@ onBeforeUnmount(() => {
                             class="absolute right-0 top-full z-[100] w-60 pt-4" @click.stop>
                             <div
                                 class="overflow-hidden rounded-[1.25rem] border border-tccGold/25 bg-[#050403] py-2 shadow-[0_24px_80px_rgba(0,0,0,0.75)] ring-1 ring-white/10">
-                                <a v-for="child in link.child" :key="child.label" :href="child.to"
+                                <NuxtLink v-for="child in link.child" :key="child.label" :to="child.to || '/'"
                                     class="block px-5 py-3 text-xs font-semibold transition-colors hover:bg-tccGold hover:text-tccDarkNavy"
                                     :class="isLinkActive(child) ? 'text-tccGold' : 'text-white/90'"
                                     @click="closeChildMenu">
                                     {{ child.label }}
-                                </a>
+                                </NuxtLink>
                             </div>
                         </div>
                     </div>
-                    <a v-else :href="link.to"
+                    <NuxtLink v-else :to="link.to || '/'"
                         class="font-poppins text-[10px] font-semibold uppercase tracking-[0.14em] transition-colors duration-200 2xl:text-[11px] 2xl:tracking-[0.18em]"
                         :class="isLinkActive(link) ? 'text-tccGold hover:text-white' : 'text-white/70 hover:text-white'">
                         {{ link.label }}
-                    </a>
+                    </NuxtLink>
                 </template>
             </div>
 
@@ -170,10 +170,10 @@ onBeforeUnmount(() => {
                         <img :src="profilePhoto" :alt="profileAlt"
                             class="h-8 w-8 rounded-full border border-white/30 transition-colors duration-300 group-hover:border-tccGold">
                     </button>
-                    <a v-else href="/profile" class="group relative block" aria-label="Profile">
+                    <NuxtLink v-else to="/profile" class="group relative block" aria-label="Profile">
                         <img :src="profilePhoto" :alt="profileAlt"
                             class="h-8 w-8 rounded-full border border-white/30 transition-colors duration-300 group-hover:border-tccGold">
-                    </a>
+                    </NuxtLink>
 
                     <div v-show="needsOnboarding && isProfileMenuOpen" id="profile-menu"
                         class="absolute right-0 top-full z-[100] w-44 pt-4" @click.stop>
@@ -189,14 +189,14 @@ onBeforeUnmount(() => {
                     </div>
                 </div>
                 <template v-else>
-                    <a href="/login"
+                    <NuxtLink to="/login"
                         class="rounded-full border border-white/20 px-5 py-2.5 font-poppins text-[11px] font-bold uppercase tracking-[0.18em] text-white transition-all duration-300 hover:border-tccGold hover:text-tccGold">
                         Login
-                    </a>
-                    <a href="/register"
+                    </NuxtLink>
+                    <NuxtLink to="/register"
                         class="rounded-full bg-tccGold px-5 py-2.5 font-poppins text-[11px] font-bold uppercase tracking-[0.18em] text-tccDarkNavy shadow-md shadow-tccGold/20 transition-all duration-300 hover:bg-tccLightGold">
                         Register
-                    </a>
+                    </NuxtLink>
                 </template>
             </div>
 
@@ -222,17 +222,17 @@ onBeforeUnmount(() => {
                             :class="isLinkActive(link) ? 'text-tccGold' : 'text-white/90'">
                             {{ link.label }}
                         </p>
-                        <a v-for="child in link.child" :key="`mobile-child-${child.label}`" :href="child.to"
+                        <NuxtLink v-for="child in link.child" :key="`mobile-child-${child.label}`" :to="child.to || '/'"
                             class="block py-2 pl-4 font-poppins text-xs font-semibold uppercase tracking-[0.18em]"
                             :class="isLinkActive(child) ? 'text-tccGold' : 'text-white/75'" @click="closeMobileMenu">
                             {{ child.label }}
-                        </a>
+                        </NuxtLink>
                     </div>
-                    <a v-else :href="link.to"
+                    <NuxtLink v-else :to="link.to || '/'"
                         class="block py-2 font-poppins text-xs font-semibold uppercase tracking-[0.18em]"
                         :class="isLinkActive(link) ? 'text-tccGold' : 'text-white/90'" @click="closeMobileMenu">
                         {{ link.label }}
-                    </a>
+                    </NuxtLink>
                 </template>
                 <div class="border-t border-white/10 pt-3">
                     <button v-if="isCitizenLoggedIn && needsOnboarding" type="button"
@@ -241,23 +241,23 @@ onBeforeUnmount(() => {
                         <i class="pi pi-sign-out text-xs" aria-hidden="true" />
                         {{ isLoadingLogout ? 'Logging Out...' : 'Logout' }}
                     </button>
-                    <a v-else-if="isCitizenLoggedIn" href="/profile"
+                    <NuxtLink v-else-if="isCitizenLoggedIn" to="/profile"
                         class="flex w-full items-center justify-center gap-2 rounded bg-tccGold px-4 py-2 text-center font-poppins text-sm font-semibold text-tccDarkNavy transition-colors hover:bg-tccLightGold"
                         @click="closeMobileMenu">
                         <img :src="profilePhoto" :alt="profileAlt" class="h-6 w-6 rounded-full">
                         Profile
-                    </a>
+                    </NuxtLink>
                     <div v-else class="grid grid-cols-2 gap-3">
-                        <a href="/login"
+                        <NuxtLink to="/login"
                             class="block w-full rounded border border-white/20 px-4 py-2 text-center font-poppins text-sm font-semibold text-white transition-colors hover:border-tccGold hover:text-tccGold"
                             @click="closeMobileMenu">
                             Login
-                        </a>
-                        <a href="/register"
+                        </NuxtLink>
+                        <NuxtLink to="/register"
                             class="block w-full rounded bg-tccGold px-4 py-2 text-center font-poppins text-sm font-semibold text-tccDarkNavy transition-colors hover:bg-tccLightGold"
                             @click="closeMobileMenu">
                             Register
-                        </a>
+                        </NuxtLink>
                     </div>
                 </div>
             </div>

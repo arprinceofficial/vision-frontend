@@ -154,13 +154,13 @@ const shouldShowPortfolioServicesSkeleton = computed(() => (
                         If you're passionate about cars, interested in alternatives, or looking to diversify, a private
                         portfolio could be right for you.
                     </p>
-                    <a href="#consultation"
+                    <NuxtLink to="#consultation"
                         class="mt-9 inline-flex items-center gap-3 rounded-full bg-tccGold px-6 py-3.5 text-[14px] font-bold text-tccDarkNavy transition-colors hover:bg-tccLightGold">
                         Get In Touch
                         <span class="grid h-5 w-5 place-items-center rounded-full bg-tccDarkNavy text-white">
                             <i class="fa-solid fa-arrow-right text-[10px]" aria-hidden="true" />
                         </span>
-                    </a>
+                    </NuxtLink>
                 </div>
             </div>
         </section>
@@ -249,11 +249,11 @@ const shouldShowPortfolioServicesSkeleton = computed(() => (
                             Speak to our Private Office team to discuss personalised portfolio options that suit you.
                         </p>
                     </div>
-                    <a href="/contact"
+                    <NuxtLink to="/contact"
                         class="inline-flex items-center justify-center gap-3 rounded-full border border-tccGold/50 bg-tccGold px-6 py-3.5 text-[13px] font-bold text-tccDarkNavy transition-colors hover:bg-tccLightGold md:shrink-0">
                         Book A Call
                         <i class="fa-solid fa-arrow-right text-[11px]" aria-hidden="true" />
-                    </a>
+                    </NuxtLink>
                 </div>
 
                 <div v-if="shouldShowPortfolioServicesSkeleton"
@@ -316,11 +316,11 @@ const shouldShowPortfolioServicesSkeleton = computed(() => (
                                 option for those seeking both security and financial growth.
                             </p>
                         </div>
-                        <a href="#consultation"
+                        <NuxtLink to="#consultation"
                             class="mt-9 inline-flex items-center gap-3 rounded-full bg-tccGold px-6 py-3.5 text-[13px] font-bold text-tccDarkNavy transition-colors hover:bg-tccLightGold">
                             Find Out More
                             <i class="fa-solid fa-circle-arrow-right text-[13px]" aria-hidden="true" />
-                        </a>
+                        </NuxtLink>
                     </div>
                 </div>
                 <div class="min-h-[520px]">
@@ -341,11 +341,11 @@ const shouldShowPortfolioServicesSkeleton = computed(() => (
                     Ready To Build Your Dream Collection?</h2>
                 <p class="mt-3 text-[14px] leading-relaxed text-white/70">Request a consultation with our expert team
                     today.</p>
-                <a href="/contact"
+                <NuxtLink to="/contact"
                     class="mt-7 inline-flex items-center gap-3 rounded-full bg-tccGold px-6 py-3 text-[13px] font-bold text-tccDarkNavy transition-colors hover:bg-tccLightGold">
                     Get Started
                     <i class="fa-solid fa-arrow-right text-[11px]" aria-hidden="true" />
-                </a>
+                </NuxtLink>
             </div>
         </section>
     </div>

@@ -76,13 +76,13 @@ const events = [
                 <div>
                   <span class="text-[10px] text-white/40">{{ post.date }}</span>
                   <h3 class="mt-2 font-poppins text-xl font-bold leading-tight text-white transition-colors hover:text-tccGold">
-                    <a href="/learn-more">{{ post.title }}</a>
+                    <NuxtLink to="/learn-more">{{ post.title }}</NuxtLink>
                   </h3>
                   <p class="news-card-excerpt mt-3 text-sm leading-relaxed text-white/60">{{ post.excerpt }}</p>
                 </div>
                 <div class="mt-5 flex items-center justify-between border-t border-white/10 pt-4 text-[11px] text-white/50">
                   <span>{{ post.author }}</span>
-                  <a href="/learn-more" class="font-bold uppercase tracking-[0.14em] text-tccGold hover:text-tccLightGold">Read</a>
+                  <NuxtLink to="/learn-more" class="font-bold uppercase tracking-[0.14em] text-tccGold hover:text-tccLightGold">Read</NuxtLink>
                 </div>
               </div>
             </article>
@@ -115,12 +115,12 @@ const events = [
                 <h3 class="mt-1 truncate text-sm font-semibold text-white">{{ event.title }}</h3>
                 <p class="mt-0.5 text-[10px] text-white/50">{{ event.detail }}</p>
               </div>
-              <a
-                href="/contact"
+              <NuxtLink
+                to="/contact"
                 class="rounded-full border border-tccGold/40 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-tccGold transition-all hover:bg-tccGold hover:text-tccDarkNavy"
               >
                 Join
-              </a>
+              </NuxtLink>
             </article>
           </div>
         </aside>

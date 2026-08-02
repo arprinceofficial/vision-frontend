@@ -321,13 +321,13 @@ const shouldShowExpertPanelsSkeleton = computed(() => (
                         Our syndicates allow you to join together with other like minded individuals and benefit from
                         potential future appreciation.
                     </p>
-                    <!-- <a href="#current-syndicates"
+                    <!-- <NuxtLink to="#current-syndicates"
                         class="mt-7 inline-flex items-center gap-3 rounded-full bg-tccGold px-5 py-3 text-[13px] font-bold text-tccDarkNavy transition-colors hover:bg-tccLightGold">
                         Join Syndicate
                         <span class="grid h-5 w-5 place-items-center rounded-full bg-tccDarkNavy text-white">
                             <i class="fa-solid fa-arrow-right text-[10px]" aria-hidden="true" />
                         </span>
-                    </a> -->
+                    </NuxtLink> -->
                 </div>
             </div>
         </section>
@@ -394,13 +394,13 @@ const shouldShowExpertPanelsSkeleton = computed(() => (
                             <h3 class="text-[24px] font-semibold leading-none text-white sm:text-[28px]">{{ item.title
                                 }}</h3>
                             <p class="mt-2 text-[13px] font-medium text-white/75">{{ item.marque }}</p>
-                            <a :href="item.to"
+                            <NuxtLink :to="item.to"
                                 class="mt-5 inline-flex items-center gap-3 text-[13px] font-semibold text-white/85 transition-colors hover:text-tccGold">
                                 <span class="grid h-8 w-8 place-items-center bg-tccGold text-tccDarkNavy">
                                     <i class="fa-solid fa-arrow-right text-sm" aria-hidden="true" />
                                 </span>
                                 {{ item.action }}
-                            </a>
+                            </NuxtLink>
                         </div>
                     </article>
                 </div>
@@ -446,13 +446,13 @@ const shouldShowExpertPanelsSkeleton = computed(() => (
                             <h3 class="text-[24px] font-semibold leading-none text-white sm:text-[28px]">{{ item.title
                                 }}</h3>
                             <p class="mt-2 text-[13px] font-medium text-white/75">{{ item.model }}</p>
-                            <a :href="item.to"
+                            <NuxtLink :to="item.to"
                                 class="mt-5 inline-flex items-center gap-3 text-[13px] font-semibold text-white/85 transition-colors hover:text-tccGold">
                                 <span class="grid h-8 w-8 place-items-center bg-tccGold text-tccDarkNavy">
                                     <i class="fa-solid fa-arrow-right text-sm" aria-hidden="true" />
                                 </span>
                                 View
-                            </a>
+                            </NuxtLink>
                         </div>
                     </article>
                 </div>
@@ -471,13 +471,13 @@ const shouldShowExpertPanelsSkeleton = computed(() => (
                         <div class="px-5 pb-7 pt-5 sm:px-6">
                             <h3 class="text-xl font-semibold leading-tight text-white">{{ item.title }}</h3>
                             <p class="mt-3 text-[14px] leading-relaxed text-white/65">{{ item.body }}</p>
-                            <!-- <a href="/register"
+                            <!-- <NuxtLink to="/register"
                                 class="mt-6 inline-flex items-center gap-3 text-[13px] font-medium text-white/70 transition-colors hover:text-tccGold">
                                 <span class="grid h-8 w-8 place-items-center bg-tccGold text-tccDarkNavy">
                                     <i class="fa-solid fa-arrow-right text-sm" aria-hidden="true" />
                                 </span>
                                 Join Us
-                            </a> -->
+                            </NuxtLink> -->
                         </div>
                     </article>
                 </div>

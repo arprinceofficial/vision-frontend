@@ -127,10 +127,10 @@ const submitLogin = async () => {
                                     <div class="flex items-center justify-between">
                                         <label for="password"
                                             class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">Password</label>
-                                        <a :href="forgotPasswordUrl"
+                                        <NuxtLink :to="forgotPasswordUrl"
                                             class="text-[11px] font-semibold text-tccGold transition-colors hover:text-tccLightGold">
                                             Forgot Password?
-                                        </a>
+                                        </NuxtLink>
                                     </div>
                                     <div class="relative">
                                         <input id="password" v-model="password"
@@ -156,9 +156,9 @@ const submitLogin = async () => {
 
                             <p class="pt-2 text-center text-xs font-light text-gray-500">
                                 Don't have an account?
-                                <a href="/register"
+                                <NuxtLink to="/register"
                                     class="ml-1 font-bold uppercase text-tccGold transition-colors hover:text-tccLightGold">Register
-                                    Now</a>
+                                    Now</NuxtLink>
                             </p>
                         </form>
 

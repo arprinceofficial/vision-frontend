@@ -241,13 +241,13 @@ const shouldShowAvailableSyndicatesSkeleton = computed(() => (
                     <h1 class="text-[42px] font-bold leading-tight sm:text-[56px]">Syndicated Restoration</h1>
                     <p class="mt-3 text-lg font-semibold leading-relaxed text-white">Share the investment, the
                         experience, and the enjoyment.</p>
-                    <a href="#how-it-works"
+                    <NuxtLink to="#how-it-works"
                         class="mt-10 inline-flex items-center gap-2 rounded-full bg-tccGold px-7 py-4 text-[15px] font-bold text-tccDarkNavy transition-colors hover:bg-tccLightGold">
                         Find Out More
                         <span class="flex h-5 w-5 items-center justify-center rounded-full bg-tccDarkNavy text-white">
                             <i class="fa-solid fa-arrow-up-right-from-square text-[9px]" aria-hidden="true" />
                         </span>
-                    </a>
+                    </NuxtLink>
                 </div>
 
                 <div class="flex items-center justify-end gap-8">

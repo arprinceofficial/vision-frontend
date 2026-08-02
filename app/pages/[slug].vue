@@ -419,10 +419,10 @@ const detailImage = computed(() => {
                             class="w-full rounded-lg bg-tccDarkNavy py-3.5 text-center font-poppins text-xs font-bold uppercase tracking-widest text-white shadow-lg transition-colors hover:bg-tccNavy">
                             {{ page.primary?.label }}
                         </button>
-                        <a v-if="page.secondary" :href="page.secondary.to"
+                        <NuxtLink v-if="page.secondary" :to="page.secondary.to"
                             class="block text-center text-xs font-bold uppercase text-tccGold transition-colors hover:text-tccNavy">
                             {{ page.secondary.label }}
-                        </a>
+                        </NuxtLink>
                     </form>
                 </div>
             </section>
@@ -450,12 +450,12 @@ const detailImage = computed(() => {
                         <p class="max-w-2xl text-base font-light leading-relaxed text-white/70">{{ page.description }}
                         </p>
                         <div class="flex flex-wrap gap-3">
-                            <a href="#live-grid"
+                            <NuxtLink to="#live-grid"
                                 class="rounded-full bg-tccGold px-5 py-3.5 font-poppins text-xs font-bold uppercase tracking-[0.16em] text-tccDarkNavy sm:px-6 sm:tracking-[0.22em]">View
-                                Live Assets</a>
-                            <a href="/funded-assets"
+                                Live Assets</NuxtLink>
+                            <NuxtLink to="/funded-assets"
                                 class="rounded-full border border-white/20 bg-white/10 px-5 py-3.5 font-poppins text-xs font-bold uppercase tracking-[0.16em] text-white sm:px-6 sm:tracking-[0.22em]">Funded
-                                Archive</a>
+                                Archive</NuxtLink>
                         </div>
                     </div>
                 </div>
@@ -471,16 +471,16 @@ const detailImage = computed(() => {
                 </div>
 
                 <div class="mb-8 flex flex-wrap gap-3">
-                    <a href="/syndicate-restoration"
+                    <NuxtLink to="/syndicate-restoration"
                         class="rounded border border-tccBorder bg-white px-4 py-2 font-poppins text-xs font-semibold uppercase text-tccNavy">Syndicated
-                        Restoration</a>
-                    <a href="/live-syndicate"
-                        class="rounded border border-tccBorder bg-white px-4 py-2 font-poppins text-xs font-semibold uppercase text-tccNavy">Live</a>
-                    <a href="/funded-assets"
-                        class="rounded border border-tccBorder bg-white px-4 py-2 font-poppins text-xs font-semibold uppercase text-tccNavy">Funded</a>
-                    <a href="/coming-soon-assets"
+                        Restoration</NuxtLink>
+                    <NuxtLink to="/live-syndicate"
+                        class="rounded border border-tccBorder bg-white px-4 py-2 font-poppins text-xs font-semibold uppercase text-tccNavy">Live</NuxtLink>
+                    <NuxtLink to="/funded-assets"
+                        class="rounded border border-tccBorder bg-white px-4 py-2 font-poppins text-xs font-semibold uppercase text-tccNavy">Funded</NuxtLink>
+                    <NuxtLink to="/coming-soon-assets"
                         class="rounded border border-tccBorder bg-white px-4 py-2 font-poppins text-xs font-semibold uppercase text-tccNavy">Coming
-                        Soon</a>
+                        Soon</NuxtLink>
                 </div>
 
                 <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
@@ -504,10 +504,10 @@ const detailImage = computed(() => {
                                 <div class="h-full rounded-full bg-tccGold"
                                     :style="{ width: asset.progress === 'Preview' ? '35%' : asset.progress }" />
                             </div>
-                            <a :href="asset.route"
+                            <NuxtLink :to="asset.route"
                                 class="block rounded bg-tccDarkNavy px-4 py-3 text-center font-poppins text-xs font-bold uppercase tracking-wider text-white transition-colors hover:bg-tccNavy">
                                 View Details
-                            </a>
+                            </NuxtLink>
                         </div>
                     </article>
                 </div>
@@ -585,12 +585,12 @@ const detailImage = computed(() => {
                             <i class="pi" :class="page.icon || 'pi-check'" aria-hidden="true" />
                         </div>
                         <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-                            <a v-if="page.primary" :href="page.primary.to"
+                            <NuxtLink v-if="page.primary" :to="page.primary.to"
                                 class="rounded bg-tccDarkNavy px-6 py-3 font-poppins text-xs font-bold uppercase tracking-wider text-white">{{
-                                page.primary.label }}</a>
-                            <a v-if="page.secondary" :href="page.secondary.to"
+                                page.primary.label }}</NuxtLink>
+                            <NuxtLink v-if="page.secondary" :to="page.secondary.to"
                                 class="rounded border border-tccBorder px-6 py-3 font-poppins text-xs font-bold uppercase tracking-wider text-tccNavy">{{
-                                page.secondary.label }}</a>
+                                page.secondary.label }}</NuxtLink>
                         </div>
                     </div>
 
@@ -676,10 +676,10 @@ const detailImage = computed(() => {
                                 @click="processAction(page.primary.to)">
                                 {{ page.primary.label }}
                             </button>
-                            <a v-if="page.secondary" :href="page.secondary.to"
+                            <NuxtLink v-if="page.secondary" :to="page.secondary.to"
                                 class="block rounded border border-tccBorder px-5 py-3 text-center font-poppins text-xs font-bold uppercase tracking-wider text-tccNavy">
                                 {{ page.secondary.label }}
-                            </a>
+                            </NuxtLink>
                         </aside>
                     </div>
 
@@ -714,10 +714,10 @@ const detailImage = computed(() => {
                                 @click="processAction(page.primary.to)">
                                 {{ page.primary.label }}
                             </button>
-                            <a v-if="page.secondary" :href="page.secondary.to"
+                            <NuxtLink v-if="page.secondary" :to="page.secondary.to"
                                 class="rounded border border-tccBorder px-6 py-3 text-center font-poppins text-xs font-bold uppercase tracking-wider text-tccNavy">
                                 {{ page.secondary.label }}
-                            </a>
+                            </NuxtLink>
                         </div>
                     </div>
                 </div>

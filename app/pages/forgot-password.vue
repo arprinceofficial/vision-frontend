@@ -462,9 +462,9 @@ onBeforeUnmount(() => {
 
                             <p class="pt-2 text-center text-xs font-light text-gray-500">
                                 Remembered your password?
-                                <a href="/login"
+                                <NuxtLink to="/login"
                                     class="ml-1 font-bold uppercase text-tccGold transition-colors hover:text-tccLightGold">Log
-                                    In</a>
+                                    In</NuxtLink>
                             </p>
                         </form>
 
@@ -594,10 +594,10 @@ onBeforeUnmount(() => {
                             </div>
 
                             <div class="space-y-3">
-                                <a href="/login"
+                                <NuxtLink to="/login"
                                     class="block w-full rounded-lg bg-tccGold py-3.5 text-center font-poppins text-xs font-bold uppercase tracking-widest text-tccDarkNavy shadow-lg transition-colors hover:bg-tccLightGold">
                                     Back to Login
-                                </a>
+                                </NuxtLink>
                                 <button type="button"
                                     class="text-xs font-bold uppercase text-tccGold transition-colors hover:text-tccLightGold"
                                     @click="restartFlow">

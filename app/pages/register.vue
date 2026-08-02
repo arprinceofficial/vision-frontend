@@ -545,9 +545,9 @@ const resendOtp = async () => {
 
                         <p class="text-center text-xs font-light text-gray-500">
                             Already have an account?
-                            <a href="/login"
+                            <NuxtLink to="/login"
                                 class="ml-1 font-bold uppercase text-tccGold transition-colors hover:text-tccNavy">Log
-                                In</a>
+                                In</NuxtLink>
                         </p>
                         </form>
 

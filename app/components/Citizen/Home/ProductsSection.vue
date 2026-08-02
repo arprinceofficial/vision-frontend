@@ -65,12 +65,14 @@ const isExternalLink = (to: string) => /^https?:\/\//.test(to)
                             </h3>
                             <p class="mt-4 text-sm leading-relaxed text-white/60">{{ product.description }}</p>
                         </div>
-                        <a v-if="!product.disabled" :href="product.to"
-                            :target="isExternalLink(product.to) ? '_blank' : undefined"
-                            :rel="isExternalLink(product.to) ? 'noopener noreferrer' : undefined"
+                        <NuxtLink v-if="!product.disabled && !isExternalLink(product.to)" :to="product.to"
                             class="mt-7 block rounded-full border border-white/20 py-3 text-center font-poppins text-xs font-bold uppercase tracking-[0.22em] text-white transition-colors duration-200 hover:border-tccGold hover:text-tccGold">
                             {{ product.action }}
-                        </a>
+                        </NuxtLink>
+                        <NuxtLink v-else-if="!product.disabled" :to="product.to" external target="_blank" rel="noopener noreferrer"
+                            class="mt-7 block rounded-full border border-white/20 py-3 text-center font-poppins text-xs font-bold uppercase tracking-[0.22em] text-white transition-colors duration-200 hover:border-tccGold hover:text-tccGold">
+                            {{ product.action }}
+                        </NuxtLink>
                         <span v-else
                             class="mt-7 block cursor-not-allowed rounded-full border border-white/10 bg-white/5 py-3 text-center font-poppins text-xs font-bold uppercase tracking-[0.22em] text-white/40">
                             {{ product.action }}

@@ -26,20 +26,20 @@
       <div>
         <h2 class="font-poppins text-xs font-bold uppercase tracking-[0.24em] text-white">Explore</h2>
         <div class="mt-5 grid gap-3 text-sm text-white/60">
-          <a href="/showroom" class="transition-colors hover:text-tccGold">Showroom</a>
-          <a href="/live-syndicate" class="transition-colors hover:text-tccGold">Live Syndicates</a>
-          <a href="/funded-assets" class="transition-colors hover:text-tccGold">Funded Assets</a>
-          <a href="/learn-more" class="transition-colors hover:text-tccGold">How It Works</a>
+          <NuxtLink to="/showroom" class="transition-colors hover:text-tccGold">Showroom</NuxtLink>
+          <NuxtLink to="/live-syndicate" class="transition-colors hover:text-tccGold">Live Syndicates</NuxtLink>
+          <NuxtLink to="/funded-assets" class="transition-colors hover:text-tccGold">Funded Assets</NuxtLink>
+          <NuxtLink to="/learn-more" class="transition-colors hover:text-tccGold">How It Works</NuxtLink>
         </div>
       </div>
 
       <div>
         <h2 class="font-poppins text-xs font-bold uppercase tracking-[0.24em] text-white">Members</h2>
         <div class="mt-5 grid gap-3 text-sm text-white/60">
-          <a href="/investor-classification" class="transition-colors hover:text-tccGold">Classification</a>
-          <a href="/questionnaire" class="transition-colors hover:text-tccGold">Suitability</a>
-          <a href="/kyc" class="transition-colors hover:text-tccGold">KYC Status</a>
-          <a href="/contact" class="transition-colors hover:text-tccGold">Contact</a>
+          <NuxtLink to="/investor-classification" class="transition-colors hover:text-tccGold">Classification</NuxtLink>
+          <NuxtLink to="/questionnaire" class="transition-colors hover:text-tccGold">Suitability</NuxtLink>
+          <NuxtLink to="/kyc" class="transition-colors hover:text-tccGold">KYC Status</NuxtLink>
+          <NuxtLink to="/contact" class="transition-colors hover:text-tccGold">Contact</NuxtLink>
         </div>
       </div>
     </div>

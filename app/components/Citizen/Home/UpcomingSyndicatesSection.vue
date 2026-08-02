@@ -56,10 +56,10 @@ const upcomingSyndicates = [
                         <h3 class="mt-2 font-poppins text-2xl font-bold text-white">{{ item.title }}</h3>
                         <p class="news-card-excerpt mt-3 text-sm leading-relaxed text-white/60">{{ item.description }}
                         </p>
-                        <a href="/coming-soon-details"
+                        <NuxtLink to="/coming-soon-details"
                             class="mt-6 block rounded-full bg-tccGold py-3 text-center font-poppins text-xs font-bold uppercase tracking-[0.22em] text-tccDarkNavy transition-colors duration-200 hover:bg-tccLightGold">
                             Register Interest
-                        </a>
+                        </NuxtLink>
                     </div>
                 </article>
             </div>

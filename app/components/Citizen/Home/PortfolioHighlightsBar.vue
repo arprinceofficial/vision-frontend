@@ -35,10 +35,10 @@ const highlights = [
       </div>
 
       <div class="grid grid-cols-1 gap-px overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/10 md:grid-cols-3">
-        <a
+        <NuxtLink
           v-for="item in highlights"
           :key="item.eyebrow"
-          :href="item.to"
+          :to="item.to"
           class="group block bg-tccDeepBlack/90 p-6 transition-colors duration-300 hover:bg-white/10"
         >
           <span class="block font-poppins text-[10px] font-semibold uppercase tracking-[0.24em] text-white/40">{{ item.eyebrow }}</span>
@@ -47,7 +47,7 @@ const highlights = [
           <span class="mt-5 inline-flex text-lg text-tccGold transition-transform duration-300 group-hover:-translate-y-1 group-hover:translate-x-1" aria-hidden="true">
             &nearr;
           </span>
-        </a>
+        </NuxtLink>
       </div>
     </div>
   </section>

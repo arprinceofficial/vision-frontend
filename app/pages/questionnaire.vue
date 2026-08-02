@@ -400,10 +400,10 @@ onMounted(() => {
                 </div>
 
                 <div class="border-t border-tccBorder pt-6">
-                    <a href="/kyc"
+                    <NuxtLink to="/kyc"
                         class="inline-block rounded-md bg-tccDarkNavy px-8 py-3.5 font-poppins text-xs font-bold uppercase tracking-wider text-white shadow-lg transition-colors hover:bg-tccNavy">
                         Continue to KYC verification &rarr;
-                    </a>
+                    </NuxtLink>
                 </div>
             </div>
         </div>
