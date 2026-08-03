@@ -7,6 +7,7 @@ defineProps<{
 
 const { navItems } = useProfileDashboard()
 const { citizen_user, isLoadingLogout, logout } = citizenAuth()
+const profilePhotoLoadFailed = ref(false)
 
 const getProfileDisplayName = (user: any) => {
   const info = user?.user_info || {}
@@ -25,6 +26,11 @@ const getProfileInitials = (name: string) => {
   return `${words[0][0]}${words[words.length - 1][0]}`.toUpperCase()
 }
 
+const getProfilePhoto = (user: any) => {
+  const photo = user?.user_info?.photo || user?.photo
+  return photo ? String(photo) : ''
+}
+
 const profileSummary = computed(() => {
   const user = getCitizenUserData(citizen_user.value)
   const name = getProfileDisplayName(user)
@@ -32,10 +38,18 @@ const profileSummary = computed(() => {
   return {
     name,
     initials: getProfileInitials(name),
+    photo: getProfilePhoto(user),
     email: user?.email || '',
     completion: 100
   }
 })
+
+watch(
+  () => profileSummary.value.photo,
+  () => {
+    profilePhotoLoadFailed.value = false
+  }
+)
 
 const handleLogout = async () => {
   await logout()
@@ -49,8 +63,15 @@ const handleLogout = async () => {
         <div class="relative overflow-hidden rounded-2xl border border-tccGold/20 bg-[#0b0a08] p-5 text-center text-white shadow-[0_24px_80px_rgba(0,0,0,0.32)]">
           <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(247,198,0,0.18),transparent_18rem)]" />
           <div class="relative z-10 space-y-3.5">
-            <div class="mx-auto grid h-16 w-16 place-items-center rounded-full border border-tccGold/50 bg-tccGold/10 text-tccGold shadow-[0_0_34px_rgba(247,198,0,0.14)]">
-              <span class="font-poppins text-xl font-black uppercase">{{ profileSummary.initials }}</span>
+            <div class="mx-auto grid h-16 w-16 place-items-center overflow-hidden rounded-full border border-tccGold/50 bg-tccGold/10 text-tccGold shadow-[0_0_34px_rgba(247,198,0,0.14)]">
+              <img
+                v-if="profileSummary.photo && !profilePhotoLoadFailed"
+                :src="profileSummary.photo"
+                :alt="`${profileSummary.name} profile image`"
+                class="h-full w-full object-cover"
+                @error="profilePhotoLoadFailed = true"
+              >
+              <span v-else class="font-poppins text-xl font-black uppercase">{{ profileSummary.initials }}</span>
             </div>
             <div>
               <h1 class="font-poppins text-[15px] font-black text-white">{{ profileSummary.name }}</h1>

@@ -143,17 +143,17 @@ const shouldShowLiveSyndicatesSkeleton = computed(() => (
                 </h2>
             </div>
 
-            <div v-if="shouldShowLiveSyndicatesSkeleton" class="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+            <div v-if="shouldShowLiveSyndicatesSkeleton" class="grid items-stretch gap-6 sm:grid-cols-2 xl:grid-cols-3">
                 <article v-for="(liveSyndicateSkeleton, index) in liveSyndicateSkeletons"
                     :key="`live-syndicate-skeleton-${index}`"
-                    class="w-full animate-pulse overflow-hidden rounded-lg border border-white/10 bg-[#10100e] shadow-[0_18px_55px_rgba(0,0,0,0.32)]">
+                    class="flex h-full w-full animate-pulse flex-col overflow-hidden rounded-lg border border-white/10 bg-[#10100e] shadow-[0_18px_55px_rgba(0,0,0,0.32)]">
                     <div class="relative h-52 overflow-hidden bg-tccDeepBlack sm:h-60">
                         <span class="absolute left-4 top-4 z-10 h-7 w-28 rounded-md bg-emerald-600/50" />
                         <div class="absolute inset-0 h-full w-full bg-white/10 opacity-85" />
                         <div class="absolute inset-0 bg-gradient-to-t from-[#10100e] via-transparent to-black/10" />
                     </div>
 
-                    <div class="p-5 sm:p-6">
+                    <div class="flex flex-1 flex-col p-5 sm:p-6">
                         <span class="block h-3 max-w-full rounded-full bg-white/10"
                             :class="liveSyndicateSkeleton.collectionWidth" />
                         <span class="mt-5 block h-7 max-w-full rounded-full bg-white/10 sm:h-8"
@@ -188,7 +188,9 @@ const shouldShowLiveSyndicatesSkeleton = computed(() => (
                             </div>
                         </div>
 
-                        <span class="mt-5 block h-10 rounded-md bg-tccGold/70" />
+                        <div class="mt-auto pt-5">
+                            <span class="block h-10 rounded-full bg-tccGold/70" />
+                        </div>
                     </div>
                 </article>
             </div>
@@ -203,9 +205,9 @@ const shouldShowLiveSyndicatesSkeleton = computed(() => (
                 Live syndicates are unavailable right now.
             </div>
 
-            <div v-else class="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+            <div v-else class="grid items-stretch gap-6 sm:grid-cols-2 xl:grid-cols-3">
                 <article v-for="(liveSyndicate, index) in liveSyndicates" :key="`${liveSyndicate.slug}-${index}`"
-                    class="w-full overflow-hidden rounded-lg border border-white/10 bg-[#10100e] shadow-[0_18px_55px_rgba(0,0,0,0.32)]">
+                    class="flex h-full w-full flex-col overflow-hidden rounded-lg border border-white/10 bg-[#10100e] shadow-[0_18px_55px_rgba(0,0,0,0.32)]">
                     <div class="relative h-52 overflow-hidden bg-tccDeepBlack sm:h-60">
                         <span
                             class="absolute left-4 top-4 z-10 rounded-md bg-emerald-600 px-3 py-1.5 font-poppins text-[10px] font-black uppercase tracking-[0.2em] text-white">
@@ -216,7 +218,7 @@ const shouldShowLiveSyndicatesSkeleton = computed(() => (
                         <div class="absolute inset-0 bg-gradient-to-t from-[#10100e] via-transparent to-black/10" />
                     </div>
 
-                    <div class="p-5 sm:p-6">
+                    <div class="flex flex-1 flex-col p-5 sm:p-6">
                         <span class="font-poppins text-[10px] font-medium uppercase tracking-[0.22em] text-white/55">{{
                             liveSyndicate.collection }}</span>
                         <h3 class="mt-5 font-poppins text-xl font-bold leading-tight text-white sm:text-2xl">{{
@@ -255,10 +257,12 @@ const shouldShowLiveSyndicatesSkeleton = computed(() => (
                             </div>
                         </div>
 
-                        <NuxtLink :to="`/syndicates/${liveSyndicate.slug}`"
-                            class="mt-5 block rounded-md bg-tccGold px-5 py-3 text-center font-poppins text-[11px] font-black uppercase tracking-[0.22em] text-tccDarkNavy transition-colors hover:bg-tccLightGold">
-                            Invest Now
-                        </NuxtLink>
+                        <div class="mt-auto pt-5">
+                            <NuxtLink :to="`/syndicates/${liveSyndicate.slug}`"
+                                class="block rounded-full bg-tccGold px-5 py-3 text-center font-poppins text-[11px] font-black uppercase tracking-[0.22em] text-tccDarkNavy transition-colors hover:bg-tccLightGold">
+                                Invest Now
+                            </NuxtLink>
+                        </div>
                     </div>
                 </article>
             </div>
