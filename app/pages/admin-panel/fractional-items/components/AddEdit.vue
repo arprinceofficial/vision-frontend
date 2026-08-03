@@ -9,9 +9,23 @@ const props = defineProps({
 const emit = defineEmits(['add_emit', 'close']);
 const { $formatDateForApi, $parseDateValue, $slugify } = useNuxtApp();
 
+const formTabs = [
+    { key: 'basic', label: 'Basic' },
+    { key: 'analysis', label: 'Analysis' },
+    { key: 'media', label: 'Media' },
+    { key: 'sections', label: 'CMS Sections' },
+    { key: 'lists', label: 'Lists & Chart' },
+    { key: 'settings', label: 'Settings' },
+];
+
+const activeTab = ref('basic');
+
 const visible = ref(props.isOpenModal);
 watch(() => props.isOpenModal, (newVal) => {
     visible.value = newVal;
+    if (newVal) {
+        activeTab.value = 'basic';
+    }
 });
 
 const isTruthy = (value) => value === true || value == 1;
@@ -21,19 +35,22 @@ const toInputValue = (value) => {
     return String(value);
 };
 
+const getImagePath = (value) => {
+    if (!value) return '';
+    if (typeof value === 'string') return value;
+    return value?.image || value?.url || value?.src || value?.path || value?.photo || value?.thumbnail_image || '';
+};
+
 const normalizeImageArray = (value) => {
     if (!Array.isArray(value)) return [];
-    return value.map((item) => {
-        if (typeof item === 'string') return item;
-        return item?.image || item?.url || '';
-    }).filter(Boolean);
+    return value.map(getImagePath).filter(Boolean);
 };
 
 const normalizeStringArray = (value) => {
     if (!Array.isArray(value)) return [];
     return value.map((item) => {
         if (typeof item === 'string') return item;
-        return item?.title || item?.text || item?.name || item?.value || '';
+        return item?.title || item?.text || item?.name || item?.description || item?.body || item?.value || '';
     });
 };
 
@@ -41,9 +58,55 @@ const normalizeNumberArray = (value) => {
     if (!Array.isArray(value)) return [];
     return value.map((item) => {
         if (typeof item === 'object' && item !== null) {
-            return toInputValue(item.value ?? item.year);
+            return toInputValue(item.value ?? item.year ?? item.id);
         }
         return toInputValue(item);
+    });
+};
+
+const normalizeMetricArray = (value) => {
+    if (!Array.isArray(value)) return [];
+    return value.map((item) => {
+        if (typeof item === 'string') {
+            return { label: item, value: '' };
+        }
+
+        return {
+            label: toInputValue(item?.label ?? item?.title ?? item?.name ?? item?.key),
+            value: toInputValue(item?.value ?? item?.amount ?? item?.text ?? item?.description),
+        };
+    });
+};
+
+const getDefaultNewsItem = () => ({
+    title: '',
+    date: '',
+    day: '',
+    month: '',
+    author: '',
+    image: '',
+    excerpt: '',
+});
+
+const normalizeNewsArray = (value) => {
+    if (!Array.isArray(value)) return [];
+    return value.map((item) => {
+        if (typeof item === 'string' || typeof item === 'number') {
+            return {
+                ...getDefaultNewsItem(),
+                title: toInputValue(item),
+            };
+        }
+
+        return {
+            title: toInputValue(item?.title ?? item?.name),
+            date: toInputValue(item?.date),
+            day: toInputValue(item?.day),
+            month: toInputValue(item?.month),
+            author: toInputValue(item?.author),
+            image: getImagePath(item?.image),
+            excerpt: toInputValue(item?.excerpt ?? item?.description ?? item?.summary),
+        };
     });
 };
 
@@ -124,6 +187,28 @@ const getDefaultFormData = () => ({
     asset_curation_fee: '',
     home_syndicate_total: '',
     holding_period: '',
+    this_car_eyebrow: '',
+    this_car_lead: '',
+    this_car_conclusion: '',
+    wider_market_eyebrow: '',
+    wider_market_lead: '',
+    wider_market_conclusion: '',
+    net_returns_eyebrow: '',
+    net_returns_lead: '',
+    net_returns_conclusion: '',
+    allocation_id: '',
+    collection_name: '',
+    cagr: '',
+    short_title: '',
+    hero_alt: '',
+    gallery: [],
+    this_car_paragraphs: [],
+    this_car_metrics: [],
+    wider_market_paragraphs: [],
+    wider_market_metrics: [],
+    net_returns_paragraphs: [],
+    net_returns_metrics: [],
+    news_ids: [],
     chart_years: [],
     chart_values: [],
     chart_title: '',
@@ -245,6 +330,28 @@ watch(() => props.item, (value) => {
             asset_curation_fee: toInputValue(value.asset_curation_fee),
             home_syndicate_total: toInputValue(value.home_syndicate_total),
             holding_period: value.holding_period || '',
+            this_car_eyebrow: value.this_car_eyebrow || '',
+            this_car_lead: value.this_car_lead || '',
+            this_car_conclusion: value.this_car_conclusion || '',
+            wider_market_eyebrow: value.wider_market_eyebrow || '',
+            wider_market_lead: value.wider_market_lead || '',
+            wider_market_conclusion: value.wider_market_conclusion || '',
+            net_returns_eyebrow: value.net_returns_eyebrow || '',
+            net_returns_lead: value.net_returns_lead || '',
+            net_returns_conclusion: value.net_returns_conclusion || '',
+            allocation_id: value.allocation_id || '',
+            collection_name: value.collection_name || '',
+            cagr: value.cagr || '',
+            short_title: value.short_title || '',
+            hero_alt: value.hero_alt || '',
+            gallery: normalizeImageArray(value.gallery),
+            this_car_paragraphs: normalizeStringArray(value.this_car_paragraphs),
+            this_car_metrics: normalizeMetricArray(value.this_car_metrics),
+            wider_market_paragraphs: normalizeStringArray(value.wider_market_paragraphs),
+            wider_market_metrics: normalizeMetricArray(value.wider_market_metrics),
+            net_returns_paragraphs: normalizeStringArray(value.net_returns_paragraphs),
+            net_returns_metrics: normalizeMetricArray(value.net_returns_metrics),
+            news_ids: normalizeNewsArray(value.news_ids ?? value.news),
             chart_years: normalizeNumberArray(value.chart_years),
             chart_values: normalizeNumberArray(value.chart_values),
             chart_title: value.chart_title || '',
@@ -299,6 +406,10 @@ const setExperienceImages = (photos) => {
     formData.value.experience_section.images = photos;
 };
 
+const setGallery = (photos) => {
+    formData.value.gallery = normalizeImageArray(photos);
+};
+
 const setMissionAboutImage = (photo) => {
     formData.value.mission_section.about_image = photo;
 };
@@ -309,6 +420,10 @@ const setMissionCharityImage = (photo) => {
 
 const setStoryImage = (photo) => {
     formData.value.story_section.image = photo;
+};
+
+const setNewsImage = (index, photo) => {
+    formData.value.news_ids[index].image = getImagePath(photo);
 };
 
 const addExperienceListItem = () => {
@@ -343,16 +458,25 @@ const removeListItem = (field, index) => {
     formData.value[field].splice(index, 1);
 };
 
+const addMetricItem = (field) => {
+    formData.value[field].push({ label: '', value: '' });
+};
+
+const removeMetricItem = (field, index) => {
+    formData.value[field].splice(index, 1);
+};
+
+const addNewsItem = () => {
+    formData.value.news_ids.push(getDefaultNewsItem());
+};
+
+const removeNewsItem = (index) => {
+    formData.value.news_ids.splice(index, 1);
+};
+
 const requiredFields = [
     'assetable_type',
     'assetable_id',
-    'headline',
-    'subhead_line',
-    'total_shares',
-    'available_shares',
-    'share_price',
-    'slug',
-    'item_name',
 ];
 
 const validateForm = () => {
@@ -367,6 +491,7 @@ const validateForm = () => {
         errors.forEach((key) => {
             validations_errors.value[key] = `${key.replaceAll('_', ' ')} is required`;
         });
+        activeTab.value = 'basic';
         return false;
     }
 
@@ -439,6 +564,36 @@ const serializeSubmitData = () => {
         asset_curation_fee: toNumber(formData.value.asset_curation_fee),
         home_syndicate_total: toNumber(formData.value.home_syndicate_total),
         holding_period: formData.value.holding_period,
+        this_car_eyebrow: formData.value.this_car_eyebrow,
+        this_car_lead: formData.value.this_car_lead,
+        this_car_conclusion: formData.value.this_car_conclusion,
+        wider_market_eyebrow: formData.value.wider_market_eyebrow,
+        wider_market_lead: formData.value.wider_market_lead,
+        wider_market_conclusion: formData.value.wider_market_conclusion,
+        net_returns_eyebrow: formData.value.net_returns_eyebrow,
+        net_returns_lead: formData.value.net_returns_lead,
+        net_returns_conclusion: formData.value.net_returns_conclusion,
+        allocation_id: formData.value.allocation_id,
+        collection_name: formData.value.collection_name,
+        cagr: formData.value.cagr,
+        short_title: formData.value.short_title,
+        hero_alt: formData.value.hero_alt,
+        gallery: normalizeImageArray(formData.value.gallery),
+        this_car_paragraphs: formData.value.this_car_paragraphs.filter(Boolean),
+        this_car_metrics: formData.value.this_car_metrics.filter((item) => item.label || item.value),
+        wider_market_paragraphs: formData.value.wider_market_paragraphs.filter(Boolean),
+        wider_market_metrics: formData.value.wider_market_metrics.filter((item) => item.label || item.value),
+        net_returns_paragraphs: formData.value.net_returns_paragraphs.filter(Boolean),
+        net_returns_metrics: formData.value.net_returns_metrics.filter((item) => item.label || item.value),
+        news_ids: formData.value.news_ids.filter((item) => (
+            item.title ||
+            item.date ||
+            item.day ||
+            item.month ||
+            item.author ||
+            item.image ||
+            item.excerpt
+        )),
         chart_years: formData.value.chart_years.filter((item) => item !== '').map(toNumber),
         chart_values: formData.value.chart_values.filter((item) => item !== '').map(toNumber),
         chart_title: formData.value.chart_title,
@@ -520,15 +675,30 @@ const createHandler = async () => {
 
 <template>
     <Dialog v-model:visible="visible" modal :closable="false"
-        :style="{ width: '88rem', maxWidth: 'calc(100vw - 2rem)' }" @update:visible="$emit('close')">
+        :style="{ width: '76rem', maxWidth: 'calc(100vw - 1.5rem)' }" @update:visible="$emit('close')">
         <template #header>
             <div class="flex items-center justify-center w-full gap-2">
                 <h4 class="text-xl font-semibold">{{ modalTitle }} Fractional Item</h4>
             </div>
         </template>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
+        <div class="space-y-4">
+            <div class="overflow-x-auto border-b border-gray-200 dark:border-gray-700">
+                <div class="flex min-w-max gap-2 pb-2" role="tablist">
+                    <button v-for="tab in formTabs" :key="tab.key" type="button"
+                        class="rounded-md border px-4 py-2 text-sm font-semibold transition-colors"
+                        :class="activeTab === tab.key
+                            ? 'border-green-500 bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                            : 'border-gray-200 text-gray-700 hover:border-green-400 hover:text-green-600 dark:border-gray-700 dark:text-gray-200'"
+                        @click="activeTab = tab.key">
+                        {{ tab.label }}
+                    </button>
+                </div>
+            </div>
+
+            <div class="max-h-[70vh] overflow-y-auto pr-1">
+                <div v-show="activeTab === 'basic'" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
                 <label class="font-semibold">Assetable Type</label>
                 <LazyInputText v-model="formData.assetable_type" class="w-full"
                     :class="validations_errors.assetable_type ? 'border-[#f44336!important]' : ''" autocomplete="off"
@@ -684,6 +854,41 @@ const createHandler = async () => {
                 <LazyInputError class="text-sm mt-1" :message="validations_errors.holding_period" />
             </div>
 
+            <div>
+                <label class="font-semibold">Allocation ID</label>
+                <LazyInputText v-model="formData.allocation_id" class="w-full" autocomplete="off"
+                    @focus="validations_errors.allocation_id = ''" />
+                <LazyInputError class="text-sm mt-1" :message="validations_errors.allocation_id" />
+            </div>
+
+            <div>
+                <label class="font-semibold">Collection Name</label>
+                <LazyInputText v-model="formData.collection_name" class="w-full" autocomplete="off"
+                    @focus="validations_errors.collection_name = ''" />
+                <LazyInputError class="text-sm mt-1" :message="validations_errors.collection_name" />
+            </div>
+
+            <div>
+                <label class="font-semibold">CAGR</label>
+                <LazyInputText v-model="formData.cagr" class="w-full" autocomplete="off"
+                    @focus="validations_errors.cagr = ''" />
+                <LazyInputError class="text-sm mt-1" :message="validations_errors.cagr" />
+            </div>
+
+            <div>
+                <label class="font-semibold">Short Title</label>
+                <LazyInputText v-model="formData.short_title" class="w-full" autocomplete="off"
+                    @focus="validations_errors.short_title = ''" />
+                <LazyInputError class="text-sm mt-1" :message="validations_errors.short_title" />
+            </div>
+
+            <div class="sm:col-span-2">
+                <label class="font-semibold">Hero Alt</label>
+                <LazyInputText v-model="formData.hero_alt" class="w-full" autocomplete="off"
+                    @focus="validations_errors.hero_alt = ''" />
+                <LazyInputError class="text-sm mt-1" :message="validations_errors.hero_alt" />
+            </div>
+
             <div class="sm:col-span-3">
                 <label class="font-semibold">Item Details</label>
                 <Textarea v-model="formData.item_details" rows="4" class="w-full" autocomplete="off" />
@@ -719,7 +924,169 @@ const createHandler = async () => {
                     <LazyInputError class="text-sm mt-1" :message="validations_errors.aspirational_case" />
                 </div>
             </div>
+                </div>
 
+                <div v-show="activeTab === 'analysis'" class="grid grid-cols-1 gap-4">
+            <div class="border border-gray-200 rounded-lg p-4">
+                <div class="flex justify-between items-center mb-3">
+                    <label class="font-semibold">This Car Analysis</label>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="font-semibold text-sm">Eyebrow</label>
+                        <LazyInputText v-model="formData.this_car_eyebrow" class="w-full" autocomplete="off" />
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="font-semibold text-sm">Lead</label>
+                        <Textarea v-model="formData.this_car_lead" rows="2" class="w-full" autocomplete="off" />
+                    </div>
+                    <div class="sm:col-span-3">
+                        <label class="font-semibold text-sm">Conclusion</label>
+                        <Textarea v-model="formData.this_car_conclusion" rows="3" class="w-full" autocomplete="off" />
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <label class="font-semibold">Paragraphs</label>
+                            <Button type="button" label="Add Paragraph" icon="pi pi-plus" severity="success"
+                                @click="addListItem('this_car_paragraphs')" />
+                        </div>
+                        <div v-for="(paragraph, index) in formData.this_car_paragraphs" :key="index"
+                            class="flex items-center gap-2 mb-3">
+                            <LazyInputText v-model="formData.this_car_paragraphs[index]" class="w-full" autocomplete="off" />
+                            <Button type="button" icon="pi pi-trash" severity="danger" outlined
+                                @click="removeListItem('this_car_paragraphs', index)" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <label class="font-semibold">Metrics</label>
+                            <Button type="button" label="Add Metric" icon="pi pi-plus" severity="success"
+                                @click="addMetricItem('this_car_metrics')" />
+                        </div>
+                        <div v-for="(metric, index) in formData.this_car_metrics" :key="index"
+                            class="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-2 mb-3">
+                            <LazyInputText v-model="metric.label" class="w-full" placeholder="Label" autocomplete="off" />
+                            <LazyInputText v-model="metric.value" class="w-full" placeholder="Value" autocomplete="off" />
+                            <Button type="button" icon="pi pi-trash" severity="danger" outlined
+                                @click="removeMetricItem('this_car_metrics', index)" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sm:col-span-3 border border-gray-200 rounded-lg p-4">
+                <div class="flex justify-between items-center mb-3">
+                    <label class="font-semibold">Wider Market Analysis</label>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="font-semibold text-sm">Eyebrow</label>
+                        <LazyInputText v-model="formData.wider_market_eyebrow" class="w-full" autocomplete="off" />
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="font-semibold text-sm">Lead</label>
+                        <Textarea v-model="formData.wider_market_lead" rows="2" class="w-full" autocomplete="off" />
+                    </div>
+                    <div class="sm:col-span-3">
+                        <label class="font-semibold text-sm">Conclusion</label>
+                        <Textarea v-model="formData.wider_market_conclusion" rows="3" class="w-full" autocomplete="off" />
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <label class="font-semibold">Paragraphs</label>
+                            <Button type="button" label="Add Paragraph" icon="pi pi-plus" severity="success"
+                                @click="addListItem('wider_market_paragraphs')" />
+                        </div>
+                        <div v-for="(paragraph, index) in formData.wider_market_paragraphs" :key="index"
+                            class="flex items-center gap-2 mb-3">
+                            <LazyInputText v-model="formData.wider_market_paragraphs[index]" class="w-full"
+                                autocomplete="off" />
+                            <Button type="button" icon="pi pi-trash" severity="danger" outlined
+                                @click="removeListItem('wider_market_paragraphs', index)" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <label class="font-semibold">Metrics</label>
+                            <Button type="button" label="Add Metric" icon="pi pi-plus" severity="success"
+                                @click="addMetricItem('wider_market_metrics')" />
+                        </div>
+                        <div v-for="(metric, index) in formData.wider_market_metrics" :key="index"
+                            class="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-2 mb-3">
+                            <LazyInputText v-model="metric.label" class="w-full" placeholder="Label" autocomplete="off" />
+                            <LazyInputText v-model="metric.value" class="w-full" placeholder="Value" autocomplete="off" />
+                            <Button type="button" icon="pi pi-trash" severity="danger" outlined
+                                @click="removeMetricItem('wider_market_metrics', index)" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sm:col-span-3 border border-gray-200 rounded-lg p-4">
+                <div class="flex justify-between items-center mb-3">
+                    <label class="font-semibold">Net Returns Analysis</label>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="font-semibold text-sm">Eyebrow</label>
+                        <LazyInputText v-model="formData.net_returns_eyebrow" class="w-full" autocomplete="off" />
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="font-semibold text-sm">Lead</label>
+                        <Textarea v-model="formData.net_returns_lead" rows="2" class="w-full" autocomplete="off" />
+                    </div>
+                    <div class="sm:col-span-3">
+                        <label class="font-semibold text-sm">Conclusion</label>
+                        <Textarea v-model="formData.net_returns_conclusion" rows="3" class="w-full" autocomplete="off" />
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <label class="font-semibold">Paragraphs</label>
+                            <Button type="button" label="Add Paragraph" icon="pi pi-plus" severity="success"
+                                @click="addListItem('net_returns_paragraphs')" />
+                        </div>
+                        <div v-for="(paragraph, index) in formData.net_returns_paragraphs" :key="index"
+                            class="flex items-center gap-2 mb-3">
+                            <LazyInputText v-model="formData.net_returns_paragraphs[index]" class="w-full"
+                                autocomplete="off" />
+                            <Button type="button" icon="pi pi-trash" severity="danger" outlined
+                                @click="removeListItem('net_returns_paragraphs', index)" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <label class="font-semibold">Metrics</label>
+                            <Button type="button" label="Add Metric" icon="pi pi-plus" severity="success"
+                                @click="addMetricItem('net_returns_metrics')" />
+                        </div>
+                        <div v-for="(metric, index) in formData.net_returns_metrics" :key="index"
+                            class="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-2 mb-3">
+                            <LazyInputText v-model="metric.label" class="w-full" placeholder="Label" autocomplete="off" />
+                            <LazyInputText v-model="metric.value" class="w-full" placeholder="Value" autocomplete="off" />
+                            <Button type="button" icon="pi pi-trash" severity="danger" outlined
+                                @click="removeMetricItem('net_returns_metrics', index)" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+                </div>
+
+                <div v-show="activeTab === 'media'" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div class="col-span-1 sm:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-4 border border-gray-200 rounded-lg p-4">
                 <div>
                     <label class="font-semibold">Background Image</label>
@@ -778,6 +1145,14 @@ const createHandler = async () => {
                 </div>
 
                 <div>
+                    <label class="font-semibold">Gallery</label>
+                    <div class="w-full mt-2">
+                        <MediaGallery :getPhoto="formData.gallery" :multiple="true" @set_photo="setGallery" />
+                    </div>
+                    <LazyInputError class="text-sm mt-1" :message="validations_errors.gallery" />
+                </div>
+
+                <div>
                     <label class="font-semibold">Analysis Summary PDF</label>
                     <LazyInputText v-model="formData.analysis_summary_pdf" class="w-full mt-2"
                         placeholder="https://example.com/analysis.pdf" autocomplete="off"
@@ -785,8 +1160,10 @@ const createHandler = async () => {
                     <LazyInputError class="text-sm mt-1" :message="validations_errors.analysis_summary_pdf" />
                 </div>
             </div>
+                </div>
 
-            <div class="sm:col-span-3 border border-gray-200 rounded-lg p-4">
+                <div v-show="activeTab === 'sections'" class="grid grid-cols-1 gap-4">
+            <div class="border border-gray-200 rounded-lg p-4">
                 <div class="flex justify-between items-center mb-3">
                     <label class="font-semibold">Experience Section</label>
                 </div>
@@ -989,8 +1366,10 @@ const createHandler = async () => {
                 </div>
                 <LazyInputError class="text-sm mt-1" :message="validations_errors.story_section" />
             </div>
+                </div>
 
-            <div class="sm:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div v-show="activeTab === 'lists'" class="grid grid-cols-1 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="border border-gray-200 rounded-lg p-4">
                     <div class="flex justify-between items-center mb-3">
                         <label class="font-semibold">Key Points</label>
@@ -1027,6 +1406,62 @@ const createHandler = async () => {
                             @click="removeListItem('opportunity_summary', index)" />
                     </div>
                     <LazyInputError class="text-sm mt-1" :message="validations_errors.opportunity_summary" />
+                </div>
+
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <label class="font-semibold">News</label>
+                        <Button type="button" label="Add News" icon="pi pi-plus" severity="success"
+                            @click="addNewsItem" />
+                    </div>
+
+                    <div v-if="formData.news_ids.length === 0" class="text-sm text-gray-500 mb-2">
+                        No news items added yet.
+                    </div>
+
+                    <div v-for="(newsItem, index) in formData.news_ids" :key="index"
+                        class="border border-gray-200 rounded-lg p-4 mb-3">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="font-semibold text-sm">News {{ index + 1 }}</span>
+                            <Button type="button" label="Remove" severity="danger" outlined size="small"
+                                @click="removeNewsItem(index)" />
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="font-semibold text-sm">Title</label>
+                                <LazyInputText v-model="newsItem.title" class="w-full" autocomplete="off" />
+                            </div>
+                            <div>
+                                <label class="font-semibold text-sm">Date</label>
+                                <LazyInputText v-model="newsItem.date" class="w-full" placeholder="May 28, 2026"
+                                    autocomplete="off" />
+                            </div>
+                            <div>
+                                <label class="font-semibold text-sm">Day</label>
+                                <LazyInputText v-model="newsItem.day" class="w-full" placeholder="28" autocomplete="off" />
+                            </div>
+                            <div>
+                                <label class="font-semibold text-sm">Month</label>
+                                <LazyInputText v-model="newsItem.month" class="w-full" placeholder="May" autocomplete="off" />
+                            </div>
+                            <div>
+                                <label class="font-semibold text-sm">Author</label>
+                                <LazyInputText v-model="newsItem.author" class="w-full" autocomplete="off" />
+                            </div>
+                            <div>
+                                <label class="font-semibold text-sm">Image</label>
+                                <div class="w-full mt-2">
+                                    <MediaGallery :getPhoto="newsItem.image" @set_photo="setNewsImage(index, $event)" />
+                                </div>
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="font-semibold text-sm">Excerpt</label>
+                                <Textarea v-model="newsItem.excerpt" rows="3" class="w-full" autocomplete="off" />
+                            </div>
+                        </div>
+                    </div>
+                    <LazyInputError class="text-sm mt-1" :message="validations_errors.news_ids" />
                 </div>
             </div>
 
@@ -1101,7 +1536,9 @@ const createHandler = async () => {
                     </div>
                 </div>
             </div>
+                </div>
 
+                <div v-show="activeTab === 'settings'" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div class="flex items-center gap-3">
                 <label class="font-semibold">Is Exclusive</label>
                 <ToggleSwitch v-model="formData.is_exclusive" @focus="validations_errors.is_exclusive = ''" />
@@ -1115,6 +1552,8 @@ const createHandler = async () => {
             <div class="flex items-center gap-3">
                 <label class="font-semibold">Status</label>
                 <ToggleSwitch v-model="formData.status" @focus="validations_errors.status = ''" />
+            </div>
+                </div>
             </div>
         </div>
 
