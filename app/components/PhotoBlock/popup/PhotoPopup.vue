@@ -6,6 +6,16 @@
 
     const open = ref(true)
     const emit = defineEmits(['photoPopupStatusUpdate', 'createImage'])
+    const props = defineProps({
+        buttonColorClass: {
+            type: String,
+            default: ''
+        },
+        buttonTextColorClass: {
+            type: String,
+            default: ''
+        }
+    })
 
     const close_popup = () => {
         open.value = false
@@ -34,11 +44,13 @@
             <div class="mt-3 text-center sm:mt-5 w-full">
                 <template v-if="sel_tab_index == 1">
                     <UploadImageBlock :width="240" :height="240" @createImage="create_image"
-                        @closePopup="close_popup" />
+                        @closePopup="close_popup" :button-color-class="buttonColorClass"
+                        :button-text-color-class="buttonTextColorClass" />
                 </template>
                 <template v-else>
                     <UploadVideoCapture :width="300" :height="225" @createImage="create_image"
-                        @closePopup="close_popup" />
+                        @closePopup="close_popup" :button-color-class="buttonColorClass"
+                        :button-text-color-class="buttonTextColorClass" />
                 </template>
             </div>
         </div>

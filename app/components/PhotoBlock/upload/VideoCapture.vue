@@ -36,15 +36,17 @@
         </div> -->        
     </div>
     <div v-if="get_capture" class="mt-4">
-        <button type="button" class="inline-flex w-full items-center justify-center rounded-md bg-sky-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 sm:col-start-2 gap-2" @click="submit">
-            <i class="fa fa-check"></i>
-            <span>Submit</span>
+        <button type="button"
+            class="inline-flex w-full items-center justify-center rounded-md px-3 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 sm:col-start-2 gap-2"
+            :class="[submitButtonColorClass, submitButtonTextClass]" @click="submit">
+            <i class="fa fa-check" :class="submitButtonTextClass"></i>
+            <span :class="submitButtonTextClass">Submit</span>
         </button>
     </div>
 </template>
 <script setup>
     import { CameraIcon } from '@heroicons/vue/20/solid'
-    import { ref, onMounted, onBeforeUnmount } from 'vue'
+    import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
     const isCameraOpen = ref(false)
     const isPhotoTaken = ref(false)
     const isShotPhoto = ref(false)
@@ -56,8 +58,18 @@
     const emit = defineEmits(['createImage','closePopup'])
     const props = defineProps({
         width: Number,
-        height: Number
+        height: Number,
+        buttonColorClass: {
+            type: String,
+            default: ''
+        },
+        buttonTextColorClass: {
+            type: String,
+            default: ''
+        }
     })
+    const submitButtonColorClass = computed(() => props.buttonColorClass || 'bg-sky-600 hover:bg-sky-500 focus-visible:outline-sky-600')
+    const submitButtonTextClass = computed(() => props.buttonTextColorClass || 'text-white')
 
     onMounted( () => {
         toggleCamera()

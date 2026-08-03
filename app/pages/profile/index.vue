@@ -340,7 +340,12 @@ onMounted(() => {
                 validations_errors.photo ? 'profile-photo-upload-error' : ''
               ]"
             >
-              <PhotoBlockPhoto :getPhoto="profile.photo" @set_photo="setProfilePhoto" />
+              <PhotoBlockPhoto
+                :getPhoto="profile.photo"
+                button-color-class="bg-tccGold hover:bg-tccLightGold focus-visible:outline-tccGold"
+                button-text-color-class="!text-black"
+                @set_photo="setProfilePhoto"
+              />
             </div>
             <LazyInputError :message="profileFieldErrorText('photo')" />
           </div>

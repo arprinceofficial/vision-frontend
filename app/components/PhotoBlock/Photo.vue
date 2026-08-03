@@ -1,10 +1,20 @@
 <script setup>
-    import { ref} from 'vue'
+    import { computed, ref} from 'vue'
     import PhotoPopupBlock from './popup/PhotoPopup'
     const emit = defineEmits(['set_photo'])
     const props = defineProps({
-        getPhoto: String
+        getPhoto: String,
+        buttonColorClass: {
+            type: String,
+            default: ''
+        },
+        buttonTextColorClass: {
+            type: String,
+            default: ''
+        }
     })
+    const changePhotoButtonColorClass = computed(() => props.buttonColorClass || 'bg-sky-600')
+    const changePhotoButtonTextClass = computed(() => props.buttonTextColorClass || 'text-white')
     const max_file_size = ref('2')
     const file_size_exceeded = ref(false)    
     const set_file_name = ref('')
@@ -63,10 +73,11 @@
         </div>
 
         <template v-if="getPhoto">
-            <div class="flex items-center justify-center bg-sky-600 text-white rounded-xl mt-3 gap-1 py-1 text-[11px] cursor-pointer"
+            <div class="flex items-center justify-center rounded-xl mt-3 gap-1 py-1 text-[11px] cursor-pointer transition-colors"
+                :class="[changePhotoButtonColorClass, changePhotoButtonTextClass]"
                 @click="Photo_popup_status_update(true)">
-                <i class="fa fa-repeat"></i>
-                <span>Change Photo</span>
+                <i class="fa fa-repeat" :class="changePhotoButtonTextClass"></i>
+                <span :class="changePhotoButtonTextClass">Change Photo</span>
             </div>
             <!-- <input type="file" ref="photo_input_form" class="hidden" @change="load_image" accept="image/jpg,image/jpeg,image/png" capture="environment" /> -->
         </template>
@@ -84,7 +95,8 @@
             <p>JPG, JPEG, PNG, WEBP up to {{ max_file_size }} MB</p>
         </div>
         <PhotoPopupBlock v-if="Photo_popup_open" @PhotoPopupStatusUpdate="Photo_popup_status_update"
-            @createImage="create_image" />
+            @createImage="create_image" :button-color-class="buttonColorClass"
+            :button-text-color-class="buttonTextColorClass" />
     </div>
 </template>
 <style lang="scss" scoped>
