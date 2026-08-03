@@ -9,7 +9,7 @@ type PageConfig = {
     title: string
     eyebrow: string
     description: string
-    type: 'auth' | 'status' | 'form' | 'showroom' | 'asset-list' | 'asset-detail' | 'checkout' | 'documents' | 'contact' | 'vote'
+    type: 'auth' | 'status' | 'form' | 'showroom' | 'asset-list' | 'asset-detail' | 'checkout' | 'documents' | 'vote'
     icon?: string
     tone?: NoticeTone
     primary?: { label: string, to: string }
@@ -273,13 +273,6 @@ const pageMap: Record<string, PageConfig> = {
         description: 'Submit your voting instruction for the proposed syndicate action.',
         type: 'vote',
         primary: { label: 'Submit Vote', to: '/syndicate-documents' }
-    },
-    contact: {
-        title: 'Contact Investor Support',
-        eyebrow: 'Support Desk',
-        description: 'Send a message to The Car Crowd team for onboarding, payment, or document support.',
-        type: 'contact',
-        primary: { label: 'Send Message', to: '/profile' }
     }
 }
 
@@ -594,7 +587,7 @@ const detailImage = computed(() => {
                         </div>
                     </div>
 
-                    <form v-else-if="page.type === 'form' || page.type === 'contact'"
+                    <form v-else-if="page.type === 'form'"
                         class="mx-auto mt-8 max-w-2xl space-y-5" @submit.prevent="processAction(page.primary?.to)">
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div class="space-y-1">
@@ -614,8 +607,7 @@ const detailImage = computed(() => {
                             <input type="email" class="w-full rounded-lg border border-tccBorder px-4 py-2.5 text-sm">
                         </div>
                         <div class="space-y-1">
-                            <label class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">{{
-                                page.type === 'contact' ? 'Message' : 'Investor Notes' }}</label>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">Investor Notes</label>
                             <textarea rows="5" class="w-full rounded-lg border border-tccBorder px-4 py-2.5 text-sm" />
                         </div>
                         <button type="submit"
