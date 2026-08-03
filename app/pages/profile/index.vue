@@ -15,16 +15,28 @@ type Country = {
   nationality?: string
 }
 
+type Gender = {
+  id: number | string
+  gender_name?: string
+  name?: string
+  status?: number | string | boolean
+}
+
 type NationalityOption = Country & {
   id: string
   code: string
   name: string
 }
 
-type CmsCountriesResponse = {
+type GenderOption = Gender & {
+  id: string
+  name: string
+}
+
+type CmsListResponse<T> = {
   data?: {
-    data?: Country[]
-  } | Country[]
+    data?: T[]
+  } | T[]
 }
 
 const editingProfile = ref(false)
@@ -60,7 +72,7 @@ const { data: countriesData, pending: isCountriesLoading } = await useAsyncData<
     if (countriesCache.value?.length) return countriesCache.value
 
     try {
-      const response = await $fetchCMS<CmsCountriesResponse>('v1/cms/countries', { method: 'POST' })
+      const response = await $fetchCMS<CmsListResponse<Country>>('v1/cms/countries', { method: 'POST' })
       const payload = Array.isArray(response?.data) ? response.data : response?.data?.data ?? []
       countriesCache.value = payload
       return payload
@@ -70,6 +82,25 @@ const { data: countriesData, pending: isCountriesLoading } = await useAsyncData<
     }
   },
   { default: () => countriesCache.value ?? [] }
+)
+
+const gendersCache = useState<Gender[] | null>('profile-genders-cache', () => null)
+const { data: gendersData, pending: isGendersLoading } = await useAsyncData<Gender[]>(
+  'profile-genders',
+  async () => {
+    if (gendersCache.value?.length) return gendersCache.value
+
+    try {
+      const response = await $fetchCMS<CmsListResponse<Gender>>('v1/cms/genders', { method: 'POST' })
+      const payload = Array.isArray(response?.data) ? response.data : response?.data?.data ?? []
+      gendersCache.value = payload
+      return payload
+    } catch (error) {
+      console.error('Failed to load genders:', error)
+      return []
+    }
+  },
+  { default: () => gendersCache.value ?? [] }
 )
 
 const currentUser = computed(() => getCitizenUserData(citizen_user.value))
@@ -109,6 +140,7 @@ const decodeHtmlEntities = (value: unknown) => {
 }
 
 const countries = computed(() => countriesData.value ?? [])
+const genders = computed(() => gendersData.value ?? [])
 
 const getCountryOptionLabel = (country: Country) => {
   return decodeHtmlEntities(country.nationality || country.en_short_name || country.id)
@@ -125,13 +157,62 @@ const nationalityOptions = computed<NationalityOption[]>(() => (
     .filter((country) => country.id && country.name)
 ))
 
+const genderOptions = computed<GenderOption[]>(() => (
+  genders.value
+    .filter((gender) => Number(gender.status ?? 1) === 1)
+    .map((gender) => ({
+      ...gender,
+      id: getStringValue(gender.id),
+      name: decodeHtmlEntities(gender.gender_name || gender.name || gender.id)
+    }))
+    .filter((gender) => gender.id && gender.name)
+))
+
+const findOptionByIdOrName = <T extends { id: string, name: string }>(options: T[], value: string) => {
+  const normalizedValue = value.trim().toLowerCase()
+  if (!normalizedValue) return null
+
+  return options.find((option) => (
+    option.id.trim().toLowerCase() === normalizedValue ||
+    option.name.trim().toLowerCase() === normalizedValue
+  )) || null
+}
+
 const selectedNationality = computed<NationalityOption | null>({
-  get: () => nationalityOptions.value.find((country) => country.id === profile.nationality_id) || null,
+  get: () => findOptionByIdOrName(nationalityOptions.value, profile.nationality_id),
   set: (country) => {
     profile.nationality_id = country?.id || ''
     clearValidationError('nationality_id')
   }
 })
+
+const selectedPrimaryCountry = computed<NationalityOption | null>({
+  get: () => findOptionByIdOrName(nationalityOptions.value, profile.pre_country),
+  set: (country) => {
+    profile.pre_country = country?.id || ''
+    clearValidationError('pre_country')
+  }
+})
+
+const selectedGender = computed<GenderOption | null>({
+  get: () => findOptionByIdOrName(genderOptions.value, profile.gender),
+  set: (gender) => {
+    profile.gender = gender?.id || ''
+    clearValidationError('gender')
+  }
+})
+
+const normalizedGenderId = computed(() => (
+  findOptionByIdOrName(genderOptions.value, profile.gender)?.id || profile.gender
+))
+
+const normalizedNationalityId = computed(() => (
+  findOptionByIdOrName(nationalityOptions.value, profile.nationality_id)?.id || profile.nationality_id
+))
+
+const normalizedPrimaryCountryId = computed(() => (
+  findOptionByIdOrName(nationalityOptions.value, profile.pre_country)?.id || profile.pre_country
+))
 
 const investorClass = computed(() => {
   const formatted = formatInvestorClass(currentUser.value?.investment_type)
@@ -154,8 +235,8 @@ const prefillProfile = () => {
   profile.mobile = getStringValue(user.mobile)
   profile.photo = getStringValue(info.photo || user.photo)
   profile.dob = getStringValue(info.dob)
-  profile.gender = getStringValue(info.gender || info.gender_info?.id)
-  profile.nationality_id = getStringValue(info.nationality_id || info.nationality_info?.id)
+  profile.gender = getStringValue(info.gender_id || info.gender_info?.id || info.gender)
+  profile.nationality_id = getStringValue(info.nationality_id || info.nationality_info?.id || info.nationality)
   profile.pre_country = getStringValue(info.pre_country)
   profile.pre_srteet_address = getStringValue(info.pre_srteet_address)
   profile.pre_city = getStringValue(info.pre_city)
@@ -214,7 +295,12 @@ const formatValidationFieldLabel = (field: string) => (
     .replace(/\b\w/g, (char) => char.toUpperCase())
 )
 
-const getProfilePayload = () => ({ ...profile })
+const getProfilePayload = () => ({
+  ...profile,
+  gender: normalizedGenderId.value,
+  nationality_id: normalizedNationalityId.value,
+  pre_country: normalizedPrimaryCountryId.value
+})
 
 const setProfilePhoto = (photo: string) => {
   profile.photo = photo
@@ -408,7 +494,27 @@ onMounted(() => {
               </div>
               <div class="space-y-2">
                 <label for="gender" class="block text-[10px] font-semibold text-white/55">Gender</label>
-                <input id="gender" v-model="profile.gender" :disabled="!editingProfile || isSavingProfile" class="w-full rounded-xl border border-white/14 px-4 py-2.5 text-[13px] disabled:opacity-75" :class="profileFieldErrorClass('gender')" @focus="handleProfileFieldFocus('gender')">
+                <Dropdown
+                  v-model="selectedGender"
+                  input-id="gender"
+                  :options="genderOptions"
+                  optionLabel="name"
+                  placeholder="Select gender"
+                  class="profile-option-dropdown w-full"
+                  panelClass="profile-option-dropdown-panel"
+                  :loading="isGendersLoading"
+                  :disabled="!editingProfile || isSavingProfile || isGendersLoading"
+                  :class="profileFieldErrorClass('gender')"
+                  @focus="handleProfileFieldFocus('gender')"
+                >
+                  <template #value="slotProps">
+                    <span v-if="slotProps.value" class="block truncate">{{ slotProps.value.name }}</span>
+                    <span v-else class="block truncate text-white/45">{{ slotProps.placeholder }}</span>
+                  </template>
+                  <template #option="slotProps">
+                    <span>{{ slotProps.option.name }}</span>
+                  </template>
+                </Dropdown>
                 <LazyInputError :message="profileFieldErrorText('gender')" />
               </div>
               <div class="space-y-2">
@@ -419,8 +525,8 @@ onMounted(() => {
                   :options="nationalityOptions"
                   optionLabel="name"
                   placeholder="Select nationality"
-                  class="profile-nationality-dropdown w-full"
-                  panelClass="profile-nationality-dropdown-panel"
+                  class="profile-option-dropdown w-full"
+                  panelClass="profile-option-dropdown-panel"
                   filter
                   :loading="isCountriesLoading"
                   :disabled="!editingProfile || isSavingProfile || isCountriesLoading"
@@ -448,7 +554,31 @@ onMounted(() => {
             <div class="grid gap-4 md:grid-cols-2">
               <div class="space-y-2">
                 <label for="pre_country" class="block text-[10px] font-semibold text-white/55">Country</label>
-                <input id="pre_country" v-model="profile.pre_country" :disabled="!editingProfile || isSavingProfile" class="w-full rounded-xl border border-white/14 px-4 py-2.5 text-[13px] disabled:opacity-75" :class="profileFieldErrorClass('pre_country')" @focus="handleProfileFieldFocus('pre_country')">
+                <Dropdown
+                  v-model="selectedPrimaryCountry"
+                  input-id="pre_country"
+                  :options="nationalityOptions"
+                  optionLabel="name"
+                  placeholder="Select country"
+                  class="profile-option-dropdown w-full"
+                  panelClass="profile-option-dropdown-panel"
+                  filter
+                  :loading="isCountriesLoading"
+                  :disabled="!editingProfile || isSavingProfile || isCountriesLoading"
+                  :class="profileFieldErrorClass('pre_country')"
+                  @focus="handleProfileFieldFocus('pre_country')"
+                >
+                  <template #value="slotProps">
+                    <span v-if="slotProps.value" class="block truncate">{{ slotProps.value.name }}</span>
+                    <span v-else class="block truncate text-white/45">{{ slotProps.placeholder }}</span>
+                  </template>
+                  <template #option="slotProps">
+                    <div class="flex items-center gap-2">
+                      <span v-if="slotProps.option.code" class="font-mono text-[10px] uppercase text-tccGold/70">{{ slotProps.option.code }}</span>
+                      <span>{{ slotProps.option.name }}</span>
+                    </div>
+                  </template>
+                </Dropdown>
                 <LazyInputError :message="profileFieldErrorText('pre_country')" />
               </div>
               <div class="space-y-2">
@@ -545,7 +675,7 @@ onMounted(() => {
   border-color: #f44336 !important;
 }
 
-:deep(.profile-nationality-dropdown) {
+:deep(.profile-option-dropdown) {
   min-height: 2.75rem;
   border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 0.75rem;
@@ -554,39 +684,39 @@ onMounted(() => {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
-:deep(.profile-nationality-dropdown:not(.p-disabled):hover),
-:deep(.profile-nationality-dropdown.p-focus) {
+:deep(.profile-option-dropdown:not(.p-disabled):hover),
+:deep(.profile-option-dropdown.p-focus) {
   border-color: rgba(247, 198, 0, 0.72);
 }
 
-:deep(.profile-nationality-dropdown .p-select-label) {
+:deep(.profile-option-dropdown .p-select-label) {
   padding: 0.625rem 1rem;
   color: #f5f0e8;
   font-size: 13px;
   line-height: 1.5;
 }
 
-:deep(.profile-nationality-dropdown .p-select-dropdown) {
+:deep(.profile-option-dropdown .p-select-dropdown) {
   color: rgba(245, 240, 232, 0.72);
 }
 
-:global(.profile-nationality-dropdown-panel) {
+:global(.profile-option-dropdown-panel) {
   border: 1px solid rgba(255, 255, 255, 0.16);
   background: #0a0806;
   color: #f5f0e8;
 }
 
-:global(.profile-nationality-dropdown-panel .p-select-option) {
+:global(.profile-option-dropdown-panel .p-select-option) {
   color: #f5f0e8;
 }
 
-:global(.profile-nationality-dropdown-panel .p-select-option.p-focus),
-:global(.profile-nationality-dropdown-panel .p-select-option:hover) {
+:global(.profile-option-dropdown-panel .p-select-option.p-focus),
+:global(.profile-option-dropdown-panel .p-select-option:hover) {
   background: rgba(247, 198, 0, 0.14);
   color: #f7c600;
 }
 
-:global(.profile-nationality-dropdown-panel .p-select-filter) {
+:global(.profile-option-dropdown-panel .p-select-filter) {
   border-color: rgba(255, 255, 255, 0.22);
   background: rgba(255, 255, 255, 0.1);
   color: #f5f0e8;
