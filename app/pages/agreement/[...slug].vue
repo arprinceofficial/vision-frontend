@@ -188,7 +188,7 @@ const mergeAgreementAsset = (asset: AgreementAsset | null) => {
 }
 
 const readStoredAgreementAsset = () => {
-    if (!process.client || !slug.value) return
+    if (!import.meta.client || !slug.value) return
 
     const storedAsset = sessionStorage.getItem(`agreement-asset:${slug.value}`)
     if (!storedAsset) return
@@ -321,7 +321,10 @@ const updateAllocationRequestState = async (state: number) => {
         const response = await $fetchCitizen<AllocationRequestResponse>(`v1/customer/allocation-requests/${requestSlug}/update-state`, {
             method: 'POST',
             body: {
-                state
+                state,
+                agree_terms: true,
+                agree_documents: true,
+                agree_support: true
             }
         })
         const request = normalizeAllocationRequest(response?.data)
