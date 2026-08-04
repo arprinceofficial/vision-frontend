@@ -56,11 +56,20 @@ type AllocationRequest = {
     allocationCost: number
     vehicle: string
     reference: string
+    documentSignatureId: string
     signedDocumentPath: {
         subscriptionAgreement: string
         termsAndConditions: string
         generatedAt: string
     }
+}
+
+type SignatureSubmitPayload = {
+    signature_method: 'draw' | 'type' | 'upload'
+    signature_type: 'canvas'
+    signature_canvas: string
+    signature_text?: string
+    signature_style?: string
 }
 
 const agreementRecords: AgreementRecord[] = [
@@ -103,6 +112,8 @@ const allocationRequest = ref<AllocationRequest | null>(null)
 const agreementAsset = ref<AgreementAsset | null>(null)
 const isPreparingAllocation = ref(false)
 const isUpdatingAllocationState = ref(false)
+const isSubmittingSignature = ref(false)
+const signatureSubmitError = ref('')
 const preparedRoutePath = ref('')
 const preparingRoutePath = ref('')
 
@@ -114,6 +125,44 @@ const getNumberValue = (value: unknown, fallback = 0) => {
 const getStringValue = (...values: unknown[]) => {
     const value = values.find((item) => item !== null && item !== undefined && String(item).trim() !== '')
     return value === undefined ? '' : String(value).trim()
+}
+
+const getDocumentSignatureId = (item: Record<string, any>) => {
+    const ids: unknown[] = [
+        item.document_signature_id,
+        item.documentSignatureId
+    ]
+
+    const collectSignatureIds = (value: unknown, depth = 0) => {
+        if (!value || depth > 4) return
+
+        if (Array.isArray(value)) {
+            value.forEach((entry) => collectSignatureIds(entry, depth + 1))
+            return
+        }
+
+        if (typeof value !== 'object') return
+
+        const record = value as Record<string, any>
+        ids.push(
+            record.id,
+            record.document_signature_id,
+            record.documentSignatureId
+        )
+
+        collectSignatureIds(record.data, depth + 1)
+        collectSignatureIds(record.document_signature, depth + 1)
+        collectSignatureIds(record.documentSignature, depth + 1)
+        collectSignatureIds(record.document_signatures, depth + 1)
+        collectSignatureIds(record.documentSignatures, depth + 1)
+    }
+
+    collectSignatureIds(item.document_signature)
+    collectSignatureIds(item.documentSignature)
+    collectSignatureIds(item.document_signatures)
+    collectSignatureIds(item.documentSignatures)
+
+    return getStringValue(...ids)
 }
 
 const normalizeAllocationRequest = (item: Record<string, any> | null | undefined): AllocationRequest | null => {
@@ -144,6 +193,7 @@ const normalizeAllocationRequest = (item: Record<string, any> | null | undefined
             agreementRecords[0]?.vehicle
         ),
         reference: slugValue || getStringValue(item.reference, agreementAsset.value?.reference, agreementRecords[0]?.reference),
+        documentSignatureId: getDocumentSignatureId(item),
         signedDocumentPath: {
             subscriptionAgreement: getStringValue(signedDocumentPath.subscription_agreement, signedDocumentPath.subscriptionAgreement),
             termsAndConditions: getStringValue(signedDocumentPath.terms_and_conditions, signedDocumentPath.termsAndConditions),
@@ -307,14 +357,15 @@ const signedDocumentPath = computed(() => allocationRequest.value?.signedDocumen
     termsAndConditions: '',
     generatedAt: ''
 })
+const documentSignatureId = computed(() => allocationRequest.value?.documentSignatureId || '')
 const setStageFromRequestState = (state: number) => {
     currentStage.value = requestStateStageMap[state] || 'overview'
 }
 
 const getAllocationRequestSlug = () => getStringValue(allocationRequest.value?.slug, allocationRequestSlug.value)
 
-const fetchAllocationRequest = async (requestSlug: string) => {
-    if (!requestSlug) return
+const fetchAllocationRequestData = async (requestSlug: string) => {
+    if (!requestSlug) return null
 
     const response = await $fetchCitizen<AllocationRequestResponse>(`v1/customer/allocation-requests/${requestSlug}`, {
         method: 'GET'
@@ -323,6 +374,15 @@ const fetchAllocationRequest = async (requestSlug: string) => {
 
     if (request) {
         allocationRequest.value = request
+    }
+
+    return request
+}
+
+const fetchAllocationRequest = async (requestSlug: string) => {
+    const request = await fetchAllocationRequestData(requestSlug)
+
+    if (request) {
         setStageFromRequestState(request.state)
 
         if (request.state === 2) {
@@ -333,6 +393,16 @@ const fetchAllocationRequest = async (requestSlug: string) => {
             }
         }
     }
+}
+
+const ensureDocumentSignatureId = async () => {
+    if (documentSignatureId.value) return documentSignatureId.value
+
+    const requestSlug = getAllocationRequestSlug()
+    if (!requestSlug) return ''
+
+    const request = await fetchAllocationRequestData(requestSlug)
+    return request?.documentSignatureId || documentSignatureId.value
 }
 
 const updateAllocationRequestState = async (state: number) => {
@@ -562,8 +632,45 @@ const proceedToSignature = () => {
     currentStage.value = 'signature'
 }
 
-const submitSignature = () => {
-    currentStage.value = 'signed-documents'
+const submitSignature = async (payload: SignatureSubmitPayload) => {
+    if (isSubmittingSignature.value) return
+
+    isSubmittingSignature.value = true
+    signatureSubmitError.value = ''
+
+    try {
+        const signatureDocumentId = await ensureDocumentSignatureId()
+
+        if (!signatureDocumentId) {
+            console.error('[Agreement] Document signature id is missing')
+            signatureSubmitError.value = 'Document signature is not ready yet. Please reload the agreement and try again.'
+            return
+        }
+
+        const response = await $fetchCitizen<AllocationRequestResponse>(`v1/customer/documents/${signatureDocumentId}/sign`, {
+            method: 'POST',
+            body: payload
+        })
+        const request = normalizeAllocationRequest(response?.data?.allocation_request || response?.data?.allocationRequest || response?.data)
+
+        if (request?.slug) {
+            allocationRequest.value = request
+            setStageFromRequestState(request.state)
+        }
+
+        signatureSubmitError.value = ''
+        currentStage.value = 'signed-documents'
+    } catch (error) {
+        console.error('[Agreement] Unable to submit signature', error)
+        signatureSubmitError.value = getStringValue(
+            (error as any)?.data?.message,
+            (error as any)?.response?._data?.message,
+            (error as any)?.message,
+            'Unable to submit signature. Please try again.'
+        )
+    } finally {
+        isSubmittingSignature.value = false
+    }
 }
 
 const proceedToVote = () => {
@@ -647,6 +754,8 @@ useHead(() => ({
                             v-else-if="currentStage === 'signature'"
                             key="signature"
                             :agreement="agreement"
+                            :is-submitting="isSubmittingSignature"
+                            :submit-error="signatureSubmitError"
                             @back-to-documents="showTerms"
                             @submit="submitSignature"
                         />

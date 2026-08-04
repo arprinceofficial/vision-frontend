@@ -1,5 +1,12 @@
 <script setup lang="ts">
 type SignatureMethod = 'draw' | 'type' | 'upload'
+type SignatureSubmitPayload = {
+    signature_method: SignatureMethod
+    signature_type: 'canvas'
+    signature_canvas: string
+    signature_text?: string
+    signature_style?: string
+}
 
 type AgreementRecord = {
     vehicle: string
@@ -7,13 +14,18 @@ type AgreementRecord = {
     supportEmail: string
 }
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
     agreement: AgreementRecord
-}>()
+    isSubmitting?: boolean
+    submitError?: string
+}>(), {
+    isSubmitting: false,
+    submitError: ''
+})
 
 const emit = defineEmits<{
     (event: 'back-to-documents'): void
-    (event: 'submit'): void
+    (event: 'submit', payload: SignatureSubmitPayload): void
 }>()
 
 const signatureMethod = ref<SignatureMethod>('draw')
@@ -21,6 +33,7 @@ const typedSignatureName = ref('')
 const selectedSignatureStyle = ref('heritage')
 const uploadedSignatureName = ref('')
 const uploadedSignaturePreview = ref('')
+const uploadedSignatureDataUrl = ref('')
 const hasDrawnSignature = ref(false)
 const signatureCanvas = ref<HTMLCanvasElement | null>(null)
 let isDrawingSignature = false
@@ -189,34 +202,98 @@ const clearDrawnSignature = () => {
     resizeSignatureCanvas()
 }
 
-const setUploadedSignatureFile = (file?: File) => {
-    if (!file || typeof URL === 'undefined') {
-        return
-    }
+const readFileAsDataUrl = (file: File) => new Promise<string>((resolve, reject) => {
+    const reader = new FileReader()
 
-    if (uploadedSignaturePreview.value) {
+    reader.onload = () => resolve(String(reader.result || ''))
+    reader.onerror = () => reject(reader.error)
+    reader.readAsDataURL(file)
+})
+
+const setUploadedSignatureFile = async (file?: File) => {
+    if (!file) return
+
+    if (uploadedSignaturePreview.value && uploadedSignaturePreview.value.startsWith('blob:') && typeof URL !== 'undefined') {
         URL.revokeObjectURL(uploadedSignaturePreview.value)
     }
 
     uploadedSignatureName.value = file.name
-    uploadedSignaturePreview.value = URL.createObjectURL(file)
+    uploadedSignatureDataUrl.value = await readFileAsDataUrl(file)
+    uploadedSignaturePreview.value = uploadedSignatureDataUrl.value
 }
 
 const handleSignatureUpload = (event: Event) => {
     const target = event.target as HTMLInputElement
-    setUploadedSignatureFile(target.files?.[0])
+    void setUploadedSignatureFile(target.files?.[0])
 }
 
 const handleSignatureDrop = (event: DragEvent) => {
-    setUploadedSignatureFile(event.dataTransfer?.files?.[0])
+    void setUploadedSignatureFile(event.dataTransfer?.files?.[0])
+}
+
+const getTypedSignatureCanvasDataUrl = () => {
+    const canvas = document.createElement('canvas')
+    const context = canvas.getContext('2d')
+
+    if (!context) return ''
+
+    canvas.width = 900
+    canvas.height = 260
+    context.clearRect(0, 0, canvas.width, canvas.height)
+    context.fillStyle = signatureStrokeColor
+    context.textAlign = 'center'
+    context.textBaseline = 'middle'
+    context.font = selectedSignatureStyle.value === 'serif'
+        ? 'italic 74px Georgia, "Times New Roman", serif'
+        : 'italic 82px "Brush Script MT", "Segoe Script", cursive'
+    context.fillText(typedSignatureName.value.trim(), canvas.width / 2, canvas.height / 2, canvas.width - 80)
+
+    return canvas.toDataURL('image/png')
+}
+
+const getSignaturePayload = (): SignatureSubmitPayload | null => {
+    if (!signatureReady.value) return null
+
+    if (signatureMethod.value === 'draw') {
+        const signatureCanvasData = signatureCanvas.value?.toDataURL('image/png') || ''
+        if (!signatureCanvasData) return null
+
+        return {
+            signature_method: 'draw',
+            signature_type: 'canvas',
+            signature_canvas: signatureCanvasData
+        }
+    }
+
+    if (signatureMethod.value === 'type') {
+        const typedSignatureCanvas = getTypedSignatureCanvasDataUrl()
+        if (!typedSignatureCanvas) return null
+
+        return {
+            signature_method: 'type',
+            signature_type: 'canvas',
+            signature_canvas: typedSignatureCanvas,
+            signature_text: typedSignatureName.value.trim(),
+            signature_style: selectedSignatureStyle.value
+        }
+    }
+
+    if (!uploadedSignatureDataUrl.value) return null
+
+    return {
+        signature_method: 'upload',
+        signature_type: 'canvas',
+        signature_canvas: uploadedSignatureDataUrl.value
+    }
 }
 
 const submitSignature = () => {
-    if (!signatureReady.value) {
-        return
-    }
+    if (!signatureReady.value || props.isSubmitting) return
 
-    emit('submit')
+    const payload = getSignaturePayload()
+    if (!payload) return
+
+    emit('submit', payload)
 }
 
 onMounted(() => {
@@ -226,7 +303,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-    if (uploadedSignaturePreview.value && typeof URL !== 'undefined') {
+    if (uploadedSignaturePreview.value && uploadedSignaturePreview.value.startsWith('blob:') && typeof URL !== 'undefined') {
         URL.revokeObjectURL(uploadedSignaturePreview.value)
     }
 })
@@ -434,6 +511,11 @@ onBeforeUnmount(() => {
                     </span>
                 </div>
 
+                <div v-if="props.submitError" class="rounded-xl border border-red-400/45 bg-red-500/10 px-4 py-3 text-sm font-semibold text-red-100">
+                    <i class="pi pi-exclamation-triangle mr-2 text-xs text-red-300" aria-hidden="true" />
+                    {{ props.submitError }}
+                </div>
+
                 <section class="rounded-xl border border-white/10 bg-white/[0.04] p-5">
                     <h2 class="font-poppins text-lg font-black text-white">Signature Process</h2>
                     <div class="mt-4 space-y-3">
@@ -476,11 +558,12 @@ onBeforeUnmount(() => {
                     :class="signatureReady
                         ? 'bg-tccGold text-tccDarkNavy shadow-lg shadow-tccGold/20 hover:bg-tccLightGold'
                         : 'cursor-not-allowed bg-white/10 text-white/35'"
-                    :disabled="!signatureReady"
+                    :disabled="!signatureReady || props.isSubmitting"
                     @click="submitSignature"
                 >
-                    <i class="pi pi-file-edit text-xs" aria-hidden="true" />
-                    Submit Signature
+                    <i v-if="props.isSubmitting" class="pi pi-spin pi-spinner text-xs" aria-hidden="true" />
+                    <i v-else class="pi pi-file-edit text-xs" aria-hidden="true" />
+                    {{ props.isSubmitting ? 'Submitting...' : 'Submit Signature' }}
                 </button>
 
                 <div class="rounded-xl border border-white/10 bg-white/[0.04] p-4 text-sm text-white/60">
