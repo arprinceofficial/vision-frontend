@@ -56,6 +56,11 @@ type AllocationRequest = {
     allocationCost: number
     vehicle: string
     reference: string
+    signedDocumentPath: {
+        subscriptionAgreement: string
+        termsAndConditions: string
+        generatedAt: string
+    }
 }
 
 const agreementRecords: AgreementRecord[] = [
@@ -121,6 +126,7 @@ const normalizeAllocationRequest = (item: Record<string, any> | null | undefined
         ? totalAmount / sharesCount
         : getNumberValue(fractionalItem.per_share_value ?? fractionalItem.allocation_cost ?? agreementAsset.value?.allocationCost)
     const slugValue = getStringValue(item.slug, allocationRequestSlug.value)
+    const signedDocumentPath = item.signed_document_path || item.signedDocumentPath || {}
 
     return {
         id: getStringValue(item.id),
@@ -137,7 +143,12 @@ const normalizeAllocationRequest = (item: Record<string, any> | null | undefined
             agreementAsset.value?.vehicle,
             agreementRecords[0]?.vehicle
         ),
-        reference: slugValue || getStringValue(item.reference, agreementAsset.value?.reference, agreementRecords[0]?.reference)
+        reference: slugValue || getStringValue(item.reference, agreementAsset.value?.reference, agreementRecords[0]?.reference),
+        signedDocumentPath: {
+            subscriptionAgreement: getStringValue(signedDocumentPath.subscription_agreement, signedDocumentPath.subscriptionAgreement),
+            termsAndConditions: getStringValue(signedDocumentPath.terms_and_conditions, signedDocumentPath.termsAndConditions),
+            generatedAt: getStringValue(signedDocumentPath.generated_at, signedDocumentPath.generatedAt)
+        }
     }
 }
 
@@ -291,6 +302,11 @@ const requestStateStageMap: Record<number, AgreementStage> = {
 const activeTimelineIndex = computed(() => stageIndexMap[currentStage.value])
 const activeDocumentIndex = computed(() => (currentStage.value === 'terms' ? 2 : 1))
 const totalInvestment = computed(() => `GBP ${(agreement.value.allocations * agreement.value.allocationCost).toLocaleString('en-GB')}`)
+const signedDocumentPath = computed(() => allocationRequest.value?.signedDocumentPath || {
+    subscriptionAgreement: '',
+    termsAndConditions: '',
+    generatedAt: ''
+})
 const setStageFromRequestState = (state: number) => {
     currentStage.value = requestStateStageMap[state] || 'overview'
 }
@@ -308,6 +324,14 @@ const fetchAllocationRequest = async (requestSlug: string) => {
     if (request) {
         allocationRequest.value = request
         setStageFromRequestState(request.state)
+
+        if (request.state === 2) {
+            try {
+                await updateAllocationRequestState(2)
+            } catch (error) {
+                console.error('[Agreement] Unable to refresh document state', error)
+            }
+        }
     }
 }
 
@@ -670,6 +694,8 @@ useHead(() => ({
                             :current-stage="currentStage"
                             :active-document-index="activeDocumentIndex"
                             :support-email="agreement.supportEmail"
+                            :subscription-agreement-url="signedDocumentPath.subscriptionAgreement"
+                            :terms-and-conditions-url="signedDocumentPath.termsAndConditions"
                             @show-subscription="showSubscription"
                             @show-terms="showTerms"
                             @proceed-to-sign="openReadyToSignModal"

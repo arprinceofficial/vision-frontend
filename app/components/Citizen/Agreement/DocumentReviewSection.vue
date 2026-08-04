@@ -1,9 +1,14 @@
 <script setup lang="ts">
-defineProps<{
+const props = withDefaults(defineProps<{
     currentStage: string
     activeDocumentIndex: number
     supportEmail: string
-}>()
+    subscriptionAgreementUrl?: string
+    termsAndConditionsUrl?: string
+}>(), {
+    subscriptionAgreementUrl: '',
+    termsAndConditionsUrl: ''
+})
 
 const emit = defineEmits<{
     (event: 'show-subscription'): void
@@ -40,6 +45,24 @@ const subscriptionBullets: string[] = [
     'The Bare Trust name which will hold the asset',
     'The syndicate being the sole beneficiary of the Bare Trust'
 ]
+
+const activeDocumentTitle = computed(() => (
+    props.currentStage === 'subscription' ? 'Subscription Agreement' : 'Terms and Conditions'
+))
+
+const activeDocumentUrl = computed(() => (
+    props.currentStage === 'subscription'
+        ? props.subscriptionAgreementUrl
+        : props.termsAndConditionsUrl
+))
+
+const activeDocumentProxyUrl = computed(() => (
+    activeDocumentUrl.value ? `/api/agreement-document?url=${encodeURIComponent(activeDocumentUrl.value)}` : ''
+))
+
+const activeDocumentEmbedUrl = computed(() => (
+    activeDocumentProxyUrl.value ? `${activeDocumentProxyUrl.value}#toolbar=1&navpanes=0` : ''
+))
 </script>
 
 <template>
@@ -137,20 +160,29 @@ const subscriptionBullets: string[] = [
                     <div class="flex flex-wrap items-center gap-3">
                         <i class="pi pi-file-pdf text-tccGold" aria-hidden="true" />
                         <h2 class="font-poppins text-base font-black">
-                            {{ currentStage === 'subscription' ? 'Subscription Agreement' : 'Terms and Conditions' }}
+                            {{ activeDocumentTitle }}
                         </h2>
                         <span
                             class="rounded-full bg-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-white/75">
                             Document {{ activeDocumentIndex }} of 2
                         </span>
                     </div>
-                    <button type="button"
-                        class="inline-flex items-center justify-center gap-2 rounded-md border border-white/15 bg-white/10 px-3 py-2 text-[11px] font-black uppercase tracking-[0.12em] text-white transition-colors hover:border-tccGold hover:text-tccGold">
+                    <a :href="activeDocumentProxyUrl || undefined" target="_blank" rel="noopener"
+                        class="inline-flex items-center justify-center gap-2 rounded-md border border-white/15 bg-white/10 px-3 py-2 text-[11px] font-black uppercase tracking-[0.12em] text-white transition-colors hover:border-tccGold hover:text-tccGold"
+                        :class="!activeDocumentProxyUrl ? 'pointer-events-none opacity-50' : ''"
+                        :aria-disabled="!activeDocumentProxyUrl">
                         <i class="pi pi-window-maximize text-xs" aria-hidden="true" />
                         Fullscreen
-                    </button>
+                    </a>
                 </div>
-                <div class="grid min-h-[420px] place-items-center bg-gradient-to-b from-white to-slate-50 p-6">
+                <div v-if="activeDocumentEmbedUrl" class="min-h-[520px] bg-white">
+                    <iframe
+                        :src="activeDocumentEmbedUrl"
+                        :title="activeDocumentTitle"
+                        class="block h-[72vh] min-h-[520px] w-full border-0 bg-white"
+                    />
+                </div>
+                <div v-else class="grid min-h-[420px] place-items-center bg-gradient-to-b from-white to-slate-50 p-6">
                     <div
                         class="rounded-lg border border-slate-200 bg-white px-5 py-4 text-center shadow-[0_18px_50px_rgba(15,23,42,0.12)]">
                         <i class="pi pi-spin pi-spinner text-tccGold" aria-hidden="true" />
