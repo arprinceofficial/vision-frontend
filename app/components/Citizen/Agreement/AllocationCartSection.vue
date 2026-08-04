@@ -34,7 +34,7 @@ const trustAdminFee = computed(() => allocationSubtotal.value * 0.005)
             </h1>
         </div>
 
-        <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_24rem]">
+        <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_24rem]">
             <section class="rounded-xl border border-white/10 bg-white/[0.04] p-5 shadow-[0_18px_70px_rgba(0,0,0,0.24)] sm:p-6">
                 <div class="grid gap-6 md:grid-cols-[18rem_minmax(0,1fr)]">
                     <div class="min-h-56 rounded-xl border border-tccGold/20 bg-tccDeepBlack/70 p-5">

@@ -790,7 +790,7 @@ useHead(() => ({
                 @show-overview="showOverview" @show-documents="showSubscription" />
 
             <section class="bg-tccDeepBlack pb-14 sm:pb-16">
-                <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+                <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <CitizenAgreementSummaryStrip :agreement="agreement" :total-investment="totalInvestment"
                         :reference="displayedReference" :is-reference-loading="isReferenceLoading" />
 
