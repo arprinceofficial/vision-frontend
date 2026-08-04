@@ -1,7 +1,10 @@
 <script setup lang="ts">
-defineProps<{
+withDefaults(defineProps<{
     supportEmail: string
-}>()
+    isLoading?: boolean
+}>(), {
+    isLoading: false
+})
 
 const emit = defineEmits<{
     (event: 'get-started'): void
@@ -107,10 +110,12 @@ const cards: OverviewCard[] = [
 
         <div class="mt-5 rounded-lg border border-white/10 bg-white/[0.04] p-4 text-center">
             <button type="button"
-                class="inline-flex items-center justify-center gap-2 rounded-full bg-tccGold px-6 py-3 font-poppins text-[11px] font-black uppercase tracking-[0.18em] text-tccDarkNavy transition-colors hover:bg-tccLightGold"
+                class="inline-flex items-center justify-center gap-2 rounded-full bg-tccGold px-6 py-3 font-poppins text-[11px] font-black uppercase tracking-[0.18em] text-tccDarkNavy transition-colors hover:bg-tccLightGold disabled:cursor-not-allowed disabled:opacity-70"
+                :disabled="isLoading"
                 @click="emit('get-started')">
-                <i class="pi pi-check-circle text-xs" aria-hidden="true" />
-                Let&apos;s Get Started
+                <i v-if="isLoading" class="pi pi-spin pi-spinner text-xs" aria-hidden="true" />
+                <i v-else class="pi pi-check-circle text-xs" aria-hidden="true" />
+                {{ isLoading ? 'Updating...' : "Let's Get Started" }}
             </button>
         </div>
     </div>

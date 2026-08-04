@@ -97,6 +97,7 @@ const allocationRequestSlug = computed(() => {
 const allocationRequest = ref<AllocationRequest | null>(null)
 const agreementAsset = ref<AgreementAsset | null>(null)
 const isPreparingAllocation = ref(false)
+const isUpdatingAllocationState = ref(false)
 const preparedRoutePath = ref('')
 const preparingRoutePath = ref('')
 
@@ -294,6 +295,8 @@ const setStageFromRequestState = (state: number) => {
     currentStage.value = requestStateStageMap[state] || 'overview'
 }
 
+const getAllocationRequestSlug = () => getStringValue(allocationRequest.value?.slug, allocationRequestSlug.value)
+
 const fetchAllocationRequest = async (requestSlug: string) => {
     if (!requestSlug) return
 
@@ -305,6 +308,33 @@ const fetchAllocationRequest = async (requestSlug: string) => {
     if (request) {
         allocationRequest.value = request
         setStageFromRequestState(request.state)
+    }
+}
+
+const updateAllocationRequestState = async (state: number) => {
+    const requestSlug = getAllocationRequestSlug()
+    if (!requestSlug || isUpdatingAllocationState.value) return
+
+    isUpdatingAllocationState.value = true
+
+    try {
+        const response = await $fetchCitizen<AllocationRequestResponse>(`v1/customer/allocation-requests/${requestSlug}/update-state`, {
+            method: 'POST',
+            body: {
+                state
+            }
+        })
+        const request = normalizeAllocationRequest(response?.data)
+
+        if (request) {
+            allocationRequest.value = request
+            setStageFromRequestState(request.state)
+            return
+        }
+
+        setStageFromRequestState(state)
+    } finally {
+        isUpdatingAllocationState.value = false
     }
 }
 
@@ -434,6 +464,17 @@ const isReferenceLoading = computed(() => (
     !displayedReference.value &&
     isAllocationFlowLoading.value
 ))
+const shouldShowAgreementSkeleton = computed(() => (
+    isAllocationRoute.value &&
+    !allocationRequest.value &&
+    isAllocationFlowLoading.value
+))
+const isGetStartedLoading = computed(() => (
+    isAllocationRoute.value && (
+        isAllocationFlowLoading.value ||
+        isUpdatingAllocationState.value
+    )
+))
 
 onMounted(() => {
     void prepareAllocationFlow()
@@ -456,6 +497,25 @@ const showOverview = () => {
 
 const showSubscription = () => {
     currentStage.value = 'subscription'
+}
+
+const getStarted = async () => {
+    if (!isAllocationRoute.value) {
+        showSubscription()
+        return
+    }
+
+    if (!getAllocationRequestSlug()) {
+        await prepareAllocationFlow()
+    }
+
+    if (!getAllocationRequestSlug()) return
+
+    try {
+        await updateAllocationRequestState(2)
+    } catch (error) {
+        console.error('[Agreement] Unable to update allocation state', error)
+    }
 }
 
 const showTerms = () => {
@@ -528,88 +588,93 @@ useHead(() => ({
     <div class="bg-tccDeepBlack font-poppins text-white">
         <CitizenAgreementBreadcrumb :reference="displayedReference" :is-reference-loading="isReferenceLoading" />
 
-        <CitizenAgreementTimeline
-            :steps="timelineSteps"
-            :active-index="activeTimelineIndex"
-            @show-overview="showOverview"
-            @show-documents="showSubscription"
-        />
+        <CitizenAgreementPageSkeleton v-if="shouldShowAgreementSkeleton" />
 
-        <section class="bg-tccDeepBlack pb-14 sm:pb-16">
-            <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-                <CitizenAgreementSummaryStrip
-                    :agreement="agreement"
-                    :total-investment="totalInvestment"
-                    :reference="displayedReference"
-                    :is-reference-loading="isReferenceLoading"
-                />
+        <template v-else>
+            <CitizenAgreementTimeline
+                :steps="timelineSteps"
+                :active-index="activeTimelineIndex"
+                @show-overview="showOverview"
+                @show-documents="showSubscription"
+            />
 
-                <Transition name="agreement-fade" mode="out-in">
-                    <CitizenAgreementWhatHappensNextSection
-                        v-if="currentStage === 'overview'"
-                        key="overview"
-                        :support-email="agreement.supportEmail"
-                        @get-started="showSubscription"
-                    />
-
-                    <CitizenAgreementSignatureSection
-                        v-else-if="currentStage === 'signature'"
-                        key="signature"
+            <section class="bg-tccDeepBlack pb-14 sm:pb-16">
+                <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+                    <CitizenAgreementSummaryStrip
                         :agreement="agreement"
-                        @back-to-documents="showTerms"
-                        @submit="submitSignature"
+                        :total-investment="totalInvestment"
+                        :reference="displayedReference"
+                        :is-reference-loading="isReferenceLoading"
                     />
 
-                    <CitizenAgreementSignedDocumentsReviewSection
-                        v-else-if="currentStage === 'signed-documents'"
-                        key="signed-documents"
-                        :agreement="agreement"
-                        @proceed-to-vote="proceedToVote"
-                    />
+                    <Transition name="agreement-fade" mode="out-in">
+                        <CitizenAgreementWhatHappensNextSection
+                            v-if="currentStage === 'overview'"
+                            key="overview"
+                            :support-email="agreement.supportEmail"
+                            :is-loading="isGetStartedLoading"
+                            @get-started="getStarted"
+                        />
 
-                    <CitizenAgreementSyndicateVoteSection
-                        v-else-if="currentStage === 'vote'"
-                        key="vote"
-                        :agreement="agreement"
-                        @continue="proceedToCart"
-                    />
+                        <CitizenAgreementSignatureSection
+                            v-else-if="currentStage === 'signature'"
+                            key="signature"
+                            :agreement="agreement"
+                            @back-to-documents="showTerms"
+                            @submit="submitSignature"
+                        />
 
-                    <CitizenAgreementAllocationCartSection
-                        v-else-if="currentStage === 'cart'"
-                        key="cart"
-                        :agreement="agreement"
-                        @proceed-to-payment="proceedToPaymentAgreement"
-                    />
+                        <CitizenAgreementSignedDocumentsReviewSection
+                            v-else-if="currentStage === 'signed-documents'"
+                            key="signed-documents"
+                            :agreement="agreement"
+                            @proceed-to-vote="proceedToVote"
+                        />
 
-                    <CitizenAgreementPaymentAgreementSection
-                        v-else-if="currentStage === 'payment-agreement'"
-                        key="payment-agreement"
-                        :agreement="agreement"
-                        @back-to-cart="proceedToCart"
-                        @proceed-to-payment="proceedToBankTransfer"
-                    />
+                        <CitizenAgreementSyndicateVoteSection
+                            v-else-if="currentStage === 'vote'"
+                            key="vote"
+                            :agreement="agreement"
+                            @continue="proceedToCart"
+                        />
 
-                    <CitizenAgreementBankTransferDetailsSection
-                        v-else-if="currentStage === 'bank-transfer'"
-                        key="bank-transfer"
-                        :agreement="agreement"
-                        @back-to-cart="proceedToCart"
-                        @confirm-payment="confirmPayment"
-                    />
+                        <CitizenAgreementAllocationCartSection
+                            v-else-if="currentStage === 'cart'"
+                            key="cart"
+                            :agreement="agreement"
+                            @proceed-to-payment="proceedToPaymentAgreement"
+                        />
 
-                    <CitizenAgreementDocumentReviewSection
-                        v-else
-                        key="documents"
-                        :current-stage="currentStage"
-                        :active-document-index="activeDocumentIndex"
-                        :support-email="agreement.supportEmail"
-                        @show-subscription="showSubscription"
-                        @show-terms="showTerms"
-                        @proceed-to-sign="openReadyToSignModal"
-                    />
-                </Transition>
-            </div>
-        </section>
+                        <CitizenAgreementPaymentAgreementSection
+                            v-else-if="currentStage === 'payment-agreement'"
+                            key="payment-agreement"
+                            :agreement="agreement"
+                            @back-to-cart="proceedToCart"
+                            @proceed-to-payment="proceedToBankTransfer"
+                        />
+
+                        <CitizenAgreementBankTransferDetailsSection
+                            v-else-if="currentStage === 'bank-transfer'"
+                            key="bank-transfer"
+                            :agreement="agreement"
+                            @back-to-cart="proceedToCart"
+                            @confirm-payment="confirmPayment"
+                        />
+
+                        <CitizenAgreementDocumentReviewSection
+                            v-else
+                            key="documents"
+                            :current-stage="currentStage"
+                            :active-document-index="activeDocumentIndex"
+                            :support-email="agreement.supportEmail"
+                            @show-subscription="showSubscription"
+                            @show-terms="showTerms"
+                            @proceed-to-sign="openReadyToSignModal"
+                        />
+                    </Transition>
+                </div>
+            </section>
+        </template>
 
         <CitizenAgreementReadyToSignModal
             :is-open-modal="isReadyToSignModalOpen"
