@@ -8,6 +8,7 @@ type AgreementRecord = {
 
 const props = defineProps<{
     agreement: AgreementRecord
+    isLoading?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -134,11 +135,12 @@ const terms = [
                         :class="isAccepted
                             ? 'bg-tccGold text-tccDarkNavy shadow-lg shadow-tccGold/20 hover:bg-tccLightGold'
                             : 'cursor-not-allowed bg-white/10 text-white/35'"
-                        :disabled="!isAccepted"
+                        :disabled="!isAccepted || isLoading"
                         @click="emit('proceed-to-payment')"
                     >
-                        <i class="pi pi-arrow-right text-xs" aria-hidden="true" />
-                        Proceed to Payment
+                        <i v-if="isLoading" class="pi pi-spin pi-spinner text-xs" aria-hidden="true" />
+                        <i v-else class="pi pi-arrow-right text-xs" aria-hidden="true" />
+                        {{ isLoading ? 'Processing...' : 'Proceed to Payment' }}
                     </button>
 
                     <button

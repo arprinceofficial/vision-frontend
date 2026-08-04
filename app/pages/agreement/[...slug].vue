@@ -777,8 +777,20 @@ const proceedToPaymentAgreement = async () => {
     }
 }
 
-const proceedToBankTransfer = () => {
-    currentStage.value = 'bank-transfer'
+const proceedToBankTransfer = async () => {
+    if (!isAllocationRoute.value) {
+        currentStage.value = 'bank-transfer'
+        return
+    }
+
+    try {
+        await updateAllocationRequestState(6, {
+            includeAgreementFlags: false,
+            syncStage: true
+        })
+    } catch (error) {
+        console.error('[Agreement] Unable to proceed to payment', error)
+    }
 }
 
 const confirmPayment = () => {
@@ -847,8 +859,8 @@ useHead(() => ({
                             @proceed-to-payment="proceedToPaymentAgreement" />
 
                         <CitizenAgreementPaymentAgreementSection v-else-if="currentStage === 'payment-agreement'"
-                            key="payment-agreement" :agreement="agreement" @back-to-cart="proceedToCart"
-                            @proceed-to-payment="proceedToBankTransfer" />
+                            key="payment-agreement" :agreement="agreement" :is-loading="isUpdatingAllocationState"
+                            @back-to-cart="proceedToCart" @proceed-to-payment="proceedToBankTransfer" />
 
                         <CitizenAgreementBankTransferDetailsSection v-else-if="currentStage === 'bank-transfer'"
                             key="bank-transfer" :agreement="agreement" @back-to-cart="proceedToCart"
