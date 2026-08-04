@@ -118,6 +118,7 @@ const agreementAsset = ref<AgreementAsset | null>(null)
 const isPreparingAllocation = ref(false)
 const isUpdatingAllocationState = ref(false)
 const isSubmittingSignature = ref(false)
+const isSubmittingCart = ref(false)
 const signatureSubmitError = ref('')
 const signedDocumentsStateUpdatedFor = ref('')
 const preparedRoutePath = ref('')
@@ -742,8 +743,38 @@ const proceedToCart = async () => {
     }
 }
 
-const proceedToPaymentAgreement = () => {
-    currentStage.value = 'payment-agreement'
+const proceedToPaymentAgreement = async () => {
+    if (!isAllocationRoute.value) {
+        currentStage.value = 'payment-agreement'
+        return
+    }
+
+    const requestSlug = getAllocationRequestSlug()
+    if (!requestSlug || isSubmittingCart.value) return
+
+    isSubmittingCart.value = true
+
+    try {
+        const response = await $fetchCitizen<AllocationRequestResponse>(`v1/customer/allocation-requests/${requestSlug}/cart`, {
+            method: 'POST',
+            body: {
+                shares_count: agreement.value.allocations,
+                payment_method: 'bank_transfer',
+                state: 5
+            }
+        })
+        const request = normalizeAllocationRequest(response?.data?.allocation_request || response?.data?.allocationRequest || response?.data)
+
+        if (request?.slug) {
+            allocationRequest.value = request
+        }
+
+        currentStage.value = 'payment-agreement'
+    } catch (error) {
+        console.error('[Agreement] Unable to submit cart', error)
+    } finally {
+        isSubmittingCart.value = false
+    }
 }
 
 const proceedToBankTransfer = () => {
@@ -812,7 +843,8 @@ useHead(() => ({
                             :agreement="agreement" :is-loading="isUpdatingAllocationState" @continue="proceedToCart" />
 
                         <CitizenAgreementAllocationCartSection v-else-if="currentStage === 'cart'" key="cart"
-                            :agreement="agreement" @proceed-to-payment="proceedToPaymentAgreement" />
+                            :agreement="agreement" :is-loading="isSubmittingCart"
+                            @proceed-to-payment="proceedToPaymentAgreement" />
 
                         <CitizenAgreementPaymentAgreementSection v-else-if="currentStage === 'payment-agreement'"
                             key="payment-agreement" :agreement="agreement" @back-to-cart="proceedToCart"

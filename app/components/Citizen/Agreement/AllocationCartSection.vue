@@ -8,6 +8,7 @@ type AgreementRecord = {
 
 const props = defineProps<{
     agreement: AgreementRecord
+    isLoading?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -146,10 +147,13 @@ const trustAdminFee = computed(() => allocationSubtotal.value * 0.005)
                     <button
                         type="button"
                         class="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-tccGold px-5 py-3 font-poppins text-xs font-black uppercase tracking-[0.14em] text-tccDarkNavy shadow-lg shadow-tccGold/20 transition-colors hover:bg-tccLightGold"
+                        :class="isLoading ? 'cursor-wait opacity-75' : ''"
+                        :disabled="isLoading"
                         @click="emit('proceed-to-payment')"
                     >
-                        <i class="pi pi-arrow-right text-xs" aria-hidden="true" />
-                        Proceed to Payment
+                        <i v-if="isLoading" class="pi pi-spin pi-spinner text-xs" aria-hidden="true" />
+                        <i v-else class="pi pi-arrow-right text-xs" aria-hidden="true" />
+                        {{ isLoading ? 'Processing...' : 'Proceed to Payment' }}
                     </button>
                 </section>
             </aside>
