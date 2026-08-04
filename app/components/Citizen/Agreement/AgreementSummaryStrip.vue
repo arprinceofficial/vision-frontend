@@ -5,10 +5,15 @@ type AgreementRecord = {
     reference: string
 }
 
-defineProps<{
+withDefaults(defineProps<{
     agreement: AgreementRecord
     totalInvestment: string
-}>()
+    reference?: string
+    isReferenceLoading?: boolean
+}>(), {
+    reference: '',
+    isReferenceLoading: false
+})
 </script>
 
 <template>
@@ -25,7 +30,13 @@ defineProps<{
         </div>
         <div>
             <span class="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Reference</span>
-            <strong class="mt-1 block text-sm text-tccGold sm:text-base">{{ agreement.reference }}</strong>
+            <span
+                v-if="isReferenceLoading"
+                class="mt-2 block h-4 w-24 rounded-full bg-tccGold/25 shadow-[0_0_18px_rgba(247,198,0,0.16)] animate-pulse"
+                aria-label="Loading reference"
+            />
+            <strong v-else-if="reference" class="mt-1 block text-sm text-tccGold sm:text-base">{{ reference }}</strong>
+            <strong v-else class="mt-1 block text-sm text-white/35 sm:text-base">Pending</strong>
         </div>
     </div>
 </template>

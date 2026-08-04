@@ -1,0 +1,642 @@
+<script setup lang="ts">
+definePageMeta({
+    layout: 'default'
+})
+
+type AgreementStage =
+    | 'overview'
+    | 'subscription'
+    | 'terms'
+    | 'signature'
+    | 'signed-documents'
+    | 'vote'
+    | 'cart'
+    | 'payment-agreement'
+    | 'bank-transfer'
+
+type TimelineStep = {
+    key: string
+    label: string
+    icon: string
+}
+
+type AgreementRecord = {
+    id: string
+    vehicle: string
+    collection: string
+    year: string
+    allocations: number
+    allocationCost: number
+    reference: string
+    supportEmail: string
+}
+
+type AgreementAsset = Partial<AgreementRecord>
+
+const route = useRoute()
+
+type AllocationRequestResponse = {
+    status?: boolean
+    message?: string
+    data?: Record<string, any> | null
+}
+
+type FractionalItemResponse = {
+    status?: boolean
+    message?: string
+    data?: Record<string, any> | null
+}
+
+type AllocationRequest = {
+    id: string
+    slug: string
+    state: number
+    sharesCount: number
+    totalAmount: number
+    allocationCost: number
+    vehicle: string
+    reference: string
+}
+
+const agreementRecords: AgreementRecord[] = [
+    {
+        id: 'NN93366393',
+        vehicle: 'Diablo VT Roadster Lamborghini',
+        collection: 'Modern Classics Collection',
+        year: '1997',
+        allocations: 1,
+        allocationCost: 5000,
+        reference: 'NN93366393',
+        supportEmail: 'support@thecarcrowd.co.uk'
+    }
+]
+
+const routeSegments = computed(() => {
+    const params = route.params.slug
+    const segments = Array.isArray(params) ? params : [params]
+
+    return segments
+        .flatMap((segment) => String(segment || '').split('/'))
+        .filter(Boolean)
+})
+
+const slug = computed(() => routeSegments.value[0] || '')
+const shareRouteCount = computed(() => {
+    const shareSegment = routeSegments.value.find((segment) => /^a-\d+$/i.test(segment))
+    if (!shareSegment) return 1
+
+    const shareCount = Number(shareSegment.replace(/^a-/i, ''))
+    return Number.isFinite(shareCount) && shareCount > 0 ? Math.round(shareCount) : 1
+})
+
+const allocationRequestSlug = computed(() => {
+    const requestSegment = routeSegments.value.find((segment) => /^s-/i.test(segment))
+    return requestSegment ? requestSegment.replace(/^s-/i, '') : ''
+})
+
+const allocationRequest = ref<AllocationRequest | null>(null)
+const agreementAsset = ref<AgreementAsset | null>(null)
+const isPreparingAllocation = ref(false)
+const preparedRoutePath = ref('')
+const preparingRoutePath = ref('')
+
+const getNumberValue = (value: unknown, fallback = 0) => {
+    const numberValue = Number(value)
+    return Number.isFinite(numberValue) ? numberValue : fallback
+}
+
+const getStringValue = (...values: unknown[]) => {
+    const value = values.find((item) => item !== null && item !== undefined && String(item).trim() !== '')
+    return value === undefined ? '' : String(value).trim()
+}
+
+const normalizeAllocationRequest = (item: Record<string, any> | null | undefined): AllocationRequest | null => {
+    if (!item) return null
+
+    const fractionalItem = item.fractional_item || item.fractionalItem || {}
+    const sharesCount = getNumberValue(item.shares_count ?? item.sharesCount, shareRouteCount.value)
+    const totalAmount = getNumberValue(item.total_amount ?? item.price)
+    const allocationCost = sharesCount > 0 && totalAmount > 0
+        ? totalAmount / sharesCount
+        : getNumberValue(fractionalItem.per_share_value ?? fractionalItem.allocation_cost ?? agreementAsset.value?.allocationCost)
+    const slugValue = getStringValue(item.slug, allocationRequestSlug.value)
+
+    return {
+        id: getStringValue(item.id),
+        slug: slugValue,
+        state: getNumberValue(item.state, 1),
+        sharesCount,
+        totalAmount,
+        allocationCost,
+        vehicle: getStringValue(
+            fractionalItem.asset_name,
+            fractionalItem.item_name,
+            fractionalItem.headline,
+            fractionalItem.assetable?.name,
+            agreementAsset.value?.vehicle,
+            agreementRecords[0]?.vehicle
+        ),
+        reference: slugValue || getStringValue(item.reference, agreementAsset.value?.reference, agreementRecords[0]?.reference)
+    }
+}
+
+const getSpecValue = (specs: unknown, labelPattern: RegExp) => {
+    if (!Array.isArray(specs)) return ''
+
+    const spec = specs.find((item: any) => labelPattern.test(getStringValue(item?.label)))
+    return getStringValue((spec as any)?.value)
+}
+
+const normalizeAgreementAsset = (item: Record<string, any> | null | undefined): AgreementAsset | null => {
+    if (!item) return null
+
+    const assetable = item.assetable || {}
+    const vehicle = getStringValue(
+        item.vehicle,
+        item.title,
+        item.asset_name,
+        item.item_name,
+        item.headline,
+        assetable.name
+    )
+
+    return {
+        id: getStringValue(item.uid, item.allocationId, item.allocation_id, item.id),
+        vehicle,
+        collection: getStringValue(item.collection, item.collection_name),
+        year: getStringValue(item.year, assetable.year, getSpecValue(item.specs, /year/i)),
+        allocationCost: getNumberValue(item.allocationCost ?? item.per_share_value ?? item.funded_current_price),
+        reference: getStringValue(item.allocationId, item.allocation_id, item.slug),
+        supportEmail: 'support@thecarcrowd.co.uk'
+    }
+}
+
+const mergeAgreementAsset = (asset: AgreementAsset | null) => {
+    if (!asset) return
+
+    agreementAsset.value = {
+        ...(agreementAsset.value || {}),
+        ...(asset.id ? { id: asset.id } : {}),
+        ...(asset.vehicle ? { vehicle: asset.vehicle } : {}),
+        ...(asset.collection ? { collection: asset.collection } : {}),
+        ...(asset.year ? { year: asset.year } : {}),
+        ...(asset.allocationCost ? { allocationCost: asset.allocationCost } : {}),
+        ...(asset.reference ? { reference: asset.reference } : {}),
+        ...(asset.supportEmail ? { supportEmail: asset.supportEmail } : {})
+    }
+}
+
+const readStoredAgreementAsset = () => {
+    if (!process.client || !slug.value) return
+
+    const storedAsset = sessionStorage.getItem(`agreement-asset:${slug.value}`)
+    if (!storedAsset) return
+
+    try {
+        const parsedAsset = JSON.parse(storedAsset)
+        const asset = normalizeAgreementAsset(parsedAsset)
+
+        if (asset) {
+            mergeAgreementAsset(asset)
+        }
+    } catch {
+        sessionStorage.removeItem(`agreement-asset:${slug.value}`)
+    }
+}
+
+const getAgreementFallback = (matchedAgreement: AgreementRecord | undefined) => {
+    const fallbackAgreement = matchedAgreement ?? agreementRecords[0]!
+    const asset = agreementAsset.value
+
+    if (!asset) return fallbackAgreement
+
+    return {
+        ...fallbackAgreement,
+        ...asset,
+        id: slug.value || asset.id || fallbackAgreement.id,
+        vehicle: asset.vehicle || fallbackAgreement.vehicle,
+        collection: asset.collection || fallbackAgreement.collection,
+        year: asset.year || fallbackAgreement.year,
+        allocations: shareRouteCount.value,
+        allocationCost: asset.allocationCost || fallbackAgreement.allocationCost,
+        reference: allocationRequestSlug.value || asset.reference || fallbackAgreement.reference,
+        supportEmail: asset.supportEmail || fallbackAgreement.supportEmail
+    }
+}
+
+const agreement = computed<AgreementRecord>(() => {
+    const normalizedSlug = slug.value.toLowerCase()
+    const matchedAgreement = agreementRecords.find((record) => record.id.toLowerCase() === normalizedSlug)
+    const request = allocationRequest.value
+    const fallbackAgreement = getAgreementFallback(matchedAgreement)
+
+    if (request) {
+        return {
+            ...fallbackAgreement,
+            id: slug.value || fallbackAgreement.id,
+            vehicle: request.vehicle || fallbackAgreement.vehicle,
+            allocations: request.sharesCount || shareRouteCount.value,
+            allocationCost: request.allocationCost || fallbackAgreement.allocationCost,
+            reference: request.reference || allocationRequestSlug.value || ''
+        }
+    }
+
+    if (routeSegments.value.length > 1) {
+        return {
+            ...fallbackAgreement,
+            id: slug.value || fallbackAgreement.id,
+            allocations: shareRouteCount.value,
+            reference: allocationRequestSlug.value || ''
+        }
+    }
+
+    return matchedAgreement ?? agreementRecords[0]!
+})
+
+const currentStage = ref<AgreementStage>('overview')
+const isReadyToSignModalOpen = ref(false)
+const isPaymentConfirmationModalOpen = ref(false)
+
+const timelineSteps: TimelineStep[] = [
+    { key: 'what-happens-next', label: 'What Happens Next', icon: 'pi pi-verified' },
+    { key: 'documents', label: 'Documents', icon: 'pi pi-file' },
+    { key: 'syndicate-vote', label: 'Syndicate Vote', icon: 'pi pi-users' },
+    { key: 'cart', label: 'Cart', icon: 'pi pi-shopping-cart' },
+    { key: 'final-agreement', label: 'Final Agreement', icon: 'pi pi-file-check' },
+    { key: 'payment', label: 'Payment', icon: 'pi pi-credit-card' }
+]
+
+const stageIndexMap: Record<AgreementStage, number> = {
+    overview: 0,
+    subscription: 1,
+    terms: 1,
+    signature: 1,
+    'signed-documents': 1,
+    vote: 2,
+    cart: 3,
+    'payment-agreement': 4,
+    'bank-transfer': 5
+}
+
+const requestStateStageMap: Record<number, AgreementStage> = {
+    1: 'overview',
+    2: 'subscription',
+    3: 'vote',
+    4: 'cart',
+    5: 'payment-agreement',
+    6: 'bank-transfer'
+}
+
+const activeTimelineIndex = computed(() => stageIndexMap[currentStage.value])
+const activeDocumentIndex = computed(() => (currentStage.value === 'terms' ? 2 : 1))
+const totalInvestment = computed(() => `GBP ${(agreement.value.allocations * agreement.value.allocationCost).toLocaleString('en-GB')}`)
+const setStageFromRequestState = (state: number) => {
+    currentStage.value = requestStateStageMap[state] || 'overview'
+}
+
+const fetchAllocationRequest = async (requestSlug: string) => {
+    if (!requestSlug) return
+
+    const response = await $fetchCitizen<AllocationRequestResponse>(`v1/customer/allocation-requests/${requestSlug}`, {
+        method: 'GET'
+    })
+    const request = normalizeAllocationRequest(response?.data)
+
+    if (request) {
+        allocationRequest.value = request
+        setStageFromRequestState(request.state)
+    }
+}
+
+const fetchAgreementAsset = async () => {
+    if (!slug.value || routeSegments.value.length <= 1) return
+
+    readStoredAgreementAsset()
+
+    try {
+        const response = await $fetchCitizen<FractionalItemResponse>(`v1/customer/fractional-items/${slug.value}`, {
+            method: 'GET'
+        })
+        const asset = normalizeAgreementAsset(response?.data)
+
+        if (asset) {
+            mergeAgreementAsset(asset)
+        }
+    } catch {
+        readStoredAgreementAsset()
+    }
+}
+
+const requestShares = async () => {
+    if (!slug.value || allocationRequestSlug.value || isPreparingAllocation.value) return
+
+    isPreparingAllocation.value = true
+
+    try {
+        const response = await $fetchCitizen<AllocationRequestResponse>(`v1/customer/fractional-items/${slug.value}/request-shares`, {
+            method: 'POST',
+            body: {
+                shares_count: shareRouteCount.value
+            }
+        })
+        const request = normalizeAllocationRequest(response?.data)
+        const requestAsset = normalizeAgreementAsset(response?.data?.fractional_item || response?.data?.fractionalItem)
+
+        if (requestAsset) {
+            mergeAgreementAsset(requestAsset)
+        }
+
+        if (!request?.slug) return
+
+        allocationRequest.value = request
+        setStageFromRequestState(request.state)
+
+        await navigateTo(`/agreement/${encodeURIComponent(slug.value)}/a-${shareRouteCount.value}/s-${encodeURIComponent(request.slug)}`, {
+            replace: true
+        })
+    } finally {
+        isPreparingAllocation.value = false
+    }
+}
+
+const prepareAllocationFlow = async () => {
+    const currentRoutePath = route.fullPath
+
+    if (
+        !slug.value ||
+        preparedRoutePath.value === currentRoutePath ||
+        preparingRoutePath.value === currentRoutePath
+    ) {
+        return null
+    }
+
+    preparingRoutePath.value = currentRoutePath
+
+    try {
+        await fetchAgreementAsset()
+
+        if (allocationRequestSlug.value) {
+            await fetchAllocationRequest(allocationRequestSlug.value)
+            preparedRoutePath.value = currentRoutePath
+            return allocationRequest.value
+        }
+
+        if (routeSegments.value.length > 1) {
+            await requestShares()
+            preparedRoutePath.value = currentRoutePath
+            return allocationRequest.value
+        }
+
+        preparedRoutePath.value = currentRoutePath
+        return null
+    } finally {
+        if (preparingRoutePath.value === currentRoutePath) {
+            preparingRoutePath.value = ''
+        }
+    }
+}
+
+const {
+    pending: allocationFlowPending,
+    status: allocationFlowStatus
+} = await useAsyncData(
+    'agreement-allocation-flow',
+    async () => {
+        return prepareAllocationFlow()
+    },
+    {
+        default: () => null,
+        lazy: true,
+        server: false,
+        watch: [() => route.fullPath]
+    }
+)
+
+const isAllocationRoute = computed(() => routeSegments.value.length > 1)
+const displayedReference = computed(() => (
+    isAllocationRoute.value
+        ? getStringValue(allocationRequest.value?.reference, allocationRequestSlug.value)
+        : agreement.value.reference
+))
+const isAllocationFlowLoading = computed(() => (
+    isPreparingAllocation.value ||
+    preparingRoutePath.value === route.fullPath ||
+    allocationFlowPending.value ||
+    allocationFlowStatus.value === 'pending' ||
+    (
+        isAllocationRoute.value &&
+        preparedRoutePath.value !== route.fullPath &&
+        allocationFlowStatus.value !== 'error'
+    )
+))
+const isReferenceLoading = computed(() => (
+    isAllocationRoute.value &&
+    !displayedReference.value &&
+    isAllocationFlowLoading.value
+))
+
+onMounted(() => {
+    void prepareAllocationFlow()
+})
+
+watch(currentStage, async () => {
+    await nextTick()
+
+    if (typeof window !== 'undefined') {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        })
+    }
+}, { flush: 'post' })
+
+const showOverview = () => {
+    currentStage.value = 'overview'
+}
+
+const showSubscription = () => {
+    currentStage.value = 'subscription'
+}
+
+const showTerms = () => {
+    currentStage.value = 'terms'
+}
+
+const openReadyToSignModal = () => {
+    isReadyToSignModalOpen.value = true
+}
+
+const closeReadyToSignModal = () => {
+    isReadyToSignModalOpen.value = false
+}
+
+const proceedToSignature = () => {
+    isReadyToSignModalOpen.value = false
+    currentStage.value = 'signature'
+}
+
+const submitSignature = () => {
+    currentStage.value = 'signed-documents'
+}
+
+const proceedToVote = () => {
+    currentStage.value = 'vote'
+}
+
+const proceedToCart = () => {
+    currentStage.value = 'cart'
+}
+
+const proceedToPaymentAgreement = () => {
+    currentStage.value = 'payment-agreement'
+}
+
+const proceedToBankTransfer = () => {
+    currentStage.value = 'bank-transfer'
+}
+
+const confirmPayment = () => {
+    isPaymentConfirmationModalOpen.value = true
+}
+
+const closePaymentConfirmationModal = () => {
+    isPaymentConfirmationModalOpen.value = false
+}
+
+const editPaymentCart = () => {
+    isPaymentConfirmationModalOpen.value = false
+    currentStage.value = 'cart'
+}
+
+const completePaymentConfirmation = () => {
+    isPaymentConfirmationModalOpen.value = false
+    void navigateTo('/profile/transactions')
+}
+
+useHead(() => ({
+    title: `Agreement ${agreement.value.reference} - The Car Crowd`,
+    meta: [
+        {
+            name: 'description',
+            content: `Review documents for ${agreement.value.vehicle}.`
+        }
+    ]
+}))
+</script>
+
+<template>
+    <div class="bg-tccDeepBlack font-poppins text-white">
+        <CitizenAgreementBreadcrumb :reference="displayedReference" :is-reference-loading="isReferenceLoading" />
+
+        <CitizenAgreementTimeline
+            :steps="timelineSteps"
+            :active-index="activeTimelineIndex"
+            @show-overview="showOverview"
+            @show-documents="showSubscription"
+        />
+
+        <section class="bg-tccDeepBlack pb-14 sm:pb-16">
+            <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+                <CitizenAgreementSummaryStrip
+                    :agreement="agreement"
+                    :total-investment="totalInvestment"
+                    :reference="displayedReference"
+                    :is-reference-loading="isReferenceLoading"
+                />
+
+                <Transition name="agreement-fade" mode="out-in">
+                    <CitizenAgreementWhatHappensNextSection
+                        v-if="currentStage === 'overview'"
+                        key="overview"
+                        :support-email="agreement.supportEmail"
+                        @get-started="showSubscription"
+                    />
+
+                    <CitizenAgreementSignatureSection
+                        v-else-if="currentStage === 'signature'"
+                        key="signature"
+                        :agreement="agreement"
+                        @back-to-documents="showTerms"
+                        @submit="submitSignature"
+                    />
+
+                    <CitizenAgreementSignedDocumentsReviewSection
+                        v-else-if="currentStage === 'signed-documents'"
+                        key="signed-documents"
+                        :agreement="agreement"
+                        @proceed-to-vote="proceedToVote"
+                    />
+
+                    <CitizenAgreementSyndicateVoteSection
+                        v-else-if="currentStage === 'vote'"
+                        key="vote"
+                        :agreement="agreement"
+                        @continue="proceedToCart"
+                    />
+
+                    <CitizenAgreementAllocationCartSection
+                        v-else-if="currentStage === 'cart'"
+                        key="cart"
+                        :agreement="agreement"
+                        @proceed-to-payment="proceedToPaymentAgreement"
+                    />
+
+                    <CitizenAgreementPaymentAgreementSection
+                        v-else-if="currentStage === 'payment-agreement'"
+                        key="payment-agreement"
+                        :agreement="agreement"
+                        @back-to-cart="proceedToCart"
+                        @proceed-to-payment="proceedToBankTransfer"
+                    />
+
+                    <CitizenAgreementBankTransferDetailsSection
+                        v-else-if="currentStage === 'bank-transfer'"
+                        key="bank-transfer"
+                        :agreement="agreement"
+                        @back-to-cart="proceedToCart"
+                        @confirm-payment="confirmPayment"
+                    />
+
+                    <CitizenAgreementDocumentReviewSection
+                        v-else
+                        key="documents"
+                        :current-stage="currentStage"
+                        :active-document-index="activeDocumentIndex"
+                        :support-email="agreement.supportEmail"
+                        @show-subscription="showSubscription"
+                        @show-terms="showTerms"
+                        @proceed-to-sign="openReadyToSignModal"
+                    />
+                </Transition>
+            </div>
+        </section>
+
+        <CitizenAgreementReadyToSignModal
+            :is-open-modal="isReadyToSignModalOpen"
+            :support-email="agreement.supportEmail"
+            @close="closeReadyToSignModal"
+            @proceed="proceedToSignature"
+        />
+
+        <CitizenAgreementPaymentConfirmationModal
+            :is-open-modal="isPaymentConfirmationModalOpen"
+            :agreement="agreement"
+            @close="closePaymentConfirmationModal"
+            @edit-cart="editPaymentCart"
+            @confirm="completePaymentConfirmation"
+        />
+    </div>
+</template>
+
+<style scoped>
+.agreement-fade-enter-active,
+.agreement-fade-leave-active {
+    transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.agreement-fade-enter-from,
+.agreement-fade-leave-to {
+    opacity: 0;
+    transform: translateY(8px);
+}
+</style>

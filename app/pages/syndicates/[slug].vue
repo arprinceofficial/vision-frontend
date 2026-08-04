@@ -43,7 +43,20 @@ type NewsCard = {
     excerpt: string
 }
 
+type ActiveJourney = {
+    slug: string
+    uid: string
+    state: number
+    status: number
+    isCompleted: boolean
+    percentComplete: number
+    slot: number
+    price: number
+    currentStep: string
+}
+
 type SyndicateDetail = {
+    uid: string
     slug: string
     allocationId: string
     status: string
@@ -64,6 +77,7 @@ type SyndicateDetail = {
     analysisTabs: Record<AnalysisTabKey, AnalysisTab>
     technicalData: TechnicalDatum[]
     news: NewsCard[]
+    activeJourney: ActiveJourney | null
 }
 
 type CmsSyndicateResponse = {
@@ -214,6 +228,27 @@ const normalizeNews = (items: unknown): NewsCard[] => (
         : []
 )
 
+const normalizeActiveJourney = (journey: any): ActiveJourney | null => {
+    if (!journey || typeof journey !== 'object') return null
+
+    const slugValue = getFirstValue(journey.slug)
+    const uidValue = getFirstValue(journey.uid)
+
+    if (!slugValue && !uidValue) return null
+
+    return {
+        slug: slugValue,
+        uid: uidValue,
+        state: normalizeNumber(journey.state),
+        status: normalizeNumber(journey.status),
+        isCompleted: Boolean(journey.is_completed ?? journey.isCompleted),
+        percentComplete: normalizeProgress(journey.percent_complete ?? journey.percentComplete),
+        slot: normalizeNumber(journey.slot ?? journey.shares_count ?? journey.sharesCount, 1),
+        price: normalizeNumber(journey.price ?? journey.total_amount),
+        currentStep: getFirstValue(journey.current_step, journey.currentStep) || 'Initial Agreement'
+    }
+}
+
 const normalizeSyndicate = (item: Record<string, any> | null | undefined): SyndicateDetail | null => {
     if (!item) return null
 
@@ -228,6 +263,7 @@ const normalizeSyndicate = (item: Record<string, any> | null | undefined): Syndi
     const specs = normalizeStats(item.specs)
 
     return {
+        uid: getFirstValue(item.uid, item.uuid, item.id),
         slug: slugValue,
         allocationId: getFirstValue(item.allocationId),
         status: getFirstValue(item.status) || 'N/A',
@@ -247,7 +283,8 @@ const normalizeSyndicate = (item: Record<string, any> | null | undefined): Syndi
         gallery: normalizeGallery(item.gallery, heroImage, heroAlt),
         analysisTabs: normalizeAnalysisTabs(item.analysisTabs),
         technicalData: normalizeTechnicalData(item.technicalData, specs),
-        news: normalizeNews(item.news)
+        news: normalizeNews(item.news),
+        activeJourney: normalizeActiveJourney(item.activeJourney)
     }
 }
 
@@ -287,7 +324,6 @@ const shouldShowSyndicateSkeleton = computed(() => (
 const allocationCount = ref(1)
 const isAllocationModalVisible = ref(false)
 const isClientReady = ref(false)
-const allocationRecoveryProgress = 0
 const activeAnalysisTab = ref<AnalysisTabKey>('thisCar')
 
 const formatCurrency = (value: number | string | null | undefined) => (
@@ -319,6 +355,24 @@ const totalInvestment = computed(() => {
 
     return formatCurrency(allocationCount.value * syndicate.value.allocationCost)
 })
+
+const activeJourney = computed(() => syndicate.value?.activeJourney || null)
+
+const modalAllocationSlots = computed(() => activeJourney.value?.slot || allocationCount.value)
+
+const modalAllocationCost = computed(() => {
+    if (!syndicate.value) return 0
+
+    const journey = activeJourney.value
+    if (!journey?.slot || !journey.price) {
+        return syndicate.value.allocationCost
+    }
+
+    return journey.price / journey.slot
+})
+
+const modalAllocationProgress = computed(() => activeJourney.value?.percentComplete || 0)
+const modalAllocationStep = computed(() => activeJourney.value?.currentStep || 'Initial Agreement')
 
 const currentAnalysisTab = computed(() => {
     if (!syndicate.value) {
@@ -353,6 +407,11 @@ const openAllocationModal = () => {
         return
     }
 
+    if (!activeJourney.value) {
+        void navigateToAgreement(allocationCount.value)
+        return
+    }
+
     isAllocationModalVisible.value = true
 }
 
@@ -360,14 +419,58 @@ const closeAllocationModal = () => {
     isAllocationModalVisible.value = false
 }
 
-const selectAllocationFlow = async () => {
+const getAgreementPath = (shares: number, requestSlug = '') => {
+    if (!syndicate.value) {
+        return ''
+    }
+
+    const agreementUid = syndicate.value.uid || syndicate.value.allocationId
+    const shareCount = Math.max(1, Math.round(normalizeNumber(shares, 1)))
+    const basePath = `/agreement/${encodeURIComponent(agreementUid)}/a-${shareCount}`
+
+    return requestSlug ? `${basePath}/s-${encodeURIComponent(requestSlug)}` : basePath
+}
+
+const rememberAgreementAsset = () => {
+    if (!process.client || !syndicate.value) return
+
+    const agreementUid = syndicate.value.uid || syndicate.value.allocationId
+    if (!agreementUid) return
+
+    sessionStorage.setItem(`agreement-asset:${agreementUid}`, JSON.stringify({
+        id: agreementUid,
+        vehicle: syndicate.value.title,
+        collection: syndicate.value.collection,
+        year: syndicateYear.value,
+        allocationCost: syndicate.value.allocationCost,
+        reference: syndicate.value.allocationId,
+        supportEmail: 'support@thecarcrowd.co.uk'
+    }))
+}
+
+const navigateToAgreement = async (shares: number, requestSlug = '') => {
+    const path = getAgreementPath(shares, requestSlug)
+    if (!path) return
+
+    rememberAgreementAsset()
+    await navigateTo(path)
+}
+
+const startFreshAllocationFlow = async () => {
+    isAllocationModalVisible.value = false
+    await navigateToAgreement(allocationCount.value)
+}
+
+const continueExistingAllocationFlow = async () => {
     isAllocationModalVisible.value = false
 
-    if (!syndicate.value) {
+    const journey = activeJourney.value
+    if (!journey) {
+        await navigateToAgreement(allocationCount.value)
         return
     }
 
-    await navigateTo(`/agreement/${encodeURIComponent(syndicate.value.allocationId)}`)
+    await navigateToAgreement(journey.slot || allocationCount.value, journey.slug)
 }
 
 onMounted(() => {
@@ -1069,9 +1172,9 @@ useHead(() => ({
 
             <ClientOnly>
                 <CitizenSyndicatesIncompleteAllocationModal :is-open-modal="isAllocationModalVisible"
-                    :title="syndicate.title" :slots="allocationCount" :allocation-cost="syndicate.allocationCost"
-                    :progress="allocationRecoveryProgress" @close="closeAllocationModal"
-                    @start-fresh="selectAllocationFlow" @continue-existing="selectAllocationFlow" />
+                    :title="syndicate.title" :slots="modalAllocationSlots" :allocation-cost="modalAllocationCost"
+                    :progress="modalAllocationProgress" :current-step="modalAllocationStep" @close="closeAllocationModal"
+                    @start-fresh="startFreshAllocationFlow" @continue-existing="continueExistingAllocationFlow" />
             </ClientOnly>
         </template>
     </div>

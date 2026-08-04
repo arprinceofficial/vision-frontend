@@ -20,6 +20,7 @@ watch(() => props.isOpenModal, (newVal) => {
 })
 
 const allocationPrice = computed(() => (props.slots * props.allocationCost).toFixed(2))
+const slotLabel = computed(() => `${props.slots} ${props.slots === 1 ? 'slot' : 'slots'}`)
 
 const progressPercent = computed(() => Math.min(100, Math.max(0, props.progress)))
 const progressWidth = computed(() => `${progressPercent.value}%`)
@@ -78,7 +79,7 @@ const continueExisting = () => {
                                 <i class="pi pi-box text-slate-500" aria-hidden="true" />
                                 Slots:
                             </span>
-                            <strong class="text-sm font-black text-slate-950">{{ slots }} slots</strong>
+                            <strong class="text-sm font-black text-slate-950">{{ slotLabel }}</strong>
                         </div>
                         <div class="flex items-center justify-between gap-4 py-3">
                             <span class="inline-flex items-center gap-3 text-sm font-medium text-slate-500">

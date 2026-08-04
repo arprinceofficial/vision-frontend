@@ -1,7 +1,10 @@
 <script setup lang="ts">
-defineProps<{
+withDefaults(defineProps<{
     reference: string
-}>()
+    isReferenceLoading?: boolean
+}>(), {
+    isReferenceLoading: false
+})
 </script>
 
 <template>
@@ -14,7 +17,13 @@ defineProps<{
                     Live Syndicates
                 </NuxtLink>
                 <span>/</span>
-                <span class="text-tccGold">{{ reference }}</span>
+                <span
+                    v-if="isReferenceLoading"
+                    class="h-3 w-20 rounded-full bg-tccGold/25 shadow-[0_0_18px_rgba(247,198,0,0.18)] animate-pulse"
+                    aria-label="Loading reference"
+                />
+                <span v-else-if="reference" class="text-tccGold">{{ reference }}</span>
+                <span v-else class="text-white/35">Pending</span>
             </nav>
         </div>
     </section>
