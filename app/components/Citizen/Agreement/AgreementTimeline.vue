@@ -16,14 +16,14 @@ const emit = defineEmits<{
 }>()
 
 const handleStepClick = (index: number) => {
-    if (index === 0) {
-        emit('show-overview')
-        return
-    }
+    // if (index === 0) {
+    //     emit('show-overview')
+    //     return
+    // }
 
-    if (index === 1) {
-        emit('show-documents')
-    }
+    // if (index === 1) {
+    //     emit('show-documents')
+    // }
 }
 </script>
 
@@ -39,10 +39,10 @@ const handleStepClick = (index: number) => {
                                 class="absolute left-[calc(50%+1.3rem)] right-[calc(-50%+1.3rem)] top-5 h-px"
                                 :class="index < activeIndex ? 'bg-tccGold/70' : 'bg-white/10'"
                             />
-                            <button
+                            <div
                                 type="button"
                                 class="relative z-10 flex w-full flex-col items-center gap-2 text-center"
-                                :class="index <= 1 ? 'cursor-pointer' : 'cursor-default'"
+                                :class="index <= 1 ? '' : 'cursor-default'"
                                 @click="handleStepClick(index)"
                             >
                                 <span
@@ -61,7 +61,7 @@ const handleStepClick = (index: number) => {
                                 >
                                     {{ step.label }}
                                 </span>
-                            </button>
+                            </div>
                         </li>
                     </ol>
                 </div>

@@ -5,6 +5,7 @@ type AgreementRecord = {
 
 defineProps<{
     agreement: AgreementRecord
+    isLoading?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -123,11 +124,12 @@ const votingSteps = [
                         :class="isAgreed
                             ? 'bg-tccGold text-tccDarkNavy shadow-lg shadow-tccGold/20 hover:bg-tccLightGold'
                             : 'cursor-not-allowed bg-white/10 text-white/35'"
-                        :disabled="!isAgreed"
+                        :disabled="!isAgreed || isLoading"
                         @click="emit('continue')"
                     >
-                        <i class="pi pi-arrow-right text-xs" aria-hidden="true" />
-                        Continue
+                        <i v-if="isLoading" class="pi pi-spin pi-spinner text-xs" aria-hidden="true" />
+                        <i v-else class="pi pi-arrow-right text-xs" aria-hidden="true" />
+                        {{ isLoading ? 'Continuing...' : 'Continue' }}
                     </button>
                 </div>
             </section>

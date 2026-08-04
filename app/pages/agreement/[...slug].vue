@@ -726,8 +726,20 @@ const proceedToVote = async () => {
     }
 }
 
-const proceedToCart = () => {
-    currentStage.value = 'cart'
+const proceedToCart = async () => {
+    if (!isAllocationRoute.value) {
+        currentStage.value = 'cart'
+        return
+    }
+
+    try {
+        await updateAllocationRequestState(4, {
+            includeAgreementFlags: false,
+            syncStage: true
+        })
+    } catch (error) {
+        console.error('[Agreement] Unable to continue from vote', error)
+    }
 }
 
 const proceedToPaymentAgreement = () => {
@@ -797,7 +809,7 @@ useHead(() => ({
                             @proceed-to-vote="proceedToVote" />
 
                         <CitizenAgreementSyndicateVoteSection v-else-if="currentStage === 'vote'" key="vote"
-                            :agreement="agreement" @continue="proceedToCart" />
+                            :agreement="agreement" :is-loading="isUpdatingAllocationState" @continue="proceedToCart" />
 
                         <CitizenAgreementAllocationCartSection v-else-if="currentStage === 'cart'" key="cart"
                             :agreement="agreement" @proceed-to-payment="proceedToPaymentAgreement" />
