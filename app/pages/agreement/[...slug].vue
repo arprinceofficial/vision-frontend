@@ -247,7 +247,7 @@ const agreement = computed<AgreementRecord>(() => {
             ...fallbackAgreement,
             id: slug.value || fallbackAgreement.id,
             vehicle: request.vehicle || fallbackAgreement.vehicle,
-            allocations: request.sharesCount || shareRouteCount.value,
+            allocations: routeSegments.value.length > 1 ? shareRouteCount.value : request.sharesCount,
             allocationCost: request.allocationCost || fallbackAgreement.allocationCost,
             reference: request.reference || allocationRequestSlug.value || ''
         }

@@ -322,6 +322,7 @@ const shouldShowSyndicateSkeleton = computed(() => (
 ))
 
 const allocationCount = ref(1)
+const pendingAllocationCount = ref(1)
 const isAllocationModalVisible = ref(false)
 const isClientReady = ref(false)
 const activeAnalysisTab = ref<AnalysisTabKey>('thisCar')
@@ -357,6 +358,9 @@ const totalInvestment = computed(() => {
 })
 
 const activeJourney = computed(() => syndicate.value?.activeJourney || null)
+const selectedAllocationCount = computed(() => (
+    Math.max(1, Math.round(normalizeNumber(allocationCount.value, 1)))
+))
 
 const modalAllocationSlots = computed(() => activeJourney.value?.slot || allocationCount.value)
 
@@ -407,8 +411,10 @@ const openAllocationModal = () => {
         return
     }
 
+    pendingAllocationCount.value = selectedAllocationCount.value
+
     if (!activeJourney.value) {
-        void navigateToAgreement(allocationCount.value)
+        void navigateToAgreement(pendingAllocationCount.value)
         return
     }
 
@@ -458,7 +464,7 @@ const navigateToAgreement = async (shares: number, requestSlug = '') => {
 
 const startFreshAllocationFlow = async () => {
     isAllocationModalVisible.value = false
-    await navigateToAgreement(allocationCount.value)
+    await navigateToAgreement(pendingAllocationCount.value || selectedAllocationCount.value)
 }
 
 const continueExistingAllocationFlow = async () => {
@@ -466,11 +472,11 @@ const continueExistingAllocationFlow = async () => {
 
     const journey = activeJourney.value
     if (!journey) {
-        await navigateToAgreement(allocationCount.value)
+        await navigateToAgreement(pendingAllocationCount.value || selectedAllocationCount.value)
         return
     }
 
-    await navigateToAgreement(journey.slot || allocationCount.value, journey.slug)
+    await navigateToAgreement(pendingAllocationCount.value || selectedAllocationCount.value, journey.slug)
 }
 
 onMounted(() => {
