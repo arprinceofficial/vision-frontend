@@ -14,24 +14,15 @@ const emit = defineEmits<{
     (event: 'proceed-to-payment'): void
 }>()
 
-const allocationCount = ref(props.agreement.allocations)
-
 const formatCurrency = (value: number) => new Intl.NumberFormat('en-GB', {
     style: 'currency',
     currency: 'GBP'
 }).format(value)
 
+const allocationCount = computed(() => props.agreement.allocations)
 const allocationSubtotal = computed(() => allocationCount.value * props.agreement.allocationCost)
 const aumFee = computed(() => allocationSubtotal.value * 0.015)
 const trustAdminFee = computed(() => allocationSubtotal.value * 0.005)
-
-const decrementAllocation = () => {
-    allocationCount.value = Math.max(1, allocationCount.value - 1)
-}
-
-const incrementAllocation = () => {
-    allocationCount.value += 1
-}
 </script>
 
 <template>
@@ -71,7 +62,7 @@ const incrementAllocation = () => {
                                 <span class="text-[11px] font-black uppercase tracking-[0.14em] text-white/40">
                                     Number of Allocations
                                 </span>
-                                <strong class="mt-1 block text-base text-white">Lamborghini Diablo VT Roadster</strong>
+                                <strong class="mt-1 block text-base text-white">{{ allocationCount }}</strong>
                             </div>
                             <div>
                                 <span class="text-[11px] font-black uppercase tracking-[0.14em] text-white/40">
@@ -82,27 +73,13 @@ const incrementAllocation = () => {
                         </div>
 
                         <p class="mt-6 text-sm font-semibold leading-relaxed text-white/60">
-                            Please confirm the number of allocations you would like in this syndicate, you can update the number below.
+                            Please confirm the number of allocations included in this syndicate.
                         </p>
 
                         <div class="mt-5 rounded-xl border border-white/10 bg-tccDeepBlack/70 p-4">
                             <h3 class="font-poppins text-sm font-black text-white">Number of Allocations</h3>
-                            <div class="mt-4 grid grid-cols-[3rem_1fr_3rem] items-center gap-4">
-                                <button
-                                    type="button"
-                                    class="grid h-12 place-items-center rounded-lg border border-white/15 bg-white/5 text-white transition-colors hover:border-tccGold hover:text-tccGold"
-                                    @click="decrementAllocation"
-                                >
-                                    <i class="pi pi-minus" aria-hidden="true" />
-                                </button>
-                                <div class="text-center font-poppins text-2xl font-black text-white">{{ allocationCount }}</div>
-                                <button
-                                    type="button"
-                                    class="grid h-12 place-items-center rounded-lg border border-white/15 bg-white/5 text-white transition-colors hover:border-tccGold hover:text-tccGold"
-                                    @click="incrementAllocation"
-                                >
-                                    <i class="pi pi-plus" aria-hidden="true" />
-                                </button>
+                            <div class="mt-4 rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-center">
+                                <div class="font-poppins text-2xl font-black text-white">{{ allocationCount }}</div>
                             </div>
                         </div>
 
