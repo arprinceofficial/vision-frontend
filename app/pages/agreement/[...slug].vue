@@ -119,7 +119,9 @@ const isPreparingAllocation = ref(false)
 const isUpdatingAllocationState = ref(false)
 const isSubmittingSignature = ref(false)
 const isSubmittingCart = ref(false)
+const isSubmittingPaymentReceipt = ref(false)
 const signatureSubmitError = ref('')
+const paymentReceiptError = ref('')
 const signedDocumentsStateUpdatedFor = ref('')
 const preparedRoutePath = ref('')
 const preparingRoutePath = ref('')
@@ -793,12 +795,60 @@ const proceedToBankTransfer = async () => {
     }
 }
 
-const confirmPayment = () => {
-    isPaymentConfirmationModalOpen.value = true
+const getPaymentAllocationRequestId = async () => {
+    if (allocationRequest.value?.id) return allocationRequest.value.id
+
+    const requestSlug = getAllocationRequestSlug()
+    if (!requestSlug) return ''
+
+    const request = await fetchAllocationRequestData(requestSlug)
+    return request?.id || allocationRequest.value?.id || ''
+}
+
+const confirmPayment = async (receiptImage: string) => {
+    if (isSubmittingPaymentReceipt.value) return
+
+    isSubmittingPaymentReceipt.value = true
+    paymentReceiptError.value = ''
+
+    try {
+        const requestId = await getPaymentAllocationRequestId()
+
+        if (!requestId) {
+            paymentReceiptError.value = 'Allocation request id is missing. Please reload and try again.'
+            return
+        }
+
+        const response = await $fetchCitizen<AllocationRequestResponse>(`v1/customer/allocation-requests/${requestId}/pay`, {
+            method: 'POST',
+            body: {
+                payment_method: 'bank_transfer',
+                receipt_image: receiptImage
+            }
+        })
+        const request = normalizeAllocationRequest(response?.data?.allocation_request || response?.data?.allocationRequest || response?.data)
+
+        if (request?.slug) {
+            allocationRequest.value = request
+        }
+
+        isPaymentConfirmationModalOpen.value = true
+    } catch (error) {
+        console.error('[Agreement] Unable to confirm payment', error)
+        paymentReceiptError.value = getStringValue(
+            (error as any)?.data?.message,
+            (error as any)?.response?._data?.message,
+            (error as any)?.message,
+            'Unable to confirm payment. Please try again.'
+        )
+    } finally {
+        isSubmittingPaymentReceipt.value = false
+    }
 }
 
 const closePaymentConfirmationModal = () => {
     isPaymentConfirmationModalOpen.value = false
+    void navigateTo('/')
 }
 
 const editPaymentCart = () => {
@@ -863,7 +913,8 @@ useHead(() => ({
                             @back-to-cart="proceedToCart" @proceed-to-payment="proceedToBankTransfer" />
 
                         <CitizenAgreementBankTransferDetailsSection v-else-if="currentStage === 'bank-transfer'"
-                            key="bank-transfer" :agreement="agreement" @back-to-cart="proceedToCart"
+                            key="bank-transfer" :agreement="agreement" :is-loading="isSubmittingPaymentReceipt"
+                            :submit-error="paymentReceiptError" @back-to-cart="proceedToCart"
                             @confirm-payment="confirmPayment" />
 
                         <CitizenAgreementDocumentReviewSection v-else key="documents" :current-stage="currentStage"

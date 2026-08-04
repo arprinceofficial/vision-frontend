@@ -82,7 +82,7 @@ const confirmPayment = () => {
                                 Bank Transfer
                             </p>
                             <h2 class="mt-1 font-poppins text-xl font-black text-white sm:text-2xl">
-                                Confirm Payment Method
+                                Payment Confirmation
                             </h2>
                         </div>
                     </div>
@@ -133,9 +133,6 @@ const confirmPayment = () => {
                         Once the funds have been received in the <strong class="text-white">Escrow account</strong>,
                         you will get an email confirmation.
                     </p>
-                    <p class="text-white/55">
-                        If you need to change your payment method, go back to the cart page before confirming.
-                    </p>
                 </div>
 
                 <div class="rounded-xl border border-tccGold/25 bg-tccGold/10 p-4 text-sm text-white/70">
@@ -144,22 +141,14 @@ const confirmPayment = () => {
                 </div>
             </div>
 
-            <div class="grid gap-3 border-t border-white/10 bg-[#080705] p-4 sm:grid-cols-[1fr_1fr]">
+            <div class="flex justify-center border-t border-white/10 bg-[#080705] p-4">
                 <button
                     type="button"
-                    class="inline-flex min-h-14 items-center justify-center gap-2 rounded-full border border-white/20 px-5 py-3 font-poppins text-xs font-black uppercase tracking-[0.14em] text-white/75 transition-colors hover:border-tccGold hover:text-tccGold"
-                    @click="editCart"
-                >
-                    <i class="pi pi-shopping-cart text-xs" aria-hidden="true" />
-                    Edit Cart
-                </button>
-                <button
-                    type="button"
-                    class="inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-tccGold px-5 py-3 font-poppins text-xs font-black uppercase tracking-[0.14em] text-tccDarkNavy shadow-lg shadow-tccGold/20 transition-colors hover:bg-tccLightGold"
+                    class="inline-flex min-h-14 w-full max-w-72 items-center justify-center gap-2 rounded-full bg-tccGold px-5 py-3 font-poppins text-xs font-black uppercase tracking-[0.14em] text-tccDarkNavy shadow-lg shadow-tccGold/20 transition-colors hover:bg-tccLightGold"
                     @click="confirmPayment"
                 >
                     <i class="pi pi-check text-xs" aria-hidden="true" />
-                    Confirm
+                    Done
                 </button>
             </div>
         </div>

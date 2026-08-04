@@ -9,14 +9,22 @@ type AgreementRecord = {
 
 const props = defineProps<{
     agreement: AgreementRecord
+    isLoading?: boolean
+    submitError?: string
 }>()
 
 const emit = defineEmits<{
     (event: 'back-to-cart'): void
-    (event: 'confirm-payment'): void
+    (event: 'confirm-payment', receiptImage: string): void
 }>()
 
 const copiedField = ref('')
+const receiptFileName = ref('')
+const receiptPreview = ref('')
+const receiptImageDataUrl = ref('')
+const receiptError = ref('')
+const isReceiptPreviewOpen = ref(false)
+const maxReceiptImageSize = 2 * 1024 * 1024
 
 const bankDetails = [
     {
@@ -44,6 +52,7 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('en-GB', {
 }).format(value)
 
 const totalAmount = computed(() => props.agreement.allocations * props.agreement.allocationCost)
+const canConfirmPayment = computed(() => Boolean(receiptImageDataUrl.value) && !props.isLoading)
 
 const copyValue = async (label: string, value: string) => {
     copiedField.value = label
@@ -57,6 +66,76 @@ const copyValue = async (label: string, value: string) => {
             copiedField.value = ''
         }
     }, 1400)
+}
+
+const readFileAsDataUrl = (file: File) => new Promise<string>((resolve, reject) => {
+    const reader = new FileReader()
+
+    reader.onload = () => resolve(String(reader.result || ''))
+    reader.onerror = () => reject(reader.error)
+    reader.readAsDataURL(file)
+})
+
+const setReceiptFile = async (file?: File) => {
+    receiptError.value = ''
+    receiptFileName.value = ''
+    receiptPreview.value = ''
+    receiptImageDataUrl.value = ''
+
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+        receiptError.value = 'Please upload an image file only.'
+        return
+    }
+
+    if (file.size > maxReceiptImageSize) {
+        receiptError.value = 'Receipt image must be 2MB or smaller.'
+        return
+    }
+
+    try {
+        receiptFileName.value = file.name
+        receiptImageDataUrl.value = await readFileAsDataUrl(file)
+        receiptPreview.value = receiptImageDataUrl.value
+    } catch {
+        receiptError.value = 'Unable to read receipt image. Please choose another file.'
+        receiptFileName.value = ''
+        receiptImageDataUrl.value = ''
+        receiptPreview.value = ''
+    }
+}
+
+const handleReceiptUpload = (event: Event) => {
+    const target = event.target as HTMLInputElement
+    void setReceiptFile(target.files?.[0])
+}
+
+const handleReceiptDrop = (event: DragEvent) => {
+    void setReceiptFile(event.dataTransfer?.files?.[0])
+}
+
+const clearReceipt = () => {
+    receiptFileName.value = ''
+    receiptPreview.value = ''
+    receiptImageDataUrl.value = ''
+    receiptError.value = ''
+    isReceiptPreviewOpen.value = false
+}
+
+const confirmPayment = () => {
+    if (!receiptImageDataUrl.value) {
+        receiptError.value = 'Please upload your bank transfer receipt image.'
+        return
+    }
+
+    emit('confirm-payment', receiptImageDataUrl.value)
+}
+
+const openReceiptPreview = () => {
+    if (receiptPreview.value) {
+        isReceiptPreviewOpen.value = true
+    }
 }
 </script>
 
@@ -202,32 +281,89 @@ const copyValue = async (label: string, value: string) => {
                 </section>
 
                 <section class="rounded-xl border border-white/10 bg-white/[0.04] p-5">
-                    <div class="rounded-lg border border-tccGold/40 bg-tccGold/10 px-4 py-3 text-center">
-                        <i class="pi pi-clock mr-2 text-tccGold" aria-hidden="true" />
-                        <span class="font-poppins text-sm font-black text-white">Payment Pending</span>
+                    <div class="flex items-center gap-3">
+                        <i class="pi pi-image text-tccGold" aria-hidden="true" />
+                        <h2 class="font-poppins text-lg font-black text-white">Receipt Attachment</h2>
                     </div>
 
-                    <h2 class="mt-5 font-poppins text-lg font-black text-white">Next Steps</h2>
-                    <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                        <div
-                            v-for="(step, index) in ['Copy Details', 'Transfer', 'Use Ref', 'Confirm']"
-                            :key="step"
-                            class="rounded-lg border border-white/10 bg-tccDeepBlack/70 p-3 text-center"
+                    <div
+                        class="mt-4 rounded-xl border border-dashed border-tccGold/35 bg-tccDeepBlack/70 p-4 text-center transition-colors hover:border-tccGold"
+                        @drop.prevent="handleReceiptDrop"
+                        @dragover.prevent
+                    >
+                        <button
+                            v-if="receiptPreview"
+                            type="button"
+                            class="group mx-auto block w-full rounded-lg border border-white/10 bg-black/20 p-2"
+                            @click="openReceiptPreview"
                         >
-                            <span class="mx-auto grid h-8 w-8 place-items-center rounded-full bg-tccGold text-sm font-black text-tccDarkNavy">
-                                {{ index + 1 }}
+                            <img
+                                :src="receiptPreview"
+                                :alt="receiptFileName || 'Payment receipt preview'"
+                                class="mx-auto max-h-48 w-full rounded-md object-contain transition-opacity group-hover:opacity-80"
+                            />
+                            <span class="mt-2 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-xs font-black uppercase tracking-[0.12em] text-white">
+                                <i class="pi pi-search-plus text-[10px]" aria-hidden="true" />
+                                Preview
                             </span>
-                            <p class="mt-2 text-xs font-black text-white">{{ step }}</p>
-                        </div>
+                        </button>
+                        <label v-else class="block cursor-pointer">
+                            <input
+                                type="file"
+                                accept="image/*"
+                                class="sr-only"
+                                @change="handleReceiptUpload"
+                            />
+                            <span class="mx-auto grid h-12 w-12 place-items-center rounded-full bg-tccGold text-tccDarkNavy">
+                                <i class="pi pi-upload text-xl" aria-hidden="true" />
+                            </span>
+                            <span class="mt-3 block font-poppins text-sm font-black text-white">
+                                Upload receipt image
+                            </span>
+                        </label>
+                        <label v-if="receiptPreview" class="mt-3 inline-flex cursor-pointer items-center justify-center gap-2 rounded-full border border-white/15 px-4 py-2 font-poppins text-xs font-black uppercase tracking-[0.12em] text-white/75 transition-colors hover:border-tccGold hover:text-tccGold">
+                            <input
+                                type="file"
+                                accept="image/*"
+                                class="sr-only"
+                                @change="handleReceiptUpload"
+                            />
+                            <i class="pi pi-upload text-xs" aria-hidden="true" />
+                            Change Image
+                        </label>
+                        <span class="mt-1 block text-xs text-white/45">
+                            PNG, JPG, JPEG, or WEBP. Maximum size 2MB.
+                        </span>
+                    </div>
+
+                    <div v-if="receiptPreview" class="mt-3 flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-tccDeepBlack/70 px-4 py-3 text-sm">
+                        <span class="min-w-0 truncate text-white/65">{{ receiptFileName }}</span>
+                        <button
+                            type="button"
+                            class="shrink-0 font-poppins text-xs font-black uppercase tracking-[0.12em] text-red-200 transition-colors hover:text-red-100"
+                            @click="clearReceipt"
+                        >
+                            Remove
+                        </button>
+                    </div>
+
+                    <div v-if="receiptError || submitError" class="mt-3 rounded-lg border border-red-400/45 bg-red-500/10 px-4 py-3 text-sm font-semibold text-red-100">
+                        <i class="pi pi-exclamation-triangle mr-2 text-xs text-red-300" aria-hidden="true" />
+                        {{ receiptError || submitError }}
                     </div>
 
                     <button
                         type="button"
-                        class="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-tccGold px-5 py-3 font-poppins text-xs font-black uppercase tracking-[0.14em] text-tccDarkNavy shadow-lg shadow-tccGold/20 transition-colors hover:bg-tccLightGold"
-                        @click="emit('confirm-payment')"
+                        class="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full px-5 py-3 font-poppins text-xs font-black uppercase tracking-[0.14em] transition-colors"
+                        :class="canConfirmPayment
+                            ? 'bg-tccGold text-tccDarkNavy shadow-lg shadow-tccGold/20 hover:bg-tccLightGold'
+                            : 'cursor-not-allowed bg-white/10 text-white/35'"
+                        :disabled="!canConfirmPayment"
+                        @click="confirmPayment"
                     >
-                        <i class="pi pi-check-circle text-xs" aria-hidden="true" />
-                        Confirm
+                        <i v-if="isLoading" class="pi pi-spin pi-spinner text-xs" aria-hidden="true" />
+                        <i v-else class="pi pi-check-circle text-xs" aria-hidden="true" />
+                        {{ isLoading ? 'Confirming...' : 'Confirm' }}
                     </button>
 
                     <div class="mt-4 rounded-xl border border-white/10 bg-tccDeepBlack/70 p-4 text-sm text-white/60">
@@ -244,5 +380,40 @@ const copyValue = async (label: string, value: string) => {
                 </section>
             </div>
         </div>
+
+        <Teleport to="body">
+            <div
+                v-if="isReceiptPreviewOpen && receiptPreview"
+                class="fixed inset-0 z-[1000] flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm"
+                role="dialog"
+                aria-modal="true"
+                aria-label="Payment receipt preview"
+                @click.self="isReceiptPreviewOpen = false"
+            >
+                <div class="w-full max-w-5xl overflow-hidden rounded-2xl border border-white/15 bg-[#0b0a08] shadow-[0_30px_120px_rgba(0,0,0,0.78)]">
+                    <div class="flex items-center justify-between gap-4 border-b border-white/10 px-4 py-3 sm:px-5">
+                        <div class="min-w-0">
+                            <h3 class="font-poppins text-sm font-black text-white">Receipt Preview</h3>
+                            <p class="mt-1 truncate text-xs text-white/45">{{ receiptFileName }}</p>
+                        </div>
+                        <button
+                            type="button"
+                            class="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/15 text-white/70 transition-colors hover:border-tccGold hover:text-tccGold"
+                            aria-label="Close receipt preview"
+                            @click="isReceiptPreviewOpen = false"
+                        >
+                            <i class="pi pi-times text-xs" aria-hidden="true" />
+                        </button>
+                    </div>
+                    <div class="max-h-[82vh] overflow-auto bg-black p-3 sm:p-5">
+                        <img
+                            :src="receiptPreview"
+                            :alt="receiptFileName || 'Payment receipt preview'"
+                            class="mx-auto max-h-[76vh] max-w-full rounded-lg object-contain"
+                        />
+                    </div>
+                </div>
+            </div>
+        </Teleport>
     </div>
 </template>
