@@ -66,7 +66,7 @@ const profileSummary: ProfileSummary = {
 
 const navItems: ProfileNavItem[] = [
   { id: 'profile', label: 'Profile Information', icon: 'pi-user', to: '/profile' },
-  { id: 'allocations', label: 'My Allocations', icon: 'pi-briefcase', to: '/profile/allocations' },
+  // { id: 'allocations', label: 'My Allocations', icon: 'pi-briefcase', to: '/profile/allocations' },
   { id: 'transactions', label: 'Transaction Details', icon: 'pi-receipt', to: '/profile/transactions' },
   { id: 'security', label: 'Change Password', icon: 'pi-lock', to: '/profile/security' }
 ]

@@ -7,13 +7,102 @@ useHead({
     title: 'Transaction History | The Car Crowd'
 })
 
+type TransactionTone = 'success' | 'warning' | 'pending'
+
+type TransactionItem = {
+    id: string
+    slug: string
+    allocationDetails: string
+    vehicle: string
+    carName: string
+    collection: string
+    referenceId: string
+    price: string
+    totalInvestment: number
+    allocations: number
+    allocationState: string
+    allocationTone: TransactionTone
+    paymentStatus: string
+    paymentTone: TransactionTone
+    paymentMethod: string
+    signedDate: string
+    dueDate: string
+    image: string
+    description: string
+    nextAction: string
+    supportEmail: string
+}
+
+type TransactionsResponse = {
+    status?: boolean
+    message?: string
+    data?: {
+        data?: TransactionItem[]
+    }
+}
+
 const isProfileViewReady = ref(false)
-const { transactions } = useProfileDashboard()
+
+const getStringValue = (value: unknown, fallback = '') => {
+    if (value === null || value === undefined || String(value).trim() === '') return fallback
+    return String(value).trim()
+}
+
+const getNumberValue = (value: unknown, fallback = 0) => {
+    const numberValue = Number(value)
+    return Number.isFinite(numberValue) ? numberValue : fallback
+}
+
+const normalizeTransaction = (item: Partial<TransactionItem>): TransactionItem => ({
+    id: getStringValue(item.id),
+    slug: getStringValue(item.slug, item.id),
+    allocationDetails: getStringValue(item.allocationDetails),
+    vehicle: getStringValue(item.vehicle),
+    carName: getStringValue(item.carName, item.vehicle),
+    collection: getStringValue(item.collection),
+    referenceId: getStringValue(item.referenceId, item.id),
+    price: getStringValue(item.price),
+    totalInvestment: getNumberValue(item.totalInvestment),
+    allocations: getNumberValue(item.allocations),
+    allocationState: getStringValue(item.allocationState),
+    allocationTone: getStringValue(item.allocationTone, 'warning') as TransactionTone,
+    paymentStatus: getStringValue(item.paymentStatus),
+    paymentTone: getStringValue(item.paymentTone, 'pending') as TransactionTone,
+    paymentMethod: getStringValue(item.paymentMethod),
+    signedDate: getStringValue(item.signedDate),
+    dueDate: getStringValue(item.dueDate),
+    image: getStringValue(item.image),
+    description: getStringValue(item.description),
+    nextAction: getStringValue(item.nextAction),
+    supportEmail: getStringValue(item.supportEmail)
+})
+
+const {
+    data: transactionsData,
+    pending: isTransactionsLoading
+} = await useAsyncData<TransactionItem[]>(
+    'profile-transactions',
+    async () => {
+        try {
+            const response = await $fetchCitizen<TransactionsResponse>('v1/customer/transactions', {
+                method: 'GET'
+            })
+
+            return (response?.data?.data ?? []).map((item) => normalizeTransaction(item))
+        } catch (error) {
+            console.error('[Profile Transactions] Unable to load transactions', error)
+            return []
+        }
+    },
+    { default: () => [] }
+)
+
+const transactions = computed(() => transactionsData.value ?? [])
 
 const transactionSummary = computed(() => ({
-    total: transactions.length,
-    pending: transactions.filter((transaction) => transaction.paymentStatus === 'Pending').length,
-    funded: transactions.filter((transaction) => transaction.paymentStatus === 'Funded').length
+    total: transactions.value.length,
+    pending: transactions.value.filter((transaction) => transaction.paymentTone !== 'success').length,
+    funded: transactions.value.filter((transaction) => transaction.paymentStatus === 'Funded' || transaction.paymentTone === 'success').length
 }))
 
 const transactionStatusClass = (tone: string) => (
@@ -37,7 +126,7 @@ onMounted(() => {
 
 <template>
     <ClientOnly>
-        <ProfileDashboardShell v-if="isProfileViewReady" active-section="transactions">
+        <ProfileDashboardShell v-if="isProfileViewReady && !isTransactionsLoading" active-section="transactions">
             <section
                 class="overflow-hidden rounded-2xl border border-tccGold/20 bg-[#090806] text-white shadow-[0_28px_90px_rgba(0,0,0,0.34)]">
                 <div
@@ -96,7 +185,7 @@ onMounted(() => {
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-white/10 text-[13px]">
-                                <tr v-for="transaction in transactions" :key="transaction.id"
+                                <tr v-for="transaction in transactions" :key="transaction.slug || transaction.id"
                                     class="align-top transition-colors hover:bg-white/[0.035]">
                                     <td class="p-3.5">
                                         <div class="flex items-center gap-4">
@@ -138,7 +227,7 @@ onMounted(() => {
                                         </span>
                                     </td>
                                     <td class="p-3.5 text-right">
-                                        <NuxtLink :to="`/profile/transactions/${transaction.id}`"
+                                        <NuxtLink :to="`/profile/transactions/${transaction.slug || transaction.id}`"
                                             class="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-3.5 py-2 font-poppins text-[10px] font-black uppercase tracking-[0.12em] text-white transition-colors hover:border-tccGold hover:text-tccGold">
                                             <i class="pi pi-eye text-[10px]" aria-hidden="true" />
                                             View Details
