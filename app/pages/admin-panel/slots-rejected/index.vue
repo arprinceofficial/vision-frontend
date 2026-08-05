@@ -109,6 +109,20 @@ onMounted(() => {
     loadData(1);
 });
 
+const groupedData = computed(() => {
+    const groups = {};
+    if (!data.value || !data.value.length) return groups;
+    
+    data.value.forEach(req => {
+        const carName = req.fractional_item?.assetable?.asset_name || req.fractional_item?.item_name || 'Unknown Item';
+        if (!groups[carName]) {
+            groups[carName] = [];
+        }
+        groups[carName].push(req);
+    });
+    return groups;
+});
+
 // Create/Edit Modal
 const isOpenModal = ref(false);
 const item = ref({});
@@ -236,111 +250,62 @@ const handleVerifyPayment = async (id) => {
             </div>
 
             <div class="pb-2 flex flex-col justify-between w-full">
-                <div class="border border-gray-200 rounded-lg bg-white dark:bg-gray-800">
-                    <div class="p-0">
-                        <div class="custom_table overflow-auto border-b border-gray-200">
-                            <table class="table table-auto w-full text-left text-sm">
-                                <thead class="sticky z-10 top-0 bg-[#1e2f4a] text-white">
-                                    <tr>
-                                        <th class="py-3 px-3 font-semibold">Reference</th>
-                                        <th class="py-3 px-3 font-semibold">User</th>
-                                        <th class="py-3 px-3 font-semibold">Car</th>
-                                        <th class="py-3 px-3 font-semibold text-center">Slots</th>
-                                        <th class="py-3 px-3 font-semibold">Amount</th>
-                                        <th class="py-3 px-3 font-semibold text-center">Payment</th>
-                                        <th class="py-3 px-3 font-semibold text-center">State</th>
-                                        <th class="py-3 px-3 font-semibold text-center">Docs</th>
-                                        <th class="py-3 px-3 font-semibold text-center">Created</th>
-                                        <th class="py-3 px-3 font-semibold text-center">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody v-if="isLoading">
-                                    <tr v-for="index in 5" :key="index">
-                                        <td v-for="col in 10" :key="col" class="py-3 px-3 text-center">
-                                            <Skeleton width="100%" height="1.5rem"></Skeleton>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                                <tbody v-else>
-                                    <tr v-if="data.length === 0">
-                                        <td colspan="10" class="text-center py-6 text-gray-500">No requests found.</td>
-                                    </tr>
-                                    <tr v-for="(requestItem, index) in data" :key="index" class="border-b last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800" v-else>
-                                        <!-- Reference -->
-                                        <td class="py-3 px-3 text-gray-800 dark:text-gray-200">
-                                            <span class="text-gray-500 font-medium">{{ requestItem.slug || 'N/A' }}</span>
-                                        </td>
-                                        
-                                        <!-- User -->
-                                        <td class="py-3 px-3 text-gray-800 dark:text-gray-200">
-                                            <div class="font-medium">{{ requestItem.user?.user_info?.first_name || requestItem.user?.first_name }} {{ requestItem.user?.user_info?.last_name || requestItem.user?.last_name }}</div>
-                                            <div class="text-[11px] text-gray-500">{{ requestItem.user?.email }}</div>
-                                        </td>
-                                        
-                                        <!-- Car -->
-                                        <td class="py-3 px-3 text-gray-800 dark:text-gray-200">
-                                            <div class="font-medium">{{ requestItem.fractional_item?.assetable?.asset_name || requestItem.fractional_item?.item_name || 'N/A' }}</div>
-                                        </td>
-                                        
-                                        <!-- Slots -->
-                                        <td class="py-3 px-3 text-center text-gray-800 dark:text-gray-200">
-                                            <span class="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-xs font-semibold">{{ requestItem.shares_count }}</span>
-                                        </td>
-                                        
-                                        <!-- Amount -->
-                                        <td class="py-3 px-3 text-gray-800 dark:text-gray-200 font-medium">
-                                            {{ formatCurrency(requestItem.total_amount) }}
-                                        </td>
-                                        
-                                        <!-- Payment Method -->
-                                        <td class="py-3 px-3 text-center text-gray-600 dark:text-gray-300">
-                                            <span class="border px-2 py-1 rounded-md text-[10px] whitespace-nowrap bg-white dark:bg-gray-800">{{ requestItem.payment_method || 'Bank Transfer' }}</span>
-                                        </td>
-                                        
-                                        <!-- State/Status -->
-                                        <td class="py-3 px-3 text-center">
-                                            <div class="flex flex-col gap-1 items-center">
-                                                <span class="px-2 py-1 rounded text-[10px] border font-bold whitespace-nowrap" :class="getStatusSeverity(requestItem.status)">
-                                                    {{ getStatusLabel(requestItem.status) }}
-                                                </span>
-                                            </div>
-                                        </td>
-                                        
-                                        <!-- Docs -->
-                                        <td class="py-3 px-3 text-center">
-                                            <span v-if="requestItem.documents_signed" class="bg-teal-500 text-white px-2 py-1 rounded text-[10px] font-bold shadow-sm whitespace-nowrap">
-                                                <i class="fa-solid fa-file-signature mr-1"></i> Signed
-                                            </span>
-                                            <span v-else class="bg-gray-500 text-white px-2 py-1 rounded text-[10px] font-bold shadow-sm whitespace-nowrap">
-                                                <i class="fa-solid fa-clock mr-1"></i> Pending
-                                            </span>
-                                        </td>
-                                        
-                                        <!-- Created -->
-                                        <td class="py-3 px-3 text-center text-gray-600 dark:text-gray-300">
-                                            <div class="flex flex-col text-[11px] font-medium leading-tight items-center">
-                                                <span>{{ formatDate(requestItem.created_at).date }}</span>
-                                                <span>{{ formatDate(requestItem.created_at).year }}</span>
-                                                <span class="text-gray-400">{{ formatDate(requestItem.created_at).time }}</span>
-                                            </div>
-                                        </td>
-                                        
-                                        <!-- Actions -->
-                                        <td class="py-3 px-3 text-center">
-                                            <div class="flex justify-center items-center gap-1 flex-col sm:flex-row">
-                                                <button v-if="permissions?.view" @click="viewHandler(requestItem)" class="text-xs bg-[#1e2f4a] text-white px-2 py-1.5 rounded hover:bg-gray-800 shadow-sm" title="View">
-                                                    <i class="fa-solid fa-info-circle"></i>
-                                                </button>
-                                                <button v-if="permissions?.edit" @click="editHandler(requestItem)" class="text-xs bg-yellow-500 text-white px-2 py-1.5 rounded hover:bg-yellow-600 shadow-sm" title="Edit">
-                                                    <i class="fa-solid fa-upload"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                <div class="p-0">
+                    <template v-if="isLoading">
+                        <div v-for="i in 3" :key="i" class="mb-8">
+                            <Skeleton width="150px" height="1.5rem" class="mb-2" />
+                            <Skeleton width="100%" height="8rem" />
                         </div>
-                    </div>
+                    </template>
+                    <template v-else>
+                        <div v-if="Object.keys(groupedData).length === 0" class="text-center py-12 text-gray-500 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200">
+                            No rejected slots found.
+                        </div>
+                        
+                        <div v-for="(requests, carName) in groupedData" :key="carName" class="mb-8">
+                            <h4 class="text-[15px] text-gray-500 dark:text-gray-400 font-medium mb-2 px-1">{{ carName }}</h4>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-xs whitespace-nowrap border-collapse">
+                                    <thead class="bg-[#1e2f4a] text-white">
+                                        <tr>
+                                            <th class="py-2.5 px-3 font-semibold">User Name</th>
+                                            <th class="py-2.5 px-3 font-semibold">Email</th>
+                                            <th class="py-2.5 px-3 font-semibold">Number of Allocations</th>
+                                            <th class="py-2.5 px-3 font-semibold">Reference ID</th>
+                                            <th class="py-2.5 px-3 font-semibold">Allocation Amount</th>
+                                            <th class="py-2.5 px-3 font-semibold">Payment Method</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(requestItem, idx) in requests" :key="requestItem.id" 
+                                            class="border-b border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                                            :class="idx % 2 === 0 ? 'bg-gray-100 dark:bg-gray-800' : 'bg-white dark:bg-gray-900'"
+                                        >
+                                            <td class="py-2.5 px-3 text-gray-800 dark:text-gray-200 font-medium">
+                                                {{ requestItem.user?.user_info?.first_name || requestItem.user?.first_name || requestItem.user?.name || 'N/A' }} {{ requestItem.user?.user_info?.last_name || requestItem.user?.last_name || '' }}
+                                            </td>
+                                            <td class="py-2.5 px-3 text-gray-800 dark:text-gray-200">
+                                                {{ requestItem.user?.email }}
+                                            </td>
+                                            <td class="py-2.5 px-3 text-gray-800 dark:text-gray-200">
+                                                {{ requestItem.shares_count }}
+                                            </td>
+                                            <td class="py-2.5 px-3 text-gray-800 dark:text-gray-200 uppercase">
+                                                {{ requestItem.slug || 'N/A' }}
+                                            </td>
+                                            <td class="py-2.5 px-3 text-gray-800 dark:text-gray-200">
+                                                {{ formatCurrency(requestItem.total_amount) }}
+                                            </td>
+                                            <td class="py-2.5 px-3 text-gray-800 dark:text-gray-200">
+                                                {{ requestItem.payment_method || 'Bank Transfer' }}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </template>
+                </div>
                     
                     <LazyPagination v-if="!isLoading && lastPage > 1" class="px-4" :config="paginationConfig" @loadData="loadData" />
                     <LazyResponseModal :response_modal="response_modal" />
@@ -351,5 +316,4 @@ const handleVerifyPayment = async (id) => {
                 </div>
             </div>
         </div>
-    </div>
 </template>

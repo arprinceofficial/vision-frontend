@@ -1,4 +1,6 @@
 <script setup>
+import { ref, watch } from 'vue';
+
 const props = defineProps({
     isOpenModal: { type: Boolean, required: true },
     item: { type: Object, default: () => ({}) }
@@ -25,146 +27,142 @@ const getStatusLabel = (status) => {
     }
 };
 
-const getStateLabel = (state) => {
-    switch (parseInt(state)) {
-        case 1: return 'What Happens Next';
-        case 2: return 'Documents';
-        case 3: return 'Syndicate Vote';
-        case 4: return 'Cart';
-        case 5: return 'Final Agreement';
-        case 6: return 'Payment';
-        default: return 'Unknown';
-    }
+const getInvestorName = (user) => {
+    if (!user) return 'N/A';
+    return user.username || user.user_info?.first_name || user.first_name || user.name || 'Investor';
+};
+
+const getCarName = (fractionalItem) => {
+    if (!fractionalItem) return 'N/A';
+    return fractionalItem.vehicle?.name || 
+           (fractionalItem.vehicle?.make ? `${fractionalItem.vehicle.make} ${fractionalItem.vehicle.model}` : null) || 
+           fractionalItem.item_name || 
+           'N/A';
 };
 </script>
 
 <template>
-    <Dialog v-model:visible="visible" modal :closable="false" :style="{ width: '45rem' }" @update:visible="close">
+    <Dialog v-model:visible="visible" modal :closable="false" :style="{ width: '55rem' }" @update:visible="close"
+        :pt="{
+            root: { class: 'bg-[#1a202c] border border-gray-700 rounded-lg shadow-xl' },
+            header: { class: 'bg-[#1e2f4a] text-white border-b border-gray-700 rounded-t-lg px-6 py-4' },
+            content: { class: 'bg-[#1a202c] text-gray-200 px-6 py-6' }
+        }"
+    >
         <template #header>
             <div class="flex justify-between items-center w-full">
-                <span class="p-dialog-title text-xl font-bold">Allocation Request Details</span>
-                <i class="pi pi-times cursor-pointer hover:text-red-500" @click="close"></i>
+                <span class="text-xl font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-file-invoice"></i>
+                    Allocation Request Details
+                </span>
+                <i class="pi pi-times cursor-pointer hover:text-red-400 text-gray-300 transition-colors" @click="close"></i>
             </div>
         </template>
         
-        <div class="pt-4 pb-2" v-if="item && item.id">
-            <div class="grid grid-cols-2 gap-4">
-                <div class="col-span-2 sm:col-span-1 border-b pb-2">
-                    <div class="text-sm text-gray-500 mb-1">Request ID</div>
-                    <div class="font-semibold text-gray-800 dark:text-gray-200">#{{ item.id }}</div>
-                </div>
-                <div class="col-span-2 sm:col-span-1 border-b pb-2">
-                    <div class="text-sm text-gray-500 mb-1">Slug</div>
-                    <div class="font-semibold text-gray-800 dark:text-gray-200">{{ item.slug }}</div>
-                </div>
-                
-                <div class="col-span-2 sm:col-span-1 border-b pb-2">
-                    <div class="text-sm text-gray-500 mb-1">Status</div>
-                    <div class="font-semibold text-gray-800 dark:text-gray-200">{{ getStatusLabel(item.status) }}</div>
-                </div>
-                <div class="col-span-2 sm:col-span-1 border-b pb-2">
-                    <div class="text-sm text-gray-500 mb-1">State (User Journey)</div>
-                    <div class="font-semibold text-gray-800 dark:text-gray-200">{{ getStateLabel(item.state) || 'N/A' }}</div>
-                </div>
-
-                <div class="col-span-2 sm:col-span-1 border-b pb-2">
-                    <div class="text-sm text-gray-500 mb-1">Shares Count</div>
-                    <div class="font-semibold text-gray-800 dark:text-gray-200">{{ item.shares_count }}</div>
-                </div>
-                <div class="col-span-2 sm:col-span-1 border-b pb-2">
-                    <div class="text-sm text-gray-500 mb-1">Total Amount</div>
-                    <div class="font-semibold text-gray-800 dark:text-gray-200">{{ item.total_amount }}</div>
-                </div>
-
-                <div class="col-span-2 border-b pb-2">
-                    <div class="text-sm text-gray-500 mb-1">User</div>
-                    <div class="font-semibold text-gray-800 dark:text-gray-200">
-                        {{ item.user?.first_name }} {{ item.user?.last_name }} ({{ item.user?.email }})
+        <div class="space-y-4 pt-2 pb-2" v-if="item && item.id">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- User Details -->
+                <div class="border border-gray-700 shadow-lg rounded-lg overflow-hidden bg-[#2d3748]">
+                    <div class="bg-[#1e2f4a] px-4 py-3 border-b border-gray-700 flex items-center gap-2">
+                        <i class="fa-solid fa-user text-blue-400"></i>
+                        <h4 class="text-white font-semibold text-sm tracking-wide">User Details</h4>
+                    </div>
+                    <div class="p-4 grid grid-cols-2 gap-y-3 bg-[#1a202c]">
+                        <div class="text-xs text-gray-400 font-medium uppercase tracking-wider">Name</div>
+                        <div class="text-sm font-semibold text-gray-100">{{ getInvestorName(item.user) }} {{ item.user?.user_info?.last_name || item.user?.last_name || '' }}</div>
+                        
+                        <div class="text-xs text-gray-400 font-medium uppercase tracking-wider">Email</div>
+                        <div class="text-sm text-blue-400">{{ item.user?.email || 'N/A' }}</div>
+                        
+                        <div class="text-xs text-gray-400 font-medium uppercase tracking-wider">Phone</div>
+                        <div class="text-sm text-gray-200">{{ item.user?.user_info?.phone_number || item.user?.phone || 'N/A' }}</div>
                     </div>
                 </div>
 
-                <div class="col-span-2 border-b pb-2">
-                    <div class="text-sm text-gray-500 mb-1">Fractional Item</div>
-                    <div class="font-semibold text-gray-800 dark:text-gray-200">
-                        {{ item.fractional_item?.assetable?.asset_name || item.fractional_item?.item_name || 'N/A' }}
+                <!-- Fractional Item -->
+                <div class="border border-gray-700 shadow-lg rounded-lg overflow-hidden bg-[#2d3748]">
+                    <div class="bg-[#41b0b5] px-4 py-3 border-b border-[#369599] flex items-center gap-2">
+                        <i class="fa-solid fa-car text-white"></i>
+                        <h4 class="text-white font-semibold text-sm tracking-wide">Fractional Item</h4>
+                    </div>
+                    <div class="p-4 grid grid-cols-2 gap-y-3 bg-[#1a202c]">
+                        <div class="text-xs text-gray-400 font-medium uppercase tracking-wider">Car</div>
+                        <div class="text-sm text-gray-100 font-semibold">{{ getCarName(item.fractional_item) }}</div>
+                        
+                        <div class="text-xs text-gray-400 font-medium uppercase tracking-wider">Item Name</div>
+                        <div class="text-sm text-gray-200">{{ item.fractional_item?.item_name || 'N/A' }}</div>
                     </div>
                 </div>
 
-                <div class="col-span-2 sm:col-span-1 pb-2">
-                    <div class="text-sm text-gray-500 mb-1">Payment Method</div>
-                    <div class="font-semibold text-gray-800 dark:text-gray-200">{{ item.payment_method || 'N/A' }}</div>
-                </div>
-                <div class="col-span-2 sm:col-span-1 pb-2">
-                    <div class="text-sm text-gray-500 mb-1">Created At</div>
-                    <div class="font-semibold text-gray-800 dark:text-gray-200">{{ new Date(item.created_at).toLocaleString() }}</div>
-                </div>
-                
-                <div class="col-span-2 border-b pb-2 mt-2">
-                    <div class="text-sm text-gray-500 mb-2 font-bold uppercase tracking-wider">User Journey & Dates</div>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="text-xs">
-                            <span class="text-gray-500 block">Approved At</span>
-                            <span class="font-semibold">{{ item.approved_at ? new Date(item.approved_at).toLocaleString() : 'N/A' }}</span>
-                        </div>
-                        <div class="text-xs">
-                            <span class="text-gray-500 block">Paid At</span>
-                            <span class="font-semibold">{{ item.paid_at ? new Date(item.paid_at).toLocaleString() : 'N/A' }}</span>
-                        </div>
-                        <div class="text-xs">
-                            <span class="text-gray-500 block">Agreement Accepted</span>
-                            <span class="font-semibold">{{ item.agreement_accepted_at ? new Date(item.agreement_accepted_at).toLocaleString() : 'N/A' }}</span>
-                        </div>
-                        <div class="text-xs">
-                            <span class="text-gray-500 block">Documents Viewed</span>
-                            <span class="font-semibold">{{ item.documents_viewed_at ? new Date(item.documents_viewed_at).toLocaleString() : 'N/A' }}</span>
-                        </div>
-                        <div class="text-xs">
-                            <span class="text-gray-500 block">Documents Signed</span>
-                            <span class="font-semibold">{{ item.document_signed_at ? new Date(item.document_signed_at).toLocaleString() : 'N/A' }}</span>
-                        </div>
-                        <div class="text-xs">
-                            <span class="text-gray-500 block">Syndicate Vote</span>
-                            <span class="font-semibold">{{ item.syndicate_vote_at ? new Date(item.syndicate_vote_at).toLocaleString() : 'N/A' }}</span>
-                        </div>
-                        <div class="text-xs">
-                            <span class="text-gray-500 block">Cart Completed</span>
-                            <span class="font-semibold">{{ item.cart_completed_at ? new Date(item.cart_completed_at).toLocaleString() : 'N/A' }}</span>
-                        </div>
-                        <div class="text-xs">
-                            <span class="text-gray-500 block">KYC Completed</span>
-                            <span class="font-semibold">{{ item.kyc_completed_at ? new Date(item.kyc_completed_at).toLocaleString() : 'N/A' }}</span>
-                        </div>
+                <!-- Allocation Details -->
+                <div class="border border-gray-700 shadow-lg rounded-lg overflow-hidden bg-[#2d3748]">
+                    <div class="bg-[#2eb981] px-4 py-3 border-b border-[#269f6f] flex items-center gap-2">
+                        <i class="fa-solid fa-coins text-white"></i>
+                        <h4 class="text-white font-semibold text-sm tracking-wide">Allocation Details</h4>
+                    </div>
+                    <div class="p-4 grid grid-cols-2 gap-y-3 bg-[#1a202c]">
+                        <div class="text-xs text-gray-400 font-medium uppercase tracking-wider">Number of Slots</div>
+                        <div class="text-sm text-gray-100 font-semibold">{{ item.shares_count || '0' }}</div>
+                        
+                        <div class="text-xs text-gray-400 font-medium uppercase tracking-wider">Amount paid</div>
+                        <div class="text-sm text-green-400 font-bold">£{{ item.total_amount ? parseFloat(item.total_amount).toFixed(2) : '0.00' }}</div>
+                        
+                        <div class="text-xs text-gray-400 font-medium uppercase tracking-wider">Payment Method</div>
+                        <div class="text-sm text-gray-200 capitalize">{{ (item.payment_method || 'Bank Transfer').replace('_', ' ') }}</div>
                     </div>
                 </div>
 
-                <div class="col-span-2 border-b pb-2 mt-2">
-                    <div class="text-sm text-gray-500 mb-2 font-bold uppercase tracking-wider">Flags & Confirmations</div>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="px-2 py-1 text-[10px] rounded border" :class="item.agree_terms ? 'bg-green-100 text-green-700 border-green-200' : 'bg-gray-100 text-gray-500'">Agree Terms</span>
-                        <span class="px-2 py-1 text-[10px] rounded border" :class="item.agree_documents ? 'bg-green-100 text-green-700 border-green-200' : 'bg-gray-100 text-gray-500'">Agree Documents</span>
-                        <span class="px-2 py-1 text-[10px] rounded border" :class="item.agree_support ? 'bg-green-100 text-green-700 border-green-200' : 'bg-gray-100 text-gray-500'">Agree Support</span>
-                        <span class="px-2 py-1 text-[10px] rounded border" :class="item.documents_sent ? 'bg-blue-100 text-blue-700 border-blue-200' : 'bg-gray-100 text-gray-500'">Documents Sent</span>
-                        <span class="px-2 py-1 text-[10px] rounded border" :class="item.documents_signed ? 'bg-blue-100 text-blue-700 border-blue-200' : 'bg-gray-100 text-gray-500'">Documents Signed</span>
-                        <span class="px-2 py-1 text-[10px] rounded border" :class="item.kyc_skipped ? 'bg-yellow-100 text-yellow-700 border-yellow-200' : 'bg-gray-100 text-gray-500'">KYC Skipped</span>
+                <!-- Reference Details -->
+                <div class="border border-gray-700 shadow-lg rounded-lg overflow-hidden bg-[#2d3748]">
+                    <div class="bg-[#edb84f] px-4 py-3 border-b border-[#dca640] flex items-center gap-2">
+                        <i class="fa-solid fa-hashtag text-white"></i>
+                        <h4 class="text-white font-semibold text-sm tracking-wide">Reference Details</h4>
+                    </div>
+                    <div class="p-4 grid grid-cols-2 gap-y-3 bg-[#1a202c]">
+                        <div class="text-xs text-gray-400 font-medium uppercase tracking-wider">Reference</div>
+                        <div class="text-sm text-gray-200 font-medium">{{ item.slug || 'N/A' }}</div>
                     </div>
                 </div>
+            </div>
 
-                <div v-if="item.custom_note" class="col-span-2 bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-lg border border-yellow-200 mb-2">
-                    <div class="text-sm text-yellow-700 dark:text-yellow-500 font-semibold mb-1">Custom Note</div>
-                    <div class="text-gray-800 dark:text-gray-200 whitespace-pre-wrap">{{ item.custom_note }}</div>
+            <!-- Documents List -->
+            <div class="mt-4 border border-gray-700 shadow-lg rounded-lg overflow-hidden bg-[#2d3748]">
+                <div class="bg-[#4d5966] text-white px-4 py-3 font-semibold flex items-center gap-2">
+                    <i class="pi pi-file"></i> Documents List
+                </div>
+                <div class="p-4 bg-[#1a202c]">
+                    <div class="flex items-center gap-2 text-sm text-gray-200 bg-gray-800 border border-gray-700 p-3 rounded-lg w-fit shadow-inner">
+                        <i class="pi pi-file-pdf text-red-400 text-lg"></i>
+                        <span class="font-medium">document generated .pdf</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Custom Note / Rejection Reason -->
+            <div class="flex flex-wrap gap-4 mt-4" v-if="item.rejection_reason || item.custom_note">
+                <div v-if="item.custom_note" class="w-full bg-yellow-900/20 p-4 rounded-lg border border-yellow-700/50 mb-2 shadow-inner">
+                    <div class="text-xs text-yellow-500 font-bold uppercase tracking-wider mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-note-sticky"></i> Custom Note
+                    </div>
+                    <div class="text-gray-200 whitespace-pre-wrap text-sm">{{ item.custom_note }}</div>
                 </div>
 
-                <div v-if="item.rejection_reason" class="col-span-2 bg-red-50 dark:bg-red-900/20 p-3 rounded-lg border border-red-200">
-                    <div class="text-sm text-red-600 dark:text-red-400 font-semibold mb-1">Rejection Reason</div>
-                    <div class="text-gray-800 dark:text-gray-200">{{ item.rejection_reason }}</div>
+                <div v-if="item.rejection_reason" class="w-full bg-red-900/20 p-4 rounded-lg border border-red-700/50 shadow-inner">
+                    <div class="text-xs text-red-400 font-bold uppercase tracking-wider mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-exclamation"></i> Rejection Reason
+                    </div>
+                    <div class="text-gray-200 text-sm">{{ item.rejection_reason }}</div>
                 </div>
+            </div>
+            
+            <div class="flex justify-end mt-6 border-t border-gray-700 pt-4">
+                <button 
+                    @click="close"
+                    class="px-6 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded font-medium transition-colors"
+                >
+                    Close
+                </button>
             </div>
         </div>
-        
-        <template #footer>
-            <div class="flex justify-end gap-2 w-full mt-4">
-                <Button label="Close" icon="pi pi-times" class="p-button-secondary" @click="close" />
-            </div>
-        </template>
     </Dialog>
 </template>

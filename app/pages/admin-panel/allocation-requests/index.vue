@@ -2,10 +2,12 @@
 const AddEdit = defineAsyncComponent(() => import('./components/AddEdit.vue'));
 const RejectModal = defineAsyncComponent(() => import('./components/RejectModal.vue'));
 const ViewModal = defineAsyncComponent(() => import('./components/ViewModal.vue'));
+const UploadModal = defineAsyncComponent(() => import('./components/UploadModal.vue'));
 
 definePageMeta({ middleware: ['auth-admin'], layout: 'admin' });
 
 const route = useRoute();
+const router = useRouter();
 
 const paginationConfig = ref({
     data: [],
@@ -193,6 +195,20 @@ const closeRejectModal = () => {
     isOpenRejectModal.value = false;
 };
 
+// Upload Modal
+const isOpenUploadModal = ref(false);
+const selectedItemToUpload = ref(null);
+
+const openUploadModal = (item) => {
+    selectedItemToUpload.value = item;
+    isOpenUploadModal.value = true;
+};
+
+const closeUploadModal = () => {
+    selectedItemToUpload.value = null;
+    isOpenUploadModal.value = false;
+};
+
 const handleReject = async (reason) => {
     try {
         const res = await $fetchAdmin(`v1/admin/allocation-requests/${selectedItemToReject.value.id}/reject`, {
@@ -378,7 +394,7 @@ const handleVerifyPayment = async (id) => {
                                                 <button v-if="permissions?.view" @click="viewHandler(requestItem)" class="text-xs bg-[#1e2f4a] text-white px-2 py-1.5 rounded hover:bg-gray-800 shadow-sm" title="View">
                                                     <i class="fa-solid fa-info-circle"></i>
                                                 </button>
-                                                <button v-if="permissions?.edit" @click="editHandler(requestItem)" class="text-xs bg-yellow-500 text-white px-2 py-1.5 rounded hover:bg-yellow-600 shadow-sm" title="Edit">
+                                                <button v-if="permissions?.edit" @click="openUploadModal(requestItem)" class="text-xs bg-yellow-500 text-white px-2 py-1.5 rounded hover:bg-yellow-600 shadow-sm inline-block" title="Upload Documents">
                                                     <i class="fa-solid fa-upload"></i>
                                                 </button>
                                             </div>
@@ -395,6 +411,7 @@ const handleVerifyPayment = async (id) => {
                     <AddEdit :isOpenModal="isOpenModal" :item="item" :modalTitle="modalTitle" @close="cancelModal" @add_emit="receivedData" />
                     <RejectModal :isOpenModal="isOpenRejectModal" @close="closeRejectModal" @submit="handleReject" />
                     <ViewModal :isOpenModal="isOpenViewModal" :item="selectedItemToView" @close="closeViewModal" />
+                    <UploadModal :isOpenModal="isOpenUploadModal" :item="selectedItemToUpload" @close="closeUploadModal" @submit="loadData(1)" />
                 </div>
             </div>
         </div>
