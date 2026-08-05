@@ -105,6 +105,8 @@ const transactionSummary = computed(() => ({
     funded: transactions.value.filter((transaction) => transaction.paymentStatus === 'Funded' || transaction.paymentTone === 'success').length
 }))
 
+const shouldShowTransactionsSkeleton = computed(() => !isProfileViewReady.value || isTransactionsLoading.value)
+
 const transactionStatusClass = (tone: string) => (
     tone === 'success'
         ? 'border-tccGold/40 bg-tccGold/15 text-tccGold'
@@ -126,8 +128,11 @@ onMounted(() => {
 
 <template>
     <ClientOnly>
-        <ProfileDashboardShell v-if="isProfileViewReady && !isTransactionsLoading" active-section="transactions">
+        <ProfileDashboardShell active-section="transactions">
+            <ProfileTransactionsListSkeleton v-if="shouldShowTransactionsSkeleton" />
+
             <section
+                v-else
                 class="overflow-hidden rounded-2xl border border-tccGold/20 bg-[#090806] text-white shadow-[0_28px_90px_rgba(0,0,0,0.34)]">
                 <div
                     class="border-b border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(247,198,0,0.16),transparent_24rem),#0b0a08] p-5 sm:p-6">
@@ -240,7 +245,6 @@ onMounted(() => {
                 </div>
             </section>
         </ProfileDashboardShell>
-        <ProfileDashboardSkeleton v-else active-section="transactions" />
 
         <template #fallback>
             <ProfileDashboardSkeleton active-section="transactions" />
