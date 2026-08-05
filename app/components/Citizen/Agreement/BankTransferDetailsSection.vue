@@ -1,6 +1,7 @@
 <script setup lang="ts">
 type AgreementRecord = {
     vehicle: string
+    vehicleImage?: string
     allocations: number
     allocationCost: number
     reference: string
@@ -157,9 +158,18 @@ const openReceiptPreview = () => {
             <div class="space-y-5">
                 <section class="rounded-xl border border-tccGold/20 bg-[#11100d] p-5 shadow-[0_18px_70px_rgba(0,0,0,0.24)]">
                     <h2 class="font-poppins text-lg font-black text-white">Investment Summary</h2>
-                    <div class="mt-5 grid gap-4 sm:grid-cols-[10rem_minmax(0,1fr)]">
-                        <div class="grid min-h-32 place-items-center rounded-lg border border-dashed border-white/15 bg-tccDeepBlack/70 text-tccGold">
-                            <i class="pi pi-car text-4xl" aria-hidden="true" />
+                    <div class="mt-5 grid gap-4 sm:grid-cols-[16rem_minmax(0,1fr)]">
+                        <div class="relative min-h-52 overflow-hidden rounded-lg border border-white/10 bg-tccDeepBlack/70 sm:h-full">
+                            <img
+                                v-if="agreement.vehicleImage"
+                                :src="agreement.vehicleImage"
+                                :alt="`${agreement.vehicle} image`"
+                                class="absolute inset-0 h-full w-full object-cover"
+                                loading="lazy"
+                            >
+                            <div v-else class="grid h-full min-h-52 place-items-center text-tccGold">
+                                <i class="pi pi-car text-4xl" aria-hidden="true" />
+                            </div>
                         </div>
                         <div class="space-y-3">
                             <div class="flex flex-col gap-1 rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-sm sm:flex-row sm:items-center sm:justify-between">

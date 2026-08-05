@@ -1,6 +1,7 @@
 <script setup lang="ts">
 type AgreementRecord = {
     vehicle: string
+    vehicleImage?: string
     allocations: number
     allocationCost: number
     supportEmail: string
@@ -36,58 +37,63 @@ const trustAdminFee = computed(() => allocationSubtotal.value * 0.005)
         </div>
 
         <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_24rem]">
-            <section class="rounded-xl border border-white/10 bg-white/[0.04] p-5 shadow-[0_18px_70px_rgba(0,0,0,0.24)] sm:p-6">
-                <div class="grid gap-6 md:grid-cols-[18rem_minmax(0,1fr)]">
-                    <div class="min-h-56 rounded-xl border border-tccGold/20 bg-tccDeepBlack/70 p-5">
-                        <div class="grid h-full place-items-center rounded-lg border border-dashed border-white/15 text-center">
-                            <div>
-                                <i class="pi pi-car text-4xl text-tccGold" aria-hidden="true" />
-                                <p class="mt-3 text-xs font-black uppercase tracking-[0.16em] text-white/45">
-                                    Diablo VT Roadster
-                                </p>
-                            </div>
+            <section class="overflow-hidden rounded-xl border border-white/10 bg-white/[0.04] shadow-[0_18px_70px_rgba(0,0,0,0.24)]">
+                <div class="relative h-64 w-full border-b border-tccGold/20 bg-tccDeepBlack/70 sm:h-72 lg:h-80">
+                    <img
+                        v-if="agreement.vehicleImage"
+                        :src="agreement.vehicleImage"
+                        :alt="`${agreement.vehicle} image`"
+                        class="h-full w-full object-cover"
+                        loading="lazy"
+                    >
+                    <div v-else class="grid h-full place-items-center text-center">
+                        <div>
+                            <i class="pi pi-car text-4xl text-tccGold" aria-hidden="true" />
+                            <p class="mt-3 text-xs font-black uppercase tracking-[0.16em] text-white/45">
+                                {{ agreement.vehicle }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-5 sm:p-6">
+                    <h2 class="font-poppins text-2xl font-black text-white">{{ agreement.vehicle }}</h2>
+                    <p class="mt-3 text-sm font-semibold text-white/50">
+                        Trust Name: <span class="text-white">LAMDIABVTTI</span>
+                    </p>
+                    <p class="mt-4 max-w-2xl text-sm leading-relaxed text-white/70">
+                        The Lamborghini Diablo VT Roadster, a rare open-top V12 icon, combines extreme 1990s presence with landmark brand significance. A scarce pre-Audi Lamborghini with growing collector appeal.
+                    </p>
+
+                    <div class="mt-6 grid gap-4 sm:grid-cols-2">
+                        <div>
+                            <span class="text-[11px] font-black uppercase tracking-[0.14em] text-white/40">
+                                Number of Allocations
+                            </span>
+                            <strong class="mt-1 block text-base text-white">{{ allocationCount }}</strong>
+                        </div>
+                        <div>
+                            <span class="text-[11px] font-black uppercase tracking-[0.14em] text-white/40">
+                                Price per Slot
+                            </span>
+                            <strong class="mt-1 block text-base text-white">{{ formatCurrency(agreement.allocationCost) }}</strong>
                         </div>
                     </div>
 
-                    <div>
-                        <h2 class="font-poppins text-2xl font-black text-white">{{ agreement.vehicle }}</h2>
-                        <p class="mt-3 text-sm font-semibold text-white/50">
-                            Trust Name: <span class="text-white">LAMDIABVTTI</span>
-                        </p>
-                        <p class="mt-4 max-w-2xl text-sm leading-relaxed text-white/70">
-                            The Lamborghini Diablo VT Roadster, a rare open-top V12 icon, combines extreme 1990s presence with landmark brand significance. A scarce pre-Audi Lamborghini with growing collector appeal.
-                        </p>
+                    <p class="mt-6 text-sm font-semibold leading-relaxed text-white/60">
+                        Please confirm the number of allocations included in this syndicate.
+                    </p>
 
-                        <div class="mt-6 grid gap-4 sm:grid-cols-2">
-                            <div>
-                                <span class="text-[11px] font-black uppercase tracking-[0.14em] text-white/40">
-                                    Number of Allocations
-                                </span>
-                                <strong class="mt-1 block text-base text-white">{{ allocationCount }}</strong>
-                            </div>
-                            <div>
-                                <span class="text-[11px] font-black uppercase tracking-[0.14em] text-white/40">
-                                    Price per Slot
-                                </span>
-                                <strong class="mt-1 block text-base text-white">{{ formatCurrency(agreement.allocationCost) }}</strong>
-                            </div>
+                    <div class="mt-5 rounded-xl border border-white/10 bg-tccDeepBlack/70 p-4">
+                        <h3 class="font-poppins text-sm font-black text-white">Number of Allocations</h3>
+                        <div class="mt-4 rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-center">
+                            <div class="font-poppins text-2xl font-black text-white">{{ allocationCount }}</div>
                         </div>
+                    </div>
 
-                        <p class="mt-6 text-sm font-semibold leading-relaxed text-white/60">
-                            Please confirm the number of allocations included in this syndicate.
-                        </p>
-
-                        <div class="mt-5 rounded-xl border border-white/10 bg-tccDeepBlack/70 p-4">
-                            <h3 class="font-poppins text-sm font-black text-white">Number of Allocations</h3>
-                            <div class="mt-4 rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-center">
-                                <div class="font-poppins text-2xl font-black text-white">{{ allocationCount }}</div>
-                            </div>
-                        </div>
-
-                        <div class="mt-5 flex items-center justify-between rounded-xl border border-tccGold/35 bg-tccGold/10 px-4 py-4">
-                            <span class="font-poppins text-sm font-black text-white">Allocation Subtotal</span>
-                            <strong class="font-poppins text-xl font-black text-tccGold">{{ formatCurrency(allocationSubtotal) }}</strong>
-                        </div>
+                    <div class="mt-5 flex items-center justify-between rounded-xl border border-tccGold/35 bg-tccGold/10 px-4 py-4">
+                        <span class="font-poppins text-sm font-black text-white">Allocation Subtotal</span>
+                        <strong class="font-poppins text-xl font-black text-tccGold">{{ formatCurrency(allocationSubtotal) }}</strong>
                     </div>
                 </div>
             </section>

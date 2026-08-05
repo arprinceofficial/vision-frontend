@@ -446,6 +446,7 @@ const rememberAgreementAsset = () => {
     sessionStorage.setItem(`agreement-asset:${agreementUid}`, JSON.stringify({
         id: agreementUid,
         vehicle: syndicate.value.title,
+        vehicleImage: syndicate.value.heroImage,
         collection: syndicate.value.collection,
         year: syndicateYear.value,
         allocationCost: syndicate.value.allocationCost,

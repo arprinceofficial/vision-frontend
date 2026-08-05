@@ -23,6 +23,7 @@ type TimelineStep = {
 type AgreementRecord = {
     id: string
     vehicle: string
+    vehicleImage?: string
     collection: string
     year: string
     allocations: number
@@ -55,6 +56,7 @@ type AllocationRequest = {
     totalAmount: number
     allocationCost: number
     vehicle: string
+    vehicleImage: string
     reference: string
     documentSignatureId: string
     signedDocumentPath: {
@@ -201,6 +203,17 @@ const normalizeAllocationRequest = (item: Record<string, any> | null | undefined
             agreementAsset.value?.vehicle,
             agreementRecords[0]?.vehicle
         ),
+        vehicleImage: getStringValue(
+            item.vehicle_image,
+            item.vehicleImage,
+            fractionalItem.vehicle_image,
+            fractionalItem.vehicleImage,
+            fractionalItem.image,
+            fractionalItem.assetable?.vehicle_image,
+            fractionalItem.assetable?.vehicleImage,
+            fractionalItem.assetable?.image,
+            agreementAsset.value?.vehicleImage
+        ),
         reference: slugValue || getStringValue(item.reference, agreementAsset.value?.reference, agreementRecords[0]?.reference),
         documentSignatureId: getDocumentSignatureId(item),
         signedDocumentPath: {
@@ -234,6 +247,15 @@ const normalizeAgreementAsset = (item: Record<string, any> | null | undefined): 
     return {
         id: getStringValue(item.uid, item.allocationId, item.allocation_id, item.id),
         vehicle,
+        vehicleImage: getStringValue(
+            item.vehicle_image,
+            item.vehicleImage,
+            item.heroImage,
+            item.image,
+            assetable.vehicle_image,
+            assetable.vehicleImage,
+            assetable.image
+        ),
         collection: getStringValue(item.collection, item.collection_name),
         year: getStringValue(item.year, assetable.year, getSpecValue(item.specs, /year/i)),
         allocationCost: getNumberValue(item.allocationCost ?? item.per_share_value ?? item.funded_current_price),
@@ -249,6 +271,7 @@ const mergeAgreementAsset = (asset: AgreementAsset | null) => {
         ...(agreementAsset.value || {}),
         ...(asset.id ? { id: asset.id } : {}),
         ...(asset.vehicle ? { vehicle: asset.vehicle } : {}),
+        ...(asset.vehicleImage ? { vehicleImage: asset.vehicleImage } : {}),
         ...(asset.collection ? { collection: asset.collection } : {}),
         ...(asset.year ? { year: asset.year } : {}),
         ...(asset.allocationCost ? { allocationCost: asset.allocationCost } : {}),
@@ -286,6 +309,7 @@ const getAgreementFallback = (matchedAgreement: AgreementRecord | undefined) => 
         ...asset,
         id: slug.value || asset.id || fallbackAgreement.id,
         vehicle: asset.vehicle || fallbackAgreement.vehicle,
+        vehicleImage: asset.vehicleImage || fallbackAgreement.vehicleImage,
         collection: asset.collection || fallbackAgreement.collection,
         year: asset.year || fallbackAgreement.year,
         allocations: shareRouteCount.value,
@@ -306,6 +330,7 @@ const agreement = computed<AgreementRecord>(() => {
             ...fallbackAgreement,
             id: slug.value || fallbackAgreement.id,
             vehicle: request.vehicle || fallbackAgreement.vehicle,
+            vehicleImage: request.vehicleImage || fallbackAgreement.vehicleImage,
             allocations: routeSegments.value.length > 1 ? shareRouteCount.value : request.sharesCount,
             allocationCost: request.allocationCost || fallbackAgreement.allocationCost,
             reference: request.reference || allocationRequestSlug.value || ''
