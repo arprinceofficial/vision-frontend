@@ -31,6 +31,7 @@ const loadData = async () => {
                 search: search.value,
                 status: status.value.key == 'status' ? status.value.value : '',
                 trashed: status.value.key == 'trashed' ? 'only' : '',
+                role: 4 // Fetch Registered Users
             },
         });
         data.value = getData.data.data;
@@ -163,12 +164,17 @@ const onChangeHandler = () => {
                     </div>
                 </div>
                 <Skeleton v-if="isLoading" width="7rem" height="2.5rem" borderRadius="10px"></Skeleton>
-                <Button v-else-if="permissions?.add" label="Create User" @click="addNew" class="text-xs" />
+                <div v-else-if="permissions?.add" class="flex gap-2">
+                    <Button label="Add New User" @click="$router.push('/admin-panel/users/add')" class="text-xs" />
+                    <Button label="Invited User" @click="$router.push('/admin-panel/users/invited')" class="text-xs" severity="secondary" outlined />
+                    <Button label="Export Users" class="text-xs" severity="secondary" outlined />
+                    <Button label="Import" class="text-xs" severity="secondary" outlined />
+                </div>
             </div>
             <div class="pb-2 flex flex-col justify-between w-full">
                 <div class="mt-4 border border-gray-200 rounded-lg bg-white dark:bg-gray-800">
                     <div class="border-b border-gray-200">
-                        <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 py-2 px-4">Users
+                        <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 py-2 px-4">Registered Users
                         </h4>
                     </div>
                     <div class="p-4">
@@ -176,21 +182,43 @@ const onChangeHandler = () => {
                             <table class="table table-auto">
                                 <thead class="sticky z-10 top-0">
                                     <tr>
-                                        <th width="80%">
-                                            <div
-                                                class="flex flex-row items-center justify-start gap-2 text-gray-800 dark:text-gray-200">
-                                                <span>Title</span>
+                                        <th>
+                                            <div class="flex flex-row items-center justify-start gap-2 text-gray-800 dark:text-gray-200">
+                                                <span>Name</span>
                                             </div>
                                         </th>
-                                        <th width="5%">
-                                            <div
-                                                class="flex flex-row items-center justify-center gap-2 text-gray-800 dark:text-gray-200">
-                                                <span>Status</span>
+                                        <th>
+                                            <div class="flex flex-row items-center justify-start gap-2 text-gray-800 dark:text-gray-200">
+                                                <span>Email</span>
                                             </div>
                                         </th>
-                                        <th width="10%" v-if="(permissions.edit || permissions.delete) || isLoading">
-                                            <div
-                                                class="flex flex-row items-center justify-center gap-2 text-gray-800 dark:text-gray-200">
+                                        <th>
+                                            <div class="flex flex-row items-center justify-start gap-2 text-gray-800 dark:text-gray-200">
+                                                <span>Date of Birth</span>
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div class="flex flex-row items-center justify-start gap-2 text-gray-800 dark:text-gray-200">
+                                                <span>House No.</span>
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div class="flex flex-row items-center justify-start gap-2 text-gray-800 dark:text-gray-200">
+                                                <span>Street</span>
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div class="flex flex-row items-center justify-start gap-2 text-gray-800 dark:text-gray-200">
+                                                <span>Town/City</span>
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div class="flex flex-row items-center justify-start gap-2 text-gray-800 dark:text-gray-200">
+                                                <span>Postcode</span>
+                                            </div>
+                                        </th>
+                                        <th v-if="(permissions.edit || permissions.delete) || isLoading">
+                                            <div class="flex flex-row items-center justify-center gap-2 text-gray-800 dark:text-gray-200">
                                                 <span>Action</span>
                                             </div>
                                         </th>
@@ -199,19 +227,25 @@ const onChangeHandler = () => {
                                 <tbody v-if="isLoading">
                                     <tr v-for="(index) in 10" :key="index">
                                         <td class="text-gray-800 dark:text-gray-200 text-start">
-                                            <div class="flex items-center gap-2">
-                                                <Skeleton size="5rem"></Skeleton>
-                                                <div class="flex flex-col ">
-                                                    <Skeleton width="10rem" class="mb-2"></Skeleton>
-                                                    <Skeleton width="8rem" class="mb-2"></Skeleton>
-                                                    <Skeleton width="5rem" class="mb-2"></Skeleton>
-                                                </div>
-                                            </div>
+                                            <Skeleton width="100%"></Skeleton>
                                         </td>
-                                        <td>
-                                            <div class="flex justify-center items-center">
-                                                <Skeleton size="1.5rem"></Skeleton>
-                                            </div>
+                                        <td class="text-gray-800 dark:text-gray-200 text-start">
+                                            <Skeleton width="100%"></Skeleton>
+                                        </td>
+                                        <td class="text-gray-800 dark:text-gray-200 text-start">
+                                            <Skeleton width="100%"></Skeleton>
+                                        </td>
+                                        <td class="text-gray-800 dark:text-gray-200 text-start">
+                                            <Skeleton width="100%"></Skeleton>
+                                        </td>
+                                        <td class="text-gray-800 dark:text-gray-200 text-start">
+                                            <Skeleton width="100%"></Skeleton>
+                                        </td>
+                                        <td class="text-gray-800 dark:text-gray-200 text-start">
+                                            <Skeleton width="100%"></Skeleton>
+                                        </td>
+                                        <td class="text-gray-800 dark:text-gray-200 text-start">
+                                            <Skeleton width="100%"></Skeleton>
                                         </td>
                                         <td>
                                             <div class="flex justify-center items-center gap-2">
@@ -223,24 +257,25 @@ const onChangeHandler = () => {
                                 <tbody v-else>
                                     <tr v-for="(item, index) in data" :key="index">
                                         <td class="text-gray-800 dark:text-gray-200 text-start">
-                                            <div class="flex items-center gap-2">
-                                                <img :src="item.photo ? item.photo : '/svg/not-found-img.svg'"
-                                                    class="w-24 h-24 object-cover rounded-md" />
-                                                <div class="flex flex-col ">
-                                                    <span class="text-sm font-semibold">{{ item.user_info.first_name }}
-                                                        {{ item.user_info.last_name }}</span>
-                                                    <span class="text-sm">{{ item.email }}</span>
-                                                    <span class="text-sm">{{ item.ccode }} {{ item.mobile }}</span>
-                                                </div>
-                                            </div>
+                                            <span class="text-sm">{{ item.user_info?.first_name }} {{ item.user_info?.last_name }}</span>
                                         </td>
-                                        <td>
-                                            <div class="flex justify-center items-center">
-                                                <span v-if="item.status == 1" class="text-green-600"><i
-                                                        class="fa fa-power-off" aria-hidden="true"></i></span>
-                                                <span v-else class="text-red-500"><i class="fa fa-power-off"
-                                                        aria-hidden="true"></i></span>
-                                            </div>
+                                        <td class="text-gray-800 dark:text-gray-200 text-start">
+                                            <span class="text-sm">{{ item.email }}</span>
+                                        </td>
+                                        <td class="text-gray-800 dark:text-gray-200 text-start">
+                                            <span class="text-sm">{{ item.user_info?.dob ? new Date(item.user_info.dob).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }) : 'NA' }}</span>
+                                        </td>
+                                        <td class="text-gray-800 dark:text-gray-200 text-start">
+                                            <span class="text-sm">{{ item.user_info?.house_no || 'NA' }}</span>
+                                        </td>
+                                        <td class="text-gray-800 dark:text-gray-200 text-start">
+                                            <span class="text-sm">{{ item.user_info?.street || 'NA' }}</span>
+                                        </td>
+                                        <td class="text-gray-800 dark:text-gray-200 text-start">
+                                            <span class="text-sm">{{ item.user_info?.pre_city || 'NA' }}</span>
+                                        </td>
+                                        <td class="text-gray-800 dark:text-gray-200 text-start">
+                                            <span class="text-sm">{{ item.user_info?.pre_zip || 'NA' }}</span>
                                         </td>
                                         <td v-if="permissions.edit || permissions.delete">
                                             <div v-if="status.key == 'trashed' && permissions.delete"

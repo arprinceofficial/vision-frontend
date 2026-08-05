@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 
 definePageMeta({
     layout: 'admin',
@@ -19,10 +19,12 @@ const isLoading = ref(true);
 const allocations = ref([]);
 const cars = ref([]);
 const selectedCarId = ref(null);
+const appliedCarId = ref(null);
 
 const search = ref('');
 const date = ref();
 const lastPage = ref(1);
+const totalRecords = ref(0);
 
 const fetchData = async (page = 1) => {
     isLoading.value = true;
@@ -32,8 +34,8 @@ const fetchData = async (page = 1) => {
             length: 15, // The backend currently returns 15 anyway
         };
 
-        if (selectedCarId.value) {
-            params.car_id = selectedCarId.value;
+        if (appliedCarId.value) {
+            params.car_id = appliedCarId.value;
         }
 
         if (search.value) {
@@ -54,10 +56,11 @@ const fetchData = async (page = 1) => {
         });
         
         if (response?.data) {
-            cars.value = response.data.cars || [];
+            // Backend might still return cars, but we'll fetch them separately
             allocations.value = response.data.allocations?.data || [];
             paginationConfig.value.data = response.data.allocations || [];
             lastPage.value = response.data.allocations?.last_page || 1;
+            totalRecords.value = response.data.allocations?.total || 0;
         }
     } catch (error) {
         console.error('Error fetching export preview data:', error);
@@ -66,27 +69,71 @@ const fetchData = async (page = 1) => {
     }
 };
 
+const fetchFractionalItems = async () => {
+    try {
+        const itemRes = await $fetchAdmin('v1/admin/fractional-items', {
+            method: 'GET'
+        });
+        const list = itemRes?.data?.data ?? itemRes?.data ?? [];
+        cars.value = Array.isArray(list) ? list : [];
+    } catch (error) {
+        console.error('Error fetching fractional items:', error);
+    }
+};
+
 onMounted(() => {
+    fetchFractionalItems();
     fetchData(1);
 });
 
-watch(selectedCarId, () => {
+const generateReport = () => {
+    appliedCarId.value = selectedCarId.value;
     fetchData(1);
-});
+};
+
+const resetFilter = () => {
+    selectedCarId.value = null;
+    appliedCarId.value = null;
+    search.value = '';
+    date.value = null;
+    fetchData(1);
+};
 
 const formatStatus = (status) => {
     const s = parseInt(status);
     if (s === 0) return 'Pending Payment';
     if (s === 1) return 'Pending Verification';
-    if (s === 2) return 'Completed';
+    if (s === 2) return 'Accepted';
     if (s === 3 || s === -1) return 'Cancelled/Rejected';
-    return 'Unknown';
+    return 'Requested';
+};
+
+const formatCurrency = (value) => {
+    if (!value) return '£0.00';
+    return new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(value);
+};
+
+const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toISOString().split('T')[0];
+};
+
+const formatAddress = (user) => {
+    if (!user || !user.user_info) return 'N/A';
+    const ui = user.user_info;
+    const parts = [
+        ui.house_no,
+        ui.street_address || ui.street,
+        ui.city || ui.town,
+        ui.postal_code || ui.postcode
+    ].filter(p => p && p.trim() !== '');
+    return parts.length > 0 ? parts.join(', ') : 'N/A';
 };
 
 const handleExport = async () => {
     const params = {};
-    if (selectedCarId.value) {
-        params.car_id = selectedCarId.value;
+    if (appliedCarId.value) {
+        params.car_id = appliedCarId.value;
     }
     if (search.value) {
         params.search = search.value;
@@ -118,114 +165,124 @@ const handleExport = async () => {
         console.error('Failed to export:', e);
     }
 };
+
+const activeCarName = computed(() => {
+    if (!appliedCarId.value || !cars.value.length) return null;
+    const car = cars.value.find(c => c.id === appliedCarId.value);
+    return car ? (car.item_name || car.assetable?.asset_name) : null;
+});
 </script>
 
 <template>
     <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
         <!-- Page header -->
-        <div class="sm:flex sm:justify-between sm:items-center mb-8">
-            <div class="mb-4 sm:mb-0">
-                <h1 class="text-2xl md:text-3xl text-slate-800 dark:text-slate-100 font-bold">Export Allocations</h1>
-            </div>
+        <div class="mb-6">
+            <h1 class="text-2xl md:text-3xl text-[#2d3a4a] font-bold mb-1">Allocation Data Export & Report</h1>
+            <p class="text-sm text-gray-500">Select a car to filter allocations or view/export overall car allocation records.</p>
+        </div>
 
-            <!-- Header actions -->
-            <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
-                <!-- Export button -->
-                <button @click="handleExport" class="btn bg-indigo-500 hover:bg-indigo-600 text-white flex items-center justify-center px-4 py-2 rounded">
-                    <svg class="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16">
-                        <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
-                    </svg>
-                    <span class="hidden xs:block ml-2">Export CSV</span>
+        <!-- Filter Card -->
+        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm mb-6">
+            <div class="px-5 py-3 border-b border-gray-100 dark:border-gray-700 font-semibold text-gray-700 dark:text-gray-200 flex items-center gap-2">
+                <i class="fa-solid fa-filter text-blue-900 dark:text-blue-400"></i> Filter & Generate Report
+            </div>
+            <div class="p-5 flex flex-wrap items-end gap-4">
+                <div class="w-full md:w-1/3">
+                    <label class="block text-sm text-gray-600 dark:text-gray-300 mb-1">Select Fractional Item</label>
+                        <Select 
+                        v-model="selectedCarId" 
+                        :options="cars" 
+                        optionLabel="item_name" 
+                        optionValue="id" 
+                        placeholder="-- All Cars (Show All Data) --" 
+                        class="w-full"
+                        panelClass="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200"
+                    >
+                        <template #option="slotProps">
+                            <span>{{ slotProps.option.item_name || slotProps.option.assetable?.asset_name || `Car #${slotProps.option.id}` }}</span>
+                        </template>
+                        <template #value="slotProps">
+                            <span v-if="slotProps.value">{{ cars.find(c => c.id === slotProps.value)?.item_name || cars.find(c => c.id === slotProps.value)?.assetable?.asset_name || `Car #${slotProps.value}` }}</span>
+                            <span v-else>-- All Cars (Show All Data) --</span>
+                        </template>
+                    </Select>
+                </div>
+                
+                <div class="flex gap-2">
+                    <button @click="generateReport" class="bg-[#1e2f4a] hover:bg-gray-800 text-white px-4 py-2 rounded font-medium flex items-center gap-2 transition-colors">
+                        <i class="fa-solid fa-search"></i> Get Report
+                    </button>
+                    <button v-if="appliedCarId || search || date" @click="resetFilter" class="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-4 py-2 rounded font-medium flex items-center gap-2 transition-colors">
+                        <i class="fa-solid fa-rotate-left"></i> Reset Filter
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Section -->
+        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm overflow-hidden">
+            <div class="px-5 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
+                <div>
+                    <h2 class="font-bold text-[#1e2f4a] dark:text-gray-200 flex items-center gap-2 mb-1">
+                        <i class="fa-solid fa-table"></i> Report Preview 
+                        <span v-if="activeCarName" class="bg-teal-500 text-white text-xs px-2 py-0.5 rounded-full font-medium ml-2">{{ activeCarName }}</span>
+                    </h2>
+                    <p class="text-xs text-gray-500">Total: {{ totalRecords }} records found</p>
+                </div>
+                
+                <button @click="handleExport" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded font-medium flex items-center gap-2 text-sm transition-colors shadow-sm">
+                    <i class="fa-solid fa-download"></i> Download CSV / Excel
                 </button>
             </div>
-        </div>
-
-        <div class="w-full flex flex-wrap md:flex-nowrap items-center gap-4 mb-8">
-            <div class="flex items-center gap-2 w-full md:w-auto">
-                <label for="search" class="text-gray-800 dark:text-gray-200">Search</label>
-                <LazyInputText type="text" v-model="search" @keyup.enter="fetchData(1)" class="w-full md:w-auto" placeholder="Search by user or slug..." />
-            </div>
-            <div class="flex items-center gap-2 w-full md:w-auto">
-                <label class="text-gray-800 dark:text-gray-200">Date</label>
-                <DatePicker v-model="date" selectionMode="range" :manualInput="false" placeholder="Select Date Range" class="w-full md:w-auto" />
-            </div>
-            <div class="flex items-center gap-2 w-full md:w-auto">
-                <label class="text-gray-800 dark:text-gray-200">Asset</label>
-                <Select 
-                    v-model="selectedCarId" 
-                    :options="cars" 
-                    optionLabel="item_name" 
-                    optionValue="id" 
-                    placeholder="All Cars" 
-                    class="w-full md:w-48"
-                    showClear
-                >
-                    <template #option="slotProps">
-                        <span>{{ slotProps.option.item_name || slotProps.option.assetable?.asset_name || `Car #${slotProps.option.id}` }}</span>
-                    </template>
-                    <template #value="slotProps">
-                        <span v-if="slotProps.value">{{ cars.find(c => c.id === slotProps.value)?.item_name || cars.find(c => c.id === slotProps.value)?.assetable?.asset_name || `Car #${slotProps.value}` }}</span>
-                        <span v-else>All Cars</span>
-                    </template>
-                </Select>
-            </div>
-            <Button label="Search" @click="fetchData(1)" />
-        </div>
-
-        <!-- Table -->
-        <div class="bg-white dark:bg-slate-800 shadow-lg rounded-sm border border-slate-200 dark:border-slate-700 relative">
-            <header class="px-5 py-4 border-b border-slate-200 dark:border-slate-700">
-                <h2 class="font-semibold text-slate-800 dark:text-slate-100">Data Preview <span class="text-slate-400 dark:text-slate-500 font-medium">(First 15 records shown)</span></h2>
-            </header>
             
-            <div class="p-3">
-                <div v-if="isLoading" class="text-center py-8">
+            <div class="">
+                <div v-if="isLoading" class="text-center py-12">
                     <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-500"></div>
                 </div>
                 
                 <div class="overflow-x-auto" v-else>
-                    <table class="table-auto w-full dark:text-slate-300">
-                        <thead class="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900/20 border-t border-b border-slate-200 dark:border-slate-700">
+                    <table class="w-full text-left text-sm whitespace-nowrap">
+                        <thead class="bg-[#1e2f4a] text-white">
                             <tr>
-                                <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap"><div class="font-semibold text-left">First Name</div></th>
-                                <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap"><div class="font-semibold text-left">Second Name</div></th>
-                                <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap"><div class="font-semibold text-left">Email</div></th>
-                                <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap"><div class="font-semibold text-left">Asset</div></th>
-                                <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap"><div class="font-semibold text-right">Total (£)</div></th>
-                                <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap"><div class="font-semibold text-left">Status</div></th>
+                                <th class="px-3 py-3 font-semibold">First Name</th>
+                                <th class="px-3 py-3 font-semibold">Second Name</th>
+                                <th class="px-3 py-3 font-semibold">Email address</th>
+                                <th class="px-3 py-3 font-semibold">Asset</th>
+                                <th class="px-3 py-3 font-semibold">Allocation value</th>
+                                <th class="px-3 py-3 font-semibold text-center">Number of allocations</th>
+                                <th class="px-3 py-3 font-semibold">Total value (£)</th>
+                                <th class="px-3 py-3 font-semibold">Purchase Date</th>
+                                <th class="px-3 py-3 font-semibold">Asset Funded Date</th>
+                                <th class="px-3 py-3 font-semibold">Address</th>
+                                <th class="px-3 py-3 font-semibold text-center">Reference ID</th>
+                                <th class="px-3 py-3 font-semibold text-center">Status</th>
                             </tr>
                         </thead>
-                        <tbody class="text-sm divide-y divide-slate-200 dark:divide-slate-700">
+                        <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                             <tr v-if="allocations.length === 0">
-                                <td colspan="6" class="px-2 first:pl-5 last:pr-5 py-3 text-center text-slate-500">No data available for export</td>
+                                <td colspan="12" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">No data available for export</td>
                             </tr>
-                            <tr v-for="item in allocations" :key="item.id" v-else>
-                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="text-left">{{ item.user?.user_info?.first_name || item.user?.first_name || 'N/A' }}</div>
-                                </td>
-                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="text-left">{{ item.user?.user_info?.last_name || item.user?.last_name || 'N/A' }}</div>
-                                </td>
-                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="text-left">{{ item.user?.email || 'N/A' }}</div>
-                                </td>
-                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="text-left">{{ item.fractional_item?.item_name || item.fractional_item?.assetable?.asset_name || 'N/A' }}</div>
-                                </td>
-                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="text-right font-medium text-emerald-500">{{ item.total_amount }}</div>
-                                </td>
-                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="text-left">
-                                        <div class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5" 
-                                            :class="{
-                                                'bg-emerald-100 dark:bg-emerald-400/30 text-emerald-600 dark:text-emerald-400': item.status === 2,
-                                                'bg-amber-100 dark:bg-amber-400/30 text-amber-600 dark:text-amber-400': item.status === 0 || item.status === 1,
-                                                'bg-rose-100 dark:bg-rose-500/30 text-rose-500 dark:text-rose-400': item.status === 3 || item.status === -1
-                                            }">
-                                            {{ formatStatus(item.status) }}
-                                        </div>
-                                    </div>
+                            <tr v-for="item in allocations" :key="item.id" v-else class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                                <td class="px-3 py-3 text-gray-800 dark:text-gray-200">{{ item.user?.user_info?.first_name || item.user?.first_name || 'N/A' }}</td>
+                                <td class="px-3 py-3 text-gray-800 dark:text-gray-200">{{ item.user?.user_info?.last_name || item.user?.last_name || 'N/A' }}</td>
+                                <td class="px-3 py-3 text-gray-600 dark:text-gray-400">{{ item.user?.email || 'N/A' }}</td>
+                                <td class="px-3 py-3 text-gray-800 dark:text-gray-200 font-medium">{{ item.fractional_item?.item_name || item.fractional_item?.assetable?.asset_name || 'N/A' }}</td>
+                                <td class="px-3 py-3 text-gray-800 dark:text-gray-200">{{ formatCurrency(item.fractional_item?.price_per_share || 0) }}</td>
+                                <td class="px-3 py-3 text-gray-800 dark:text-gray-200 text-center border border-gray-100 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-sm w-10 h-6 inline-flex justify-center items-center rounded m-2">{{ item.shares_count || 0 }}</td>
+                                <td class="px-3 py-3 text-gray-800 dark:text-gray-200 font-medium">{{ formatCurrency(item.total_amount) }}</td>
+                                <td class="px-3 py-3 text-gray-600 dark:text-gray-400">{{ formatDate(item.created_at) }}</td>
+                                <td class="px-3 py-3 text-gray-600 dark:text-gray-400">{{ formatDate(item.fractional_item?.funded_at) }}</td>
+                                <td class="px-3 py-3 text-gray-500 dark:text-gray-400 max-w-xs truncate" :title="formatAddress(item.user)">{{ formatAddress(item.user) }}</td>
+                                <td class="px-3 py-3 text-pink-500 text-center font-medium">{{ item.slug || 'N/A' }}</td>
+                                <td class="px-3 py-3 text-center">
+                                    <span class="inline-flex font-bold rounded-md text-xs px-2 py-1 shadow-sm" 
+                                        :class="{
+                                            'bg-emerald-500 text-white': item.status === 2,
+                                            'bg-amber-400 text-white': item.status === 0 || item.status === 1,
+                                            'bg-rose-500 text-white': item.status === 3 || item.status === -1
+                                        }">
+                                        {{ formatStatus(item.status) }}
+                                    </span>
                                 </td>
                             </tr>
                         </tbody>
@@ -233,7 +290,9 @@ const handleExport = async () => {
                 </div>
             </div>
             
-            <LazyPagination v-if="!isLoading && lastPage > 1" class="px-4 pb-4" :config="paginationConfig" @loadData="fetchData" />
+            <div class="px-4 py-3 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
+                <LazyPagination v-if="!isLoading && lastPage > 1" :config="paginationConfig" @loadData="fetchData" />
+            </div>
         </div>
         
     </div>
