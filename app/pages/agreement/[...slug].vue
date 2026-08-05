@@ -919,7 +919,8 @@ useHead(() => ({
 
                     <Transition name="agreement-fade" mode="out-in">
                         <CitizenAgreementPaidStatusSection v-if="isAllocationPaid" key="already-paid"
-                            :agreement="agreement" :reference="displayedReference" :total-investment="totalInvestment" />
+                            :agreement="agreement" :reference="displayedReference"
+                            :total-investment="totalInvestment" />
 
                         <CitizenAgreementWhatHappensNextSection v-else-if="currentStage === 'overview'" key="overview"
                             :support-email="agreement.supportEmail" :is-loading="isGetStartedLoading"
