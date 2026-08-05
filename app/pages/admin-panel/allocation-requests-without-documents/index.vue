@@ -9,7 +9,7 @@ const paginationConfig = ref({
     data: [],
     lang: 'en',
     align: 'center',
-    action: ''
+    action: 'ajax'
 });
 
 const isLoading = ref(false);
@@ -17,33 +17,44 @@ const data = ref([]);
 const response_modal = ref({});
 const permissions = ref({ edit: true, view: true });
 
-const loadData = async () => {
+const search = ref('');
+const date = ref();
+const lastPage = ref(1);
+
+const loadData = async (page = 1) => {
     isLoading.value = true;
     try {
+        const params = {
+            page: page,
+            length: 10,
+        };
+
+        if (search.value) {
+            params.search = search.value;
+        }
+
+        if (date.value) {
+            const dates = Array.isArray(date.value) ? date.value : [date.value];
+            const formattedDates = dates.map(d => d ? new Date(d).toLocaleDateString('en-CA') : '').filter(Boolean);
+            if (formattedDates.length > 0) {
+                params.date = formattedDates.join(',');
+            }
+        }
+
         const getData = await $fetchAdmin(`v1/admin/allocation-requests-without-documents`, {
             method: 'GET',
-            params: {
-                page: route.query.page || 1,
-                length: 10,
-            }
+            params: params
         });
         const list = getData?.data?.data ?? getData?.data ?? [];
         data.value = Array.isArray(list) ? list : [];
-        paginationConfig.value.data = getData?.data?.meta ?? getData?.meta ?? [];
+        paginationConfig.value.data = getData?.data?.meta ?? getData?.meta ?? (getData?.data || []);
+        lastPage.value = getData?.data?.last_page ?? getData?.meta?.last_page ?? 1;
     } catch (e) {
         console.log('Get Message', e.message);
     } finally {
         isLoading.value = false;
     }
 };
-
-onMounted(() => {
-    loadData();
-});
-
-watch(() => route.query, () => {
-    loadData();
-});
 
 // Upload Modal
 const isOpenUploadModal = ref(false);
@@ -62,8 +73,12 @@ const closeUploadModal = () => {
 const handleUploadSuccess = () => {
     response_modal.value = { status: true, message: 'Documents uploaded successfully.' };
     closeUploadModal();
-    loadData();
+    loadData(1);
 };
+
+onMounted(() => {
+    loadData(1);
+});
 </script>
 
 <template>
@@ -73,6 +88,18 @@ const handleUploadSuccess = () => {
                 <div class="w-full md:w-auto flex flex-wrap gap-4">
                     <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200">Requests Without Documents</h3>
                 </div>
+            </div>
+
+            <div class="w-full flex flex-wrap md:flex-nowrap items-center gap-4 mb-8">
+                <div class="flex items-center gap-2 w-full md:w-auto">
+                    <label for="search" class="text-gray-800 dark:text-gray-200">Search</label>
+                    <LazyInputText type="text" v-model="search" @keyup.enter="loadData(1)" class="w-full md:w-auto" placeholder="Search by user or slug..." />
+                </div>
+                <div class="flex items-center gap-2 w-full md:w-auto">
+                    <label class="text-gray-800 dark:text-gray-200">Date</label>
+                    <DatePicker v-model="date" selectionMode="range" :manualInput="false" placeholder="Select Date Range" class="w-full md:w-auto" />
+                </div>
+                <Button label="Search" @click="loadData(1)" />
             </div>
 
             <div class="pb-2 flex flex-col justify-between w-full">
@@ -97,7 +124,10 @@ const handleUploadSuccess = () => {
                                     </tr>
                                 </tbody>
                                 <tbody v-else>
-                                    <tr v-for="(item, index) in data" :key="index" class="border-b last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800">
+                                    <tr v-if="data.length === 0">
+                                        <td colspan="5" class="text-center py-4 text-gray-500">No requests missing documents found.</td>
+                                    </tr>
+                                    <tr v-for="(item, index) in data" :key="index" class="border-b last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800" v-else>
                                         <td class="py-2 px-3 text-gray-800 dark:text-gray-200">
                                             <div class="text-sm font-semibold">#{{ item.id }}</div>
                                             <div class="text-xs text-gray-500">{{ item.slug }}</div>
@@ -118,15 +148,12 @@ const handleUploadSuccess = () => {
                                             </button>
                                         </td>
                                     </tr>
-                                    <tr v-if="data.length === 0">
-                                        <td colspan="5" class="text-center py-4 text-gray-500">No requests missing documents found.</td>
-                                    </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                     
-                    <LazyPagination v-if="!isLoading && paginationConfig?.data?.last_page > 1" class="px-4" :config="paginationConfig" />
+                    <LazyPagination v-if="!isLoading && lastPage > 1" class="px-4" :config="paginationConfig" @loadData="loadData" />
                     <LazyResponseModal :response_modal="response_modal" />
                     
                     <UploadModal :isOpenModal="isOpenUploadModal" :requestId="selectedRequestId" @close="closeUploadModal" @submit="handleUploadSuccess" />

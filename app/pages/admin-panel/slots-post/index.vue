@@ -11,7 +11,7 @@ const paginationConfig = ref({
     data: [],
     lang: 'en',
     align: 'center',
-    action: ''
+    action: 'ajax'
 });
 
 const isLoading = ref(false);
@@ -19,67 +19,38 @@ const data = ref([]);
 const response_modal = ref({});
 const permissions = ref({ add: true, edit: true, delete: true, view: true });
 
-const getStatusLabel = (status) => {
-    switch (parseInt(status)) {
-        case 0: return 'Pending Payment';
-        case 1: return 'Pending Verification';
-        case 2: return 'Completed';
-        case 3: return 'Cancelled/Rejected';
-        default: return 'Unknown';
-    }
-};
+const search = ref('');
+const date = ref();
+const lastPage = ref(1);
 
-const getStateLabel = (state) => {
-    switch (parseInt(state)) {
-        case 1: return 'What Happens Next';
-        case 2: return 'Documents';
-        case 3: return 'Syndicate Vote';
-        case 4: return 'Cart';
-        case 5: return 'Final Agreement';
-        case 6: return 'Payment';
-        default: return 'Unknown';
-    }
-};
-
-const getStatusSeverity = (status) => {
-    switch (parseInt(status)) {
-        case 0: return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-        case 1: return 'bg-blue-100 text-blue-800 border-blue-200';
-        case 2: return 'bg-green-100 text-green-800 border-green-200';
-        case 3: return 'bg-red-100 text-red-800 border-red-200';
-        default: return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-};
-
-
-const formatCurrency = (value) => {
-    if (!value) return '£0.00';
-    return new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(value);
-};
-
-const formatDate = (dateString) => {
-    if (!dateString) return { date: 'N/A', year: '', time: '' };
-    const d = new Date(dateString);
-    const day = d.getDate().toString().padStart(2, '0');
-    const month = d.toLocaleString('en-US', { month: 'short' });
-    const year = d.getFullYear();
-    const time = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-    return { date: `${day} ${month}`, year, time };
-};
-
-const loadData = async () => {
+const loadData = async (page = 1) => {
     isLoading.value = true;
     try {
+        const params = {
+            page: page,
+            length: 10,
+        };
+
+        if (search.value) {
+            params.search = search.value;
+        }
+
+        if (date.value) {
+            const dates = Array.isArray(date.value) ? date.value : [date.value];
+            const formattedDates = dates.map(d => d ? new Date(d).toLocaleDateString('en-CA') : '').filter(Boolean);
+            if (formattedDates.length > 0) {
+                params.date = formattedDates.join(',');
+            }
+        }
+
         const getData = await $fetchAdmin(`v1/admin/slots-post`, {
             method: 'GET',
-            params: {
-                page: route.query.page || 1,
-                length: 10,
-            }
+            params: params
         });
         const list = getData?.data?.data ?? getData?.data ?? [];
         data.value = Array.isArray(list) ? list : [];
-        paginationConfig.value.data = getData?.data?.meta ?? getData?.meta ?? [];
+        paginationConfig.value.data = getData?.data?.meta ?? getData?.meta ?? (getData?.data || []);
+        lastPage.value = getData?.data?.last_page ?? getData?.meta?.last_page ?? 1;
     } catch (e) {
         console.log('Get Message', e.message);
     } finally {
@@ -88,11 +59,7 @@ const loadData = async () => {
 };
 
 onMounted(() => {
-    loadData();
-});
-
-watch(() => route.query, () => {
-    loadData();
+    loadData(1);
 });
 
 // Create/Edit Modal
@@ -114,7 +81,7 @@ const editHandler = (i) => {
 
 const receivedData = (d) => {
     isOpenModal.value = false;
-    loadData();
+    loadData(1);
 };
 
 const cancelModal = () => {
@@ -158,7 +125,7 @@ const handleReject = async (reason) => {
         if (res.success || res.status) {
             response_modal.value = { status: true, message: 'Request rejected successfully.' };
             closeRejectModal();
-            loadData();
+            loadData(1);
         }
     } catch (e) {
         response_modal.value = { status: false, message: e.response?._data?.message || 'Error rejecting request.' };
@@ -174,7 +141,7 @@ const handleApprove = async (id) => {
         });
         if (res.success || res.status) {
             response_modal.value = { status: true, message: 'Request approved successfully.' };
-            loadData();
+            loadData(1);
         }
     } catch (e) {
         response_modal.value = { status: false, message: e.response?._data?.message || 'Error approving request.' };
@@ -190,13 +157,12 @@ const handleVerifyPayment = async (id) => {
         });
         if (res.success || res.status) {
             response_modal.value = { status: true, message: 'Payment verified successfully.' };
-            loadData();
+            loadData(1);
         }
     } catch (e) {
         response_modal.value = { status: false, message: e.response?._data?.message || 'Error verifying payment.' };
     }
 };
-
 </script>
 
 <template>
@@ -210,9 +176,19 @@ const handleVerifyPayment = async (id) => {
                 <Button v-else-if="permissions?.add" label="Create Request" @click="addNew" class="text-xs" />
             </div>
 
+            <div class="w-full flex flex-wrap md:flex-nowrap items-center gap-4 mb-8">
+                <div class="flex items-center gap-2 w-full md:w-auto">
+                    <label for="search" class="text-gray-800 dark:text-gray-200">Search</label>
+                    <LazyInputText type="text" v-model="search" @keyup.enter="loadData(1)" class="w-full md:w-auto" placeholder="Search by name or slug..." />
+                </div>
+                <div class="flex items-center gap-2 w-full md:w-auto">
+                    <label class="text-gray-800 dark:text-gray-200">Date</label>
+                    <DatePicker v-model="date" selectionMode="range" :manualInput="false" placeholder="Select Date Range" class="w-full md:w-auto" />
+                </div>
+                <Button label="Search" @click="loadData(1)" />
+            </div>
+
             <div class="pb-2 flex flex-col justify-between w-full">
-
-
                 <div class="border border-gray-200 rounded-lg bg-white dark:bg-gray-800">
                     <div class="p-0">
                         <div class="custom_table overflow-auto border-b border-gray-200">
@@ -233,7 +209,10 @@ const handleVerifyPayment = async (id) => {
                                     </tr>
                                 </tbody>
                                 <tbody v-else>
-                                    <tr v-for="(item, index) in data" :key="index" class="border-b last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800">
+                                    <tr v-if="data.length === 0">
+                                        <td colspan="4" class="text-center py-6 text-gray-500">No items found.</td>
+                                    </tr>
+                                    <tr v-for="(item, index) in data" :key="index" class="border-b last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800" v-else>
                                         <!-- ID / Slug -->
                                         <td class="py-3 px-3 text-gray-800 dark:text-gray-200">
                                             <div class="font-bold">#{{ item.id }}</div>
@@ -247,23 +226,20 @@ const handleVerifyPayment = async (id) => {
                                         
                                         <!-- Total Slots -->
                                         <td class="py-3 px-3 text-center text-gray-800 dark:text-gray-200">
-                                            <span class="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-2 py-1 rounded text-xs font-semibold">{{ item.total_shares || 0 }}</span>
+                                            <span class="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-2 py-1 rounded text-xs font-semibold">{{ item.shares_total || item.total_shares || 0 }}</span>
                                         </td>
 
                                         <!-- Available Slots -->
                                         <td class="py-3 px-3 text-center text-gray-800 dark:text-gray-200">
-                                            <span class="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 px-2 py-1 rounded text-xs font-semibold">{{ item.available_shares || 0 }}</span>
+                                            <span class="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 px-2 py-1 rounded text-xs font-semibold">{{ item.shares_available || item.available_shares || 0 }}</span>
                                         </td>
-                                    </tr>
-                                    <tr v-if="data.length === 0">
-                                        <td colspan="4" class="text-center py-6 text-gray-500">No items found.</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                     
-                    <LazyPagination v-if="!isLoading && paginationConfig?.data?.last_page > 1" class="px-4" :config="paginationConfig" />
+                    <LazyPagination v-if="!isLoading && lastPage > 1" class="px-4" :config="paginationConfig" @loadData="loadData" />
                     <LazyResponseModal :response_modal="response_modal" />
                     
                     <AddEdit :isOpenModal="isOpenModal" :item="item" :modalTitle="modalTitle" @close="cancelModal" @add_emit="receivedData" />
