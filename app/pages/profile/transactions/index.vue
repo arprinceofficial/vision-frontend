@@ -57,12 +57,6 @@ onMounted(() => {
                                 syndicate purchase.
                             </p>
                         </div>
-
-                        <NuxtLink to="/my-assets"
-                            class="inline-flex items-center justify-center gap-2 rounded-full border border-tccGold/40 bg-tccGold px-4 py-2.5 font-poppins text-[10px] font-black uppercase tracking-[0.16em] text-tccDarkNavy shadow-lg shadow-tccGold/20 transition-colors hover:bg-tccLightGold">
-                            <i class="pi pi-briefcase text-[10px]" aria-hidden="true" />
-                            My Assets
-                        </NuxtLink>
                     </div>
 
                     <div class="mt-5 grid gap-3 sm:grid-cols-3">
