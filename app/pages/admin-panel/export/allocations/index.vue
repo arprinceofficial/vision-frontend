@@ -7,27 +7,56 @@ definePageMeta({
 });
 
 const config = useRuntimeConfig();
+
+const paginationConfig = ref({
+    data: [],
+    lang: 'en',
+    align: 'center',
+    action: 'ajax'
+});
+
 const isLoading = ref(true);
 const allocations = ref([]);
 const cars = ref([]);
-const selectedCarId = ref('');
-const currentPage = ref(1);
+const selectedCarId = ref(null);
+
+const search = ref('');
+const date = ref();
 const lastPage = ref(1);
 
 const fetchData = async (page = 1) => {
     isLoading.value = true;
     try {
-        let url = `v1/admin/export/allocations?page=${page}`;
+        const params = {
+            page: page,
+            length: 15, // The backend currently returns 15 anyway
+        };
+
         if (selectedCarId.value) {
-            url += `&car_id=${selectedCarId.value}`;
+            params.car_id = selectedCarId.value;
         }
-        
-        const response = await $fetchAdmin(url);
+
+        if (search.value) {
+            params.search = search.value;
+        }
+
+        if (date.value) {
+            const dates = Array.isArray(date.value) ? date.value : [date.value];
+            const formattedDates = dates.map(d => d ? new Date(d).toLocaleDateString('en-CA') : '').filter(Boolean);
+            if (formattedDates.length > 0) {
+                params.date = formattedDates.join(',');
+            }
+        }
+
+        const response = await $fetchAdmin(`v1/admin/export/allocations`, {
+            method: 'GET',
+            params: params
+        });
         
         if (response?.data) {
             cars.value = response.data.cars || [];
             allocations.value = response.data.allocations?.data || [];
-            currentPage.value = response.data.allocations?.current_page || 1;
+            paginationConfig.value.data = response.data.allocations || [];
             lastPage.value = response.data.allocations?.last_page || 1;
         }
     } catch (error) {
@@ -38,7 +67,7 @@ const fetchData = async (page = 1) => {
 };
 
 onMounted(() => {
-    fetchData();
+    fetchData(1);
 });
 
 watch(selectedCarId, () => {
@@ -55,13 +84,27 @@ const formatStatus = (status) => {
 };
 
 const handleExport = async () => {
-    let url = `v1/admin/export/allocations/download`;
+    const params = {};
     if (selectedCarId.value) {
-        url += `?car_id=${selectedCarId.value}`;
+        params.car_id = selectedCarId.value;
+    }
+    if (search.value) {
+        params.search = search.value;
+    }
+    if (date.value) {
+        const dates = Array.isArray(date.value) ? date.value : [date.value];
+        const formattedDates = dates.map(d => d ? new Date(d).toLocaleDateString('en-CA') : '').filter(Boolean);
+        if (formattedDates.length > 0) {
+            params.date = formattedDates.join(',');
+        }
     }
     
     try {
-        const response = await $fetchAdmin(url, { responseType: 'blob' });
+        const response = await $fetchAdmin(`v1/admin/export/allocations/download`, { 
+            method: 'GET',
+            params: params,
+            responseType: 'blob' 
+        });
         const blob = new Blob([response], { type: 'text/csv' });
         const downloadUrl = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -87,22 +130,46 @@ const handleExport = async () => {
 
             <!-- Header actions -->
             <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
-                <!-- Dropdown -->
-                <select v-model="selectedCarId" class="form-select bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 text-slate-500 hover:text-slate-600 dark:text-slate-300 dark:hover:text-slate-200">
-                    <option value="">All Cars</option>
-                    <option v-for="car in cars" :key="car.id" :value="car.id">
-                        {{ car.item_name || car.assetable?.asset_name || `Car #${car.id}` }}
-                    </option>
-                </select>
-
                 <!-- Export button -->
-                <button @click="handleExport" class="btn bg-indigo-500 hover:bg-indigo-600 text-white">
+                <button @click="handleExport" class="btn bg-indigo-500 hover:bg-indigo-600 text-white flex items-center justify-center px-4 py-2 rounded">
                     <svg class="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16">
                         <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
                     </svg>
                     <span class="hidden xs:block ml-2">Export CSV</span>
                 </button>
             </div>
+        </div>
+
+        <div class="w-full flex flex-wrap md:flex-nowrap items-center gap-4 mb-8">
+            <div class="flex items-center gap-2 w-full md:w-auto">
+                <label for="search" class="text-gray-800 dark:text-gray-200">Search</label>
+                <LazyInputText type="text" v-model="search" @keyup.enter="fetchData(1)" class="w-full md:w-auto" placeholder="Search by user or slug..." />
+            </div>
+            <div class="flex items-center gap-2 w-full md:w-auto">
+                <label class="text-gray-800 dark:text-gray-200">Date</label>
+                <DatePicker v-model="date" selectionMode="range" :manualInput="false" placeholder="Select Date Range" class="w-full md:w-auto" />
+            </div>
+            <div class="flex items-center gap-2 w-full md:w-auto">
+                <label class="text-gray-800 dark:text-gray-200">Asset</label>
+                <Select 
+                    v-model="selectedCarId" 
+                    :options="cars" 
+                    optionLabel="item_name" 
+                    optionValue="id" 
+                    placeholder="All Cars" 
+                    class="w-full md:w-48"
+                    showClear
+                >
+                    <template #option="slotProps">
+                        <span>{{ slotProps.option.item_name || slotProps.option.assetable?.asset_name || `Car #${slotProps.option.id}` }}</span>
+                    </template>
+                    <template #value="slotProps">
+                        <span v-if="slotProps.value">{{ cars.find(c => c.id === slotProps.value)?.item_name || cars.find(c => c.id === slotProps.value)?.assetable?.asset_name || `Car #${slotProps.value}` }}</span>
+                        <span v-else>All Cars</span>
+                    </template>
+                </Select>
+            </div>
+            <Button label="Search" @click="fetchData(1)" />
         </div>
 
         <!-- Table -->
@@ -165,17 +232,8 @@ const handleExport = async () => {
                     </table>
                 </div>
             </div>
-        </div>
-        
-        <!-- Pagination -->
-        <div class="mt-8" v-if="lastPage > 1">
-            <div class="flex justify-between items-center w-full">
-                <button :disabled="currentPage <= 1" @click="fetchData(currentPage - 1)" class="btn bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 text-slate-500 disabled:opacity-50">Previous</button>
-                <div class="text-sm text-slate-500 dark:text-slate-400">
-                    Page <span class="font-medium text-slate-800 dark:text-slate-100">{{ currentPage }}</span> of <span class="font-medium text-slate-800 dark:text-slate-100">{{ lastPage }}</span>
-                </div>
-                <button :disabled="currentPage >= lastPage" @click="fetchData(currentPage + 1)" class="btn bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 text-slate-500 disabled:opacity-50">Next</button>
-            </div>
+            
+            <LazyPagination v-if="!isLoading && lastPage > 1" class="px-4 pb-4" :config="paginationConfig" @loadData="fetchData" />
         </div>
         
     </div>
