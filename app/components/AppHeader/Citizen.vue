@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const isHeaderClientReady = ref(false)
 const isMobileMenuOpen = ref(false)
 const openChildMenuLabel = ref<string | null>(null)
 const desktopNavRef = ref<HTMLElement | null>(null)
@@ -15,6 +16,7 @@ const profileAlt = computed(() => {
     return fullName || 'Profile'
 })
 const needsOnboarding = computed(() => Boolean(isCitizenLoggedIn.value && getCustomerOnboardingRoute(citizen_user.value)))
+const isHeaderInteractive = computed(() => isHeaderClientReady.value && citizen_user.value !== undefined)
 
 type NavLink = {
     label: string
@@ -39,6 +41,8 @@ const navLinks: NavLink[] = [
     { label: 'Retail', to: '/retail', activePaths: ['/retail'] },
     { label: 'Faqs', to: '/faqs', activePaths: ['/faqs'] },
 ]
+
+const desktopNavSkeletonWidths = ['w-10', 'w-16', 'w-24', 'w-10', 'w-12', 'w-10']
 
 const closeMobileMenu = () => {
     isMobileMenuOpen.value = false
@@ -104,6 +108,9 @@ watch(
 )
 
 onMounted(() => {
+    window.requestAnimationFrame(() => {
+        isHeaderClientReady.value = true
+    })
     document.addEventListener('click', handleDocumentClick)
 })
 
@@ -124,46 +131,60 @@ onBeforeUnmount(() => {
             </NuxtLink>
 
             <div ref="desktopNavRef" class="hidden items-center space-x-4 xl:flex 2xl:space-x-6">
-                <template v-for="link in navLinks" :key="link.label">
-                    <div v-if="hasChildMenu(link)" class="relative" @mouseenter="openChildMenu(link)"
-                        @mouseleave="closeChildMenu">
-                        <button type="button"
-                            class="flex items-center gap-1 font-poppins text-[10px] font-semibold uppercase tracking-[0.14em] transition-colors duration-200 hover:text-white focus:outline-none 2xl:text-[11px] 2xl:tracking-[0.18em]"
-                            :class="openChildMenuLabel === link.label || isLinkActive(link) ? 'text-tccGold' : 'text-white/70'"
-                            :aria-expanded="openChildMenuLabel === link.label" :aria-controls="getMenuId(link)"
-                            aria-haspopup="true" @click.stop="toggleChildMenu(link)">
-                            {{ link.label }}
-                            <svg class="h-3 w-3 transition-transform duration-200"
-                                :class="openChildMenuLabel === link.label ? 'rotate-180' : ''" viewBox="0 0 20 20"
-                                fill="currentColor" aria-hidden="true">
-                                <path fill-rule="evenodd"
-                                    d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.17l3.71-3.94a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                        <div v-show="openChildMenuLabel === link.label" :id="getMenuId(link)"
-                            class="absolute right-0 top-full z-[100] w-60 pt-4" @click.stop>
-                            <div
-                                class="overflow-hidden rounded-[1.25rem] border border-tccGold/25 bg-[#050403] py-2 shadow-[0_24px_80px_rgba(0,0,0,0.75)] ring-1 ring-white/10">
-                                <NuxtLink v-for="child in link.child" :key="child.label" :to="child.to || '/'"
-                                    class="block px-5 py-3 text-xs font-semibold transition-colors hover:bg-tccGold hover:text-tccDarkNavy"
-                                    :class="isLinkActive(child) ? 'text-tccGold' : 'text-white/90'"
-                                    @click="closeChildMenu">
-                                    {{ child.label }}
-                                </NuxtLink>
+                <template v-if="isHeaderInteractive">
+                    <template v-for="link in navLinks" :key="link.label">
+                        <div v-if="hasChildMenu(link)" class="relative" @mouseenter="openChildMenu(link)"
+                            @mouseleave="closeChildMenu">
+                            <button type="button"
+                                class="flex items-center gap-1 font-poppins text-[10px] font-semibold uppercase tracking-[0.14em] transition-colors duration-200 hover:text-white focus:outline-none 2xl:text-[11px] 2xl:tracking-[0.18em]"
+                                :class="openChildMenuLabel === link.label || isLinkActive(link) ? 'text-tccGold' : 'text-white/70'"
+                                :aria-expanded="openChildMenuLabel === link.label" :aria-controls="getMenuId(link)"
+                                aria-haspopup="true" @click.stop="toggleChildMenu(link)">
+                                {{ link.label }}
+                                <svg class="h-3 w-3 transition-transform duration-200"
+                                    :class="openChildMenuLabel === link.label ? 'rotate-180' : ''" viewBox="0 0 20 20"
+                                    fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd"
+                                        d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.17l3.71-3.94a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                            <div v-show="openChildMenuLabel === link.label" :id="getMenuId(link)"
+                                class="absolute right-0 top-full z-[100] w-60 pt-4" @click.stop>
+                                <div
+                                    class="overflow-hidden rounded-[1.25rem] border border-tccGold/25 bg-[#050403] py-2 shadow-[0_24px_80px_rgba(0,0,0,0.75)] ring-1 ring-white/10">
+                                    <NuxtLink v-for="child in link.child" :key="child.label" :to="child.to || '/'"
+                                        class="block px-5 py-3 text-xs font-semibold transition-colors hover:bg-tccGold hover:text-tccDarkNavy"
+                                        :class="isLinkActive(child) ? 'text-tccGold' : 'text-white/90'"
+                                        @click="closeChildMenu">
+                                        {{ child.label }}
+                                    </NuxtLink>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <NuxtLink v-else :to="link.to || '/'"
-                        class="font-poppins text-[10px] font-semibold uppercase tracking-[0.14em] transition-colors duration-200 2xl:text-[11px] 2xl:tracking-[0.18em]"
-                        :class="isLinkActive(link) ? 'text-tccGold hover:text-white' : 'text-white/70 hover:text-white'">
-                        {{ link.label }}
-                    </NuxtLink>
+                        <NuxtLink v-else :to="link.to || '/'"
+                            class="font-poppins text-[10px] font-semibold uppercase tracking-[0.14em] transition-colors duration-200 2xl:text-[11px] 2xl:tracking-[0.18em]"
+                            :class="isLinkActive(link) ? 'text-tccGold hover:text-white' : 'text-white/70 hover:text-white'">
+                            {{ link.label }}
+                        </NuxtLink>
+                    </template>
+                </template>
+
+                <template v-else>
+                    <span
+                        v-for="(width, index) in desktopNavSkeletonWidths"
+                        :key="`desktop-nav-skeleton-${index}`"
+                        class="h-3 animate-pulse rounded-full bg-white/12"
+                        :class="width"
+                        aria-hidden="true"
+                    />
                 </template>
             </div>
 
             <div class="hidden items-center space-x-3 xl:flex">
-                <div v-if="isCitizenLoggedIn" ref="profileMenuRef" class="relative">
+                <div v-if="!isHeaderInteractive" class="h-8 w-8 animate-pulse rounded-full border border-white/20 bg-white/12" aria-hidden="true" />
+
+                <div v-else-if="isCitizenLoggedIn" ref="profileMenuRef" class="relative">
                     <button v-if="needsOnboarding" type="button" class="group relative block"
                         :aria-expanded="isProfileMenuOpen" aria-controls="profile-menu" aria-label="Open profile menu"
                         @click.stop="toggleProfileMenu">
@@ -200,7 +221,12 @@ onBeforeUnmount(() => {
                 </template>
             </div>
 
-            <button type="button"
+            <div
+                v-if="!isHeaderInteractive"
+                class="h-10 w-10 shrink-0 animate-pulse rounded-full bg-white/12 xl:hidden"
+                aria-hidden="true"
+            />
+            <button v-else type="button"
                 class="inline-flex h-10 w-10 shrink-0 items-center justify-center text-white transition-colors hover:text-tccGold xl:hidden"
                 :aria-expanded="isMobileMenuOpen" aria-controls="mobile-menu" aria-label="Toggle mobile navigation"
                 @click="isMobileMenuOpen = !isMobileMenuOpen">
@@ -213,7 +239,7 @@ onBeforeUnmount(() => {
             </button>
         </nav>
 
-        <div v-show="isMobileMenuOpen" id="mobile-menu"
+        <div v-show="isHeaderInteractive && isMobileMenuOpen" id="mobile-menu"
             class="border-t border-white/10 bg-tccDeepBlack/95 backdrop-blur-xl xl:hidden">
             <div class="space-y-3 px-4 pb-4 pt-2">
                 <template v-for="link in navLinks" :key="`mobile-${link.label}`">
