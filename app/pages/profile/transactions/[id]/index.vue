@@ -4,12 +4,145 @@ definePageMeta({
 })
 
 const route = useRoute()
-const { getTransactionById, formatCurrency } = useProfileDashboard()
 
-const transaction = computed(() => getTransactionById(String(route.params.id || '')))
+type TransactionTone = 'success' | 'warning' | 'pending'
+
+type TransactionItem = {
+    id: string
+    slug: string
+    allocationDetails: string
+    vehicle: string
+    carName: string
+    collection: string
+    referenceId: string
+    price: string
+    totalInvestment: number
+    allocations: number
+    allocationState: string
+    allocationTone: TransactionTone
+    paymentStatus: string
+    paymentTone: TransactionTone
+    paymentMethod: string
+    signedDate: string
+    dueDate: string
+    image: string
+    description: string
+    nextAction: string
+    supportEmail: string
+}
+
+type TransactionResponse = {
+    status?: boolean
+    message?: string
+    data?: Partial<TransactionItem> | null
+}
+
+const emptyTransaction: TransactionItem = {
+    id: '',
+    slug: '',
+    allocationDetails: '',
+    vehicle: '',
+    carName: '',
+    collection: '',
+    referenceId: '',
+    price: '',
+    totalInvestment: 0,
+    allocations: 0,
+    allocationState: '',
+    allocationTone: 'warning',
+    paymentStatus: '',
+    paymentTone: 'pending',
+    paymentMethod: '',
+    signedDate: '',
+    dueDate: '',
+    image: '',
+    description: '',
+    nextAction: '',
+    supportEmail: ''
+}
+
+const getStringValue = (value: unknown, fallback = '') => {
+    if (value === null || value === undefined || String(value).trim() === '') return fallback
+    return String(value).trim()
+}
+
+const getNumberValue = (value: unknown, fallback = 0) => {
+    const numberValue = Number(value)
+    return Number.isFinite(numberValue) ? numberValue : fallback
+}
+
+const normalizeImageUrl = (value: unknown) => {
+    const imageUrl = getStringValue(value)
+    const storageHttpIndex = imageUrl.indexOf('/storage/http')
+
+    if (storageHttpIndex >= 0) {
+        return imageUrl.slice(storageHttpIndex + '/storage/'.length)
+    }
+
+    return imageUrl
+}
+
+const normalizeTransaction = (item: Partial<TransactionItem> | null | undefined): TransactionItem => ({
+    id: getStringValue(item?.id),
+    slug: getStringValue(item?.slug, String(route.params.id || '')),
+    allocationDetails: getStringValue(item?.allocationDetails),
+    vehicle: getStringValue(item?.vehicle),
+    carName: getStringValue(item?.carName, item?.vehicle),
+    collection: getStringValue(item?.collection),
+    referenceId: getStringValue(item?.referenceId, item?.id),
+    price: getStringValue(item?.price),
+    totalInvestment: getNumberValue(item?.totalInvestment),
+    allocations: getNumberValue(item?.allocations),
+    allocationState: getStringValue(item?.allocationState),
+    allocationTone: getStringValue(item?.allocationTone, 'warning') as TransactionTone,
+    paymentStatus: getStringValue(item?.paymentStatus),
+    paymentTone: getStringValue(item?.paymentTone, 'pending') as TransactionTone,
+    paymentMethod: getStringValue(item?.paymentMethod),
+    signedDate: getStringValue(item?.signedDate),
+    dueDate: getStringValue(item?.dueDate),
+    image: normalizeImageUrl(item?.image),
+    description: getStringValue(item?.description),
+    nextAction: getStringValue(item?.nextAction),
+    supportEmail: getStringValue(item?.supportEmail)
+})
+
+const {
+    data: transactionData,
+    pending: isTransactionLoading
+} = await useAsyncData<TransactionItem>(
+    'profile-transaction-details',
+    async () => {
+        const transactionSlug = String(route.params.id || '')
+
+        if (!transactionSlug) return emptyTransaction
+
+        try {
+            const response = await $fetchCitizen<TransactionResponse>(`v1/customer/transactions/${transactionSlug}`, {
+                method: 'GET'
+            })
+
+            return normalizeTransaction(response?.data)
+        } catch (error) {
+            console.error('[Profile Transaction] Unable to load transaction', error)
+            return emptyTransaction
+        }
+    },
+    {
+        default: () => emptyTransaction,
+        watch: [() => route.params.id]
+    }
+)
+
+const transaction = computed(() => transactionData.value ?? emptyTransaction)
+const transactionRouteId = computed(() => transaction.value.slug || String(route.params.id || transaction.value.id))
+
+const formatCurrency = (value: number) => new Intl.NumberFormat('en-GB', {
+    style: 'currency',
+    currency: 'GBP'
+}).format(value)
 
 useHead(() => ({
-    title: `${transaction.value.referenceId} Transaction Details | The Car Crowd`
+    title: `${transaction.value.referenceId || 'Transaction'} Transaction Details | The Car Crowd`
 }))
 
 const statusClass = computed(() => (
@@ -21,6 +154,9 @@ const statusClass = computed(() => (
 
 <template>
     <section class="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+        <ProfileDashboardSkeleton v-if="isTransactionLoading" active-section="transactions" />
+
+        <template v-else>
         <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <NuxtLink to="/profile/transactions"
                 class="inline-flex items-center gap-2 font-poppins text-[10px] font-black uppercase tracking-[0.16em] text-white/55 transition-colors hover:text-tccGold">
@@ -29,12 +165,12 @@ const statusClass = computed(() => (
             </NuxtLink>
 
             <div class="flex flex-col gap-3 sm:flex-row">
-                <NuxtLink :to="`/profile/transactions/${transaction.id}/signed-documents`"
+                <NuxtLink :to="`/profile/transactions/${transactionRouteId}/signed-documents`"
                     class="inline-flex items-center justify-center gap-2 rounded-full border border-tccGold/35 bg-tccGold/10 px-4 py-2.5 font-poppins text-[10px] font-black uppercase tracking-[0.14em] text-tccGold transition-colors hover:bg-tccGold hover:text-tccDarkNavy">
                     <i class="pi pi-file-edit text-[10px]" aria-hidden="true" />
                     View Signed Document
                 </NuxtLink>
-                <NuxtLink :to="`/profile/transactions/${transaction.id}/payment-details`"
+                <NuxtLink :to="`/profile/transactions/${transactionRouteId}/payment-details`"
                     class="inline-flex items-center justify-center gap-2 rounded-full bg-tccGold px-4 py-2.5 font-poppins text-[10px] font-black uppercase tracking-[0.14em] text-tccDarkNavy shadow-lg shadow-tccGold/20 transition-colors hover:bg-tccLightGold">
                     <i class="pi pi-credit-card text-[10px]" aria-hidden="true" />
                     Payment Details
@@ -132,5 +268,6 @@ const statusClass = computed(() => (
                 </article>
             </div>
         </section>
+        </template>
     </section>
 </template>
