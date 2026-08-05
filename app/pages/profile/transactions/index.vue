@@ -80,7 +80,7 @@ const normalizeTransaction = (item: Partial<TransactionItem>): TransactionItem =
 const {
     data: transactionsData,
     pending: isTransactionsLoading
-} = await useAsyncData<TransactionItem[]>(
+} = useAsyncData<TransactionItem[]>(
     'profile-transactions',
     async () => {
         try {
@@ -94,7 +94,11 @@ const {
             return []
         }
     },
-    { default: () => [] }
+    {
+        default: () => [],
+        lazy: true,
+        server: false
+    }
 )
 
 const transactions = computed(() => transactionsData.value ?? [])

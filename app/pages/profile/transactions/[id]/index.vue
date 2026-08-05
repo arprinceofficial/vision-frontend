@@ -110,7 +110,7 @@ const normalizeTransaction = (item: Partial<TransactionItem> | null | undefined)
 const {
     data: transactionData,
     pending: isTransactionLoading
-} = await useAsyncData<TransactionItem>(
+} = useAsyncData<TransactionItem>(
     'profile-transaction-details',
     async () => {
         const transactionSlug = String(route.params.id || '')
@@ -130,6 +130,8 @@ const {
     },
     {
         default: () => emptyTransaction,
+        lazy: true,
+        server: false,
         watch: [() => route.params.id]
     }
 )

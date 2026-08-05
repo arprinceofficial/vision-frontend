@@ -66,7 +66,7 @@ const profile = reactive({
 })
 
 const countriesCache = useState<Country[] | null>('profile-countries-cache', () => null)
-const { data: countriesData, pending: isCountriesLoading } = await useAsyncData<Country[]>(
+const { data: countriesData, pending: isCountriesLoading } = useAsyncData<Country[]>(
   'profile-countries',
   async () => {
     if (countriesCache.value?.length) return countriesCache.value
@@ -81,11 +81,15 @@ const { data: countriesData, pending: isCountriesLoading } = await useAsyncData<
       return []
     }
   },
-  { default: () => countriesCache.value ?? [] }
+  {
+    default: () => countriesCache.value ?? [],
+    lazy: true,
+    server: false
+  }
 )
 
 const gendersCache = useState<Gender[] | null>('profile-genders-cache', () => null)
-const { data: gendersData, pending: isGendersLoading } = await useAsyncData<Gender[]>(
+const { data: gendersData, pending: isGendersLoading } = useAsyncData<Gender[]>(
   'profile-genders',
   async () => {
     if (gendersCache.value?.length) return gendersCache.value
@@ -100,7 +104,11 @@ const { data: gendersData, pending: isGendersLoading } = await useAsyncData<Gend
       return []
     }
   },
-  { default: () => gendersCache.value ?? [] }
+  {
+    default: () => gendersCache.value ?? [],
+    lazy: true,
+    server: false
+  }
 )
 
 const currentUser = computed(() => getCitizenUserData(citizen_user.value))
