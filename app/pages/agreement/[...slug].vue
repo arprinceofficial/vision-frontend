@@ -82,13 +82,13 @@ type UpdateAllocationRequestStateOptions = {
 
 const agreementRecords: AgreementRecord[] = [
     {
-        id: 'NN93366393',
-        vehicle: 'Diablo VT Roadster Lamborghini',
-        collection: 'Modern Classics Collection',
-        year: '1997',
-        allocations: 1,
-        allocationCost: 5000,
-        reference: 'NN93366393',
+        id: '',
+        vehicle: '',
+        collection: '',
+        year: '',
+        allocations: 0,
+        allocationCost: 0,
+        reference: '0',
         supportEmail: 'support@thecarcrowd.co.uk'
     }
 ]
