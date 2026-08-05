@@ -52,6 +52,7 @@ type AllocationRequest = {
     id: string
     slug: string
     state: number
+    paymentStatus: string
     sharesCount: number
     totalAmount: number
     allocationCost: number
@@ -192,6 +193,7 @@ const normalizeAllocationRequest = (item: Record<string, any> | null | undefined
         id: getStringValue(item.id),
         slug: slugValue,
         state: getNumberValue(item.state, 1),
+        paymentStatus: getStringValue(item.payment_status, item.paymentStatus),
         sharesCount,
         totalAmount,
         allocationCost,
@@ -383,7 +385,10 @@ const requestStateStageMap: Record<number, AgreementStage> = {
     6: 'bank-transfer'
 }
 
-const activeTimelineIndex = computed(() => stageIndexMap[currentStage.value])
+const isAllocationPaid = computed(() => getStringValue(allocationRequest.value?.paymentStatus) === '1')
+const activeTimelineIndex = computed(() => (
+    isAllocationPaid.value ? timelineSteps.length - 1 : stageIndexMap[currentStage.value]
+))
 const activeDocumentIndex = computed(() => (currentStage.value === 'terms' ? 2 : 1))
 const totalInvestment = computed(() => `GBP ${(agreement.value.allocations * agreement.value.allocationCost).toLocaleString('en-GB')}`)
 const signedDocumentPath = computed(() => allocationRequest.value?.signedDocumentPath || {
@@ -913,7 +918,10 @@ useHead(() => ({
                         :reference="displayedReference" :is-reference-loading="isReferenceLoading" />
 
                     <Transition name="agreement-fade" mode="out-in">
-                        <CitizenAgreementWhatHappensNextSection v-if="currentStage === 'overview'" key="overview"
+                        <CitizenAgreementPaidStatusSection v-if="isAllocationPaid" key="already-paid"
+                            :agreement="agreement" :reference="displayedReference" :total-investment="totalInvestment" />
+
+                        <CitizenAgreementWhatHappensNextSection v-else-if="currentStage === 'overview'" key="overview"
                             :support-email="agreement.supportEmail" :is-loading="isGetStartedLoading"
                             @get-started="getStarted" />
 
