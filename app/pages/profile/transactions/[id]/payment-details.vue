@@ -5,6 +5,7 @@ definePageMeta({
 
 type TransactionData = {
     id: string
+    slug: string
     vehicle: string
     carName: string
     referenceId: string
@@ -28,95 +29,159 @@ type ImportantInformationData = {
     }>
 }
 
-const route = useRoute()
-
-const data: {
+type PaymentDetailsData = {
     transactions: TransactionData[]
     bankDetails: BankDetailData[]
     importantInformation: ImportantInformationData[]
-} = {
-    transactions: [
-        {
-            id: 'NN93366393',
-            vehicle: 'Diablo VT Roadster Lamborghini',
-            carName: 'Diablo VT Roadster Lamborghini',
-            referenceId: 'NN93366393',
-            totalInvestment: 5000,
-            allocations: 1,
-            image: '/generated/porsche-studio.png'
-        },
-        {
-            id: 'NN86885242',
-            vehicle: 'SLS Mercedes',
-            carName: 'SLS Mercedes',
-            referenceId: 'NN86885242',
-            totalInvestment: 5000,
-            allocations: 1,
-            image: '/generated/hero-aston-studio.png'
-        }
-    ],
-    bankDetails: [
-        {
-            label: 'Account Name',
-            value: 'THECARCROWD LIMITED',
-            note: 'Please use CAPITAL LETTERS'
-        },
-        {
-            label: 'Bank Name',
-            value: 'Revolut'
-        },
-        {
-            label: 'Sort Code',
-            value: '23-01-20'
-        },
-        {
-            label: 'Account Number',
-            value: '26640209'
-        }
-    ],
-    importantInformation: [
-        {
-            icon: 'pi-check',
-            parts: [
-                { text: 'Transfer must be from a bank account in ' },
-                { text: 'your name', tone: 'white' }
-            ]
-        },
-        {
-            icon: 'pi-clock',
-            parts: [
-                { text: 'Funds will be verified within ' },
-                { text: '5 working days', tone: 'white' }
-            ]
-        },
-        {
-            icon: 'pi-hashtag',
-            parts: [
-                { text: 'Always include reference: ' },
-                { field: 'referenceId', tone: 'gold' }
-            ]
-        },
-        {
-            icon: 'pi-exclamation-triangle',
-            parts: [
-                { text: 'Allocations not paid within deadline will be released to other investors' }
-            ]
-        }
-    ]
 }
 
-const transaction = computed(() => {
-    const transactionId = String(route.params.id || '').toLowerCase()
-    return data.transactions.find((item) => item.id.toLowerCase() === transactionId) || data.transactions[0]!
+type PaymentDetailsResponse = {
+    status?: boolean
+    message?: string
+    data?: Partial<PaymentDetailsData> | null
+}
+
+const route = useRoute()
+const isPaymentDetailsViewReady = ref(false)
+const hasPaymentDataFetchSettled = ref(false)
+const settledPaymentSlug = ref('')
+
+const emptyPaymentDetailsData: PaymentDetailsData = {
+    transactions: [],
+    bankDetails: [],
+    importantInformation: []
+}
+
+const getStringValue = (value: unknown, fallback = '') => {
+    if (value === null || value === undefined || String(value).trim() === '') return fallback
+    return String(value).trim()
+}
+
+const getNumberValue = (value: unknown, fallback = 0) => {
+    const numberValue = Number(value)
+    return Number.isFinite(numberValue) ? numberValue : fallback
+}
+
+const getRouteParamValue = (value: unknown) => Array.isArray(value) ? value[0] : value
+const requestSlug = computed(() => getStringValue(getRouteParamValue(route.params.id)))
+
+const normalizeImageUrl = (value: unknown) => {
+    const imageUrl = getStringValue(value)
+    const storageHttpIndex = imageUrl.indexOf('/storage/http')
+
+    if (storageHttpIndex >= 0) {
+        return imageUrl.slice(storageHttpIndex + '/storage/'.length)
+    }
+
+    return imageUrl
+}
+
+const normalizeTransaction = (item: Partial<TransactionData> | null | undefined): TransactionData => ({
+    id: getStringValue(item?.id),
+    slug: getStringValue(item?.slug, requestSlug.value),
+    vehicle: getStringValue(item?.vehicle),
+    carName: getStringValue(item?.carName, item?.vehicle),
+    referenceId: getStringValue(item?.referenceId, item?.id),
+    totalInvestment: getNumberValue(item?.totalInvestment),
+    allocations: getNumberValue(item?.allocations),
+    image: normalizeImageUrl(item?.image)
 })
-const bankDetails = computed(() => data.bankDetails)
-const importantInformation = computed(() => data.importantInformation.map((item) => ({
+
+const normalizeBankDetail = (item: Partial<BankDetailData> | null | undefined): BankDetailData => ({
+    label: getStringValue(item?.label),
+    value: getStringValue(item?.value),
+    note: getStringValue(item?.note)
+})
+
+const normalizeImportantInformation = (item: Partial<ImportantInformationData> | null | undefined): ImportantInformationData => ({
+    icon: getStringValue(item?.icon, 'pi-info-circle'),
+    parts: Array.isArray(item?.parts)
+        ? item.parts.map((part) => ({
+            text: getStringValue(part?.text),
+            field: part?.field === 'referenceId' ? 'referenceId' : undefined,
+            tone: part?.tone === 'white' || part?.tone === 'gold' ? part.tone : undefined
+        }))
+        : []
+})
+
+const normalizePaymentDetailsData = (payload: Partial<PaymentDetailsData> | null | undefined): PaymentDetailsData => ({
+    transactions: Array.isArray(payload?.transactions)
+        ? payload.transactions.map((item) => normalizeTransaction(item))
+        : [],
+    bankDetails: Array.isArray(payload?.bankDetails)
+        ? payload.bankDetails.map((item) => normalizeBankDetail(item)).filter((item) => item.label)
+        : [],
+    importantInformation: Array.isArray(payload?.importantInformation)
+        ? payload.importantInformation.map((item) => normalizeImportantInformation(item)).filter((item) => item.parts.length)
+        : []
+})
+
+const {
+    data: paymentDetailsData,
+    pending: isPaymentDetailsLoading
+} = useAsyncData<PaymentDetailsData>(
+    'profile-payment-details',
+    async () => {
+        const slug = requestSlug.value
+        hasPaymentDataFetchSettled.value = false
+
+        try {
+            if (!slug) return emptyPaymentDetailsData
+
+            const response = await $fetchCitizen<PaymentDetailsResponse>(
+                `v1/customer/allocation-requests/${slug}/payment-data`,
+                { method: 'GET' }
+            )
+
+            return normalizePaymentDetailsData(response?.data)
+        } catch (error) {
+            console.error('[Profile Payment Details] Unable to load payment data', error)
+            return emptyPaymentDetailsData
+        } finally {
+            settledPaymentSlug.value = slug
+            hasPaymentDataFetchSettled.value = true
+        }
+    },
+    {
+        default: () => emptyPaymentDetailsData,
+        lazy: true,
+        server: false,
+        watch: [() => route.params.id]
+    }
+)
+
+const pageData = computed(() => paymentDetailsData.value ?? emptyPaymentDetailsData)
+const transaction = computed<TransactionData>(() => pageData.value.transactions[0] ?? {
+    id: requestSlug.value,
+    slug: requestSlug.value,
+    vehicle: '',
+    carName: '',
+    referenceId: requestSlug.value,
+    totalInvestment: 0,
+    allocations: 0,
+    image: ''
+})
+const transactionRouteId = computed(() => transaction.value.slug || requestSlug.value || transaction.value.id)
+const bankDetails = computed(() => pageData.value.bankDetails)
+const importantInformation = computed(() => pageData.value.importantInformation.map((item) => ({
     ...item,
     parts: item.parts.map((part) => ({
         ...part,
         text: part.field === 'referenceId' ? transaction.value.referenceId : part.text
     }))
 })))
+const hasCachedCurrentPaymentData = computed(() => (
+    Boolean(requestSlug.value) && pageData.value.transactions.some((item) => item.slug === requestSlug.value)
+))
+const hasLoadedCurrentPaymentData = computed(() => (
+    hasCachedCurrentPaymentData.value ||
+    (hasPaymentDataFetchSettled.value && settledPaymentSlug.value === requestSlug.value)
+))
+const shouldShowPaymentDetailsSkeleton = computed(() => (
+    !isPaymentDetailsViewReady.value ||
+    isPaymentDetailsLoading.value ||
+    !hasLoadedCurrentPaymentData.value
+))
 const copiedField = ref('')
 
 const formatCurrency = (value: number) => new Intl.NumberFormat('en-GB', {
@@ -125,8 +190,20 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('en-GB', {
 }).format(value)
 
 useHead(() => ({
-    title: `${transaction.value.referenceId} Payment Details | The Car Crowd`
+    title: `${transaction.value.referenceId || 'Transaction'} Payment Details | The Car Crowd`
 }))
+
+watch(requestSlug, () => {
+    if (settledPaymentSlug.value !== requestSlug.value) {
+        hasPaymentDataFetchSettled.value = false
+    }
+})
+
+onMounted(() => {
+    window.requestAnimationFrame(() => {
+        isPaymentDetailsViewReady.value = true
+    })
+})
 
 const copyValue = async (label: string, value: string) => {
     copiedField.value = label
@@ -146,7 +223,9 @@ const copyValue = async (label: string, value: string) => {
 </script>
 
 <template>
-    <section class="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+    <ProfilePaymentDetailsSkeleton v-if="shouldShowPaymentDetailsSkeleton" />
+
+    <section v-else class="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
         <div class="mb-7 text-center">
             <span
                 class="mx-auto grid h-14 w-14 place-items-center rounded-full border border-tccGold/35 bg-tccGold/10 text-tccGold shadow-[0_0_42px_rgba(247,198,0,0.14)]">
@@ -206,7 +285,7 @@ const copyValue = async (label: string, value: string) => {
                     </div>
                 </section>
 
-                <NuxtLink :to="`/profile/transactions/${transaction.id}`"
+                <NuxtLink :to="`/profile/transactions/${transactionRouteId}`"
                     class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/20 px-4 py-2.5 font-poppins text-[10px] font-black uppercase tracking-[0.14em] text-white/75 transition-colors hover:border-tccGold hover:text-tccGold">
                     <i class="pi pi-arrow-left text-[10px]" aria-hidden="true" />
                     Back to Allocation Details

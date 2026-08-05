@@ -5,6 +5,7 @@ definePageMeta({
 
 type TransactionData = {
     id: string
+    slug: string
     vehicle: string
     referenceId: string
     allocations: number
@@ -25,89 +26,167 @@ type DocumentInformationData = {
     copy: string
 }
 
-const route = useRoute()
-
-const data: {
+type SignedDocumentsPageData = {
     transactions: TransactionData[]
     signatoryName: string
     signedDocuments: SignedDocumentData[]
     documentInformation: DocumentInformationData[]
-} = {
-    transactions: [
-        {
-            id: 'NN93366393',
-            vehicle: 'Diablo VT Roadster Lamborghini',
-            referenceId: 'NN93366393',
-            allocations: 1,
-            signedDate: '24 Jul 2026, 16:48',
-            supportEmail: 'support@thecarcrowd.co.uk'
-        },
-        {
-            id: 'NN86885242',
-            vehicle: 'SLS Mercedes',
-            referenceId: 'NN86885242',
-            allocations: 1,
-            signedDate: '12 Mar 2026, 23:11',
-            supportEmail: 'support@thecarcrowd.co.uk'
-        }
-    ],
-    signatoryName: 'Nayab Navib Navib',
-    signedDocuments: [
-        {
-            title: 'Signed Subscription Agreement',
-            badge: 'Document 1 of 2',
-            pages: '13 pages',
-            clauses: [
-                'Each Member shall have a weighted voting right which is determined by the proportion their Subscription makes up of the Target Amount.',
-                'Decisions shall be passed on the basis of a simple majority of weighted votes on a For or Against proposal.',
-                'Where there are multiple options available, all options will be stated to the Members before voting.'
-            ]
-        },
-        {
-            title: 'Signed Terms & Conditions',
-            badge: 'Document 2 of 2',
-            pages: '10 pages',
-            clauses: [
-                'THE CAR CROWD',
-                'PLATFORM TERMS AND CONDITIONS',
-                'These terms set out the basis on which TheCarCrowd Limited enables prospective members to make vehicle-related subscriptions.'
-            ]
-        }
-    ],
-    documentInformation: [
-        {
-            icon: 'pi-check-circle',
-            title: 'Documents Signed',
-            copy: 'All documents have been signed'
-        },
-        {
-            icon: 'pi-eye',
-            title: 'Review Anytime',
-            copy: 'View your documents whenever needed'
-        },
-        {
-            icon: 'pi-download',
-            title: 'Download Copies',
-            copy: 'Save PDFs for your records'
-        }
-    ]
 }
 
-const transaction = computed(() => {
-    const transactionId = String(route.params.id || '').toLowerCase()
-    return data.transactions.find((item) => item.id.toLowerCase() === transactionId) || data.transactions[0]!
+type SignedDocumentsResponse = {
+    status?: boolean
+    message?: string
+    data?: Partial<SignedDocumentsPageData> | null
+}
+
+const route = useRoute()
+const isSignedDocumentsViewReady = ref(false)
+const hasSignedDocumentsFetchSettled = ref(false)
+const settledSignedDocumentsSlug = ref('')
+
+const emptySignedDocumentsData: SignedDocumentsPageData = {
+    transactions: [],
+    signatoryName: '',
+    signedDocuments: [],
+    documentInformation: []
+}
+
+const getStringValue = (value: unknown, fallback = '') => {
+    if (value === null || value === undefined || String(value).trim() === '') return fallback
+    return String(value).trim()
+}
+
+const getNumberValue = (value: unknown, fallback = 0) => {
+    const numberValue = Number(value)
+    return Number.isFinite(numberValue) ? numberValue : fallback
+}
+
+const getRouteParamValue = (value: unknown) => Array.isArray(value) ? value[0] : value
+const requestSlug = computed(() => getStringValue(getRouteParamValue(route.params.id)))
+
+const normalizeStringArray = (value: unknown) => (
+    Array.isArray(value)
+        ? value.map((item) => getStringValue(item)).filter(Boolean)
+        : []
+)
+
+const normalizeTransaction = (item: Partial<TransactionData> | null | undefined): TransactionData => ({
+    id: getStringValue(item?.id),
+    slug: getStringValue(item?.slug, requestSlug.value),
+    vehicle: getStringValue(item?.vehicle),
+    referenceId: getStringValue(item?.referenceId, item?.id),
+    allocations: getNumberValue(item?.allocations),
+    signedDate: getStringValue(item?.signedDate),
+    supportEmail: getStringValue(item?.supportEmail, 'support@vision148.com')
 })
 
-const signedDocuments = computed(() => data.signedDocuments)
-const documentInformation = computed(() => data.documentInformation)
+const normalizeSignedDocument = (item: Partial<SignedDocumentData> | null | undefined): SignedDocumentData => ({
+    title: getStringValue(item?.title),
+    badge: getStringValue(item?.badge),
+    pages: getStringValue(item?.pages),
+    clauses: normalizeStringArray(item?.clauses)
+})
+
+const normalizeDocumentInformation = (item: Partial<DocumentInformationData> | null | undefined): DocumentInformationData => ({
+    icon: getStringValue(item?.icon, 'pi-info-circle'),
+    title: getStringValue(item?.title),
+    copy: getStringValue(item?.copy)
+})
+
+const normalizeSignedDocumentsData = (payload: Partial<SignedDocumentsPageData> | null | undefined): SignedDocumentsPageData => ({
+    transactions: Array.isArray(payload?.transactions)
+        ? payload.transactions.map((item) => normalizeTransaction(item))
+        : [],
+    signatoryName: getStringValue(payload?.signatoryName),
+    signedDocuments: Array.isArray(payload?.signedDocuments)
+        ? payload.signedDocuments.map((item) => normalizeSignedDocument(item)).filter((item) => item.title)
+        : [],
+    documentInformation: Array.isArray(payload?.documentInformation)
+        ? payload.documentInformation.map((item) => normalizeDocumentInformation(item)).filter((item) => item.title)
+        : []
+})
+
+const {
+    data: signedDocumentsData,
+    pending: isSignedDocumentsLoading
+} = useAsyncData<SignedDocumentsPageData>(
+    'profile-signed-documents',
+    async () => {
+        const slug = requestSlug.value
+        hasSignedDocumentsFetchSettled.value = false
+
+        try {
+            if (!slug) return emptySignedDocumentsData
+
+            const response = await $fetchCitizen<SignedDocumentsResponse>(
+                `v1/customer/allocation-requests/${slug}/signed-document-data`,
+                { method: 'GET' }
+            )
+
+            return normalizeSignedDocumentsData(response?.data)
+        } catch (error) {
+            console.error('[Profile Signed Documents] Unable to load signed document data', error)
+            return emptySignedDocumentsData
+        } finally {
+            settledSignedDocumentsSlug.value = slug
+            hasSignedDocumentsFetchSettled.value = true
+        }
+    },
+    {
+        default: () => emptySignedDocumentsData,
+        lazy: true,
+        server: false,
+        watch: [() => route.params.id]
+    }
+)
+
+const pageData = computed(() => signedDocumentsData.value ?? emptySignedDocumentsData)
+const transaction = computed<TransactionData>(() => pageData.value.transactions[0] ?? {
+    id: requestSlug.value,
+    slug: requestSlug.value,
+    vehicle: '',
+    referenceId: requestSlug.value,
+    allocations: 0,
+    signedDate: '',
+    supportEmail: 'support@vision148.com'
+})
+const transactionRouteId = computed(() => transaction.value.slug || requestSlug.value || transaction.value.id)
+const signedDocuments = computed(() => pageData.value.signedDocuments)
+const documentInformation = computed(() => pageData.value.documentInformation)
+const hasCachedCurrentSignedDocumentsData = computed(() => (
+    Boolean(requestSlug.value) && pageData.value.transactions.some((item) => item.slug === requestSlug.value)
+))
+const hasLoadedCurrentSignedDocuments = computed(() => (
+    hasCachedCurrentSignedDocumentsData.value ||
+    (hasSignedDocumentsFetchSettled.value && settledSignedDocumentsSlug.value === requestSlug.value)
+))
+const shouldShowSignedDocumentsSkeleton = computed(() => (
+    !isSignedDocumentsViewReady.value ||
+    isSignedDocumentsLoading.value ||
+    !hasLoadedCurrentSignedDocuments.value
+))
+
+watch(requestSlug, () => {
+    if (settledSignedDocumentsSlug.value !== requestSlug.value) {
+        hasSignedDocumentsFetchSettled.value = false
+    }
+})
+
+onMounted(() => {
+    window.requestAnimationFrame(() => {
+        isSignedDocumentsViewReady.value = true
+    })
+})
 
 useHead(() => ({
-    title: `${transaction.value.referenceId} Signed Documents | The Car Crowd`
+    title: `${transaction.value.referenceId || 'Transaction'} Signed Documents | The Car Crowd`
 }))
 </script>
 
 <template>
-    <section class="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+    <ProfileSignedDocumentsSkeleton v-if="shouldShowSignedDocumentsSkeleton" />
+
+    <section v-else class="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
         <div class="mb-7 text-center">
             <span
                 class="mx-auto grid h-14 w-14 place-items-center rounded-full border border-tccGold/35 bg-tccGold/10 text-tccGold shadow-[0_0_42px_rgba(247,198,0,0.14)]">
@@ -124,7 +203,7 @@ useHead(() => ({
                     <h2 class="font-poppins text-lg font-black text-white">Documents Available</h2>
                     <p class="mx-auto mt-2.5 max-w-2xl text-[13px] leading-relaxed text-white/72">
                         Your signed investment documents are ready for review.
-                        Signed by {{ data.signatoryName }} on {{ transaction.signedDate }}.
+                        Signed by {{ pageData.signatoryName }} on {{ transaction.signedDate }}.
                     </p>
                 </section>
 
@@ -223,7 +302,7 @@ useHead(() => ({
                                             electronically</span>
                                         <div
                                             class="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                                            <strong class="pdf-preview-title">{{ data.signatoryName }}</strong>
+                                            <strong class="pdf-preview-title">{{ pageData.signatoryName }}</strong>
                                             <span class="pdf-preview-muted text-[13px]">{{ transaction.signedDate
                                             }}</span>
                                         </div>
@@ -236,7 +315,7 @@ useHead(() => ({
             </main>
 
             <aside class="space-y-4 lg:sticky lg:top-24 lg:self-start">
-                <NuxtLink :to="`/profile/transactions/${transaction.id}/payment-details`"
+                <NuxtLink :to="`/profile/transactions/${transactionRouteId}/payment-details`"
                     class="inline-flex w-full items-center justify-center gap-2 rounded-full bg-tccGold px-4 py-2.5 font-poppins text-[10px] font-black uppercase tracking-[0.14em] text-tccDarkNavy shadow-lg shadow-tccGold/20 transition-colors hover:bg-tccLightGold">
                     <i class="pi pi-credit-card text-[10px]" aria-hidden="true" />
                     Go to Payment Details
@@ -276,7 +355,7 @@ useHead(() => ({
                     </div>
                 </div>
 
-                <NuxtLink :to="`/profile/transactions/${transaction.id}`"
+                <NuxtLink :to="`/profile/transactions/${transactionRouteId}`"
                     class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/20 px-4 py-2.5 font-poppins text-[10px] font-black uppercase tracking-[0.14em] text-white/75 transition-colors hover:border-tccGold hover:text-tccGold">
                     <i class="pi pi-arrow-left text-[10px]" aria-hidden="true" />
                     Back to Allocation Details
