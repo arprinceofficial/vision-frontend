@@ -510,14 +510,14 @@ const statusBadgeClass = (status: AssetStatus) => {
                                 </div>
                             </div>
 
-                            <div
+                            <!-- <div
                                 class="mt-6 flex flex-col gap-4 border-t border-white/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
                                 <p class="text-xs leading-relaxed text-white/50">{{ asset.nextStep }}</p>
                                 <NuxtLink :to="asset.actionRoute"
                                     class="w-full shrink-0 rounded-full border border-white/20 px-4 py-2 text-center font-poppins text-[10px] font-bold uppercase tracking-[0.18em] text-white transition-colors hover:border-tccGold hover:text-tccGold sm:w-auto sm:tracking-[0.2em]">
                                     {{ asset.actionLabel }}
                                 </NuxtLink>
-                            </div>
+                            </div> -->
                         </div>
                     </article>
                 </div>
@@ -591,14 +591,14 @@ const statusBadgeClass = (status: AssetStatus) => {
                             No portfolio documents are available right now.
                         </div>
                         <template v-else>
-                            <NuxtLink v-for="document in documents" :key="document.title" to="/profile"
+                            <div v-for="document in documents" :key="document.title" to="/profile"
                                 class="flex items-center justify-between gap-3 py-4 text-sm transition-colors hover:text-tccGold">
                                 <span class="flex min-w-0 items-center gap-3">
                                     <i class="pi pi-folder text-tccGold" aria-hidden="true" />
                                     <span class="truncate text-white/80">{{ document.title }}</span>
                                 </span>
-                                <span class="shrink-0 text-[11px] text-white/50">{{ document.count }}</span>
-                            </NuxtLink>
+                                <!-- <span class="shrink-0 text-[11px] text-white/50">{{ document.count }}</span> -->
+                            </div>
                         </template>
                     </div>
                 </section>
