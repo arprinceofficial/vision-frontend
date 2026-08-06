@@ -145,7 +145,7 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('en-GB', {
 }).format(value)
 
 useHead(() => ({
-    title: `${transaction.value.referenceId} Transaction Details | Vision148`
+    title: `${transaction.value.referenceId || 'Transaction'} Transaction Details | Vision148`
 }))
 
 const statusClass = computed(() => (
@@ -203,7 +203,7 @@ onMounted(() => {
                                 class="h-56 w-full object-cover opacity-90">
                         </div>
 
-                        <<<<<<< HEAD <div class="mt-4 space-y-3.5">
+                        <div class="mt-4 space-y-3.5">
                             <div>
                                 <span class="text-[10px] font-black uppercase tracking-[0.18em] text-white/45">Car
                                     Name</span>
@@ -216,129 +216,73 @@ onMounted(() => {
                                 <p class="mt-2 text-[13px] leading-relaxed text-white/72">{{ transaction.description }}
                                 </p>
                             </div>
-                </div>
-                </article>
+                        </div>
+                    </article>
 
-                <article
-                    class="rounded-2xl border border-tccGold/20 bg-[radial-gradient(circle_at_top_right,rgba(247,198,0,0.12),transparent_20rem),#0b0a08] p-5">
-                    <div class="flex items-center gap-3">
-                        <i class="pi pi-shopping-cart text-tccGold" aria-hidden="true" />
-                        <h2 class="font-poppins text-lg font-black text-white">Purchase Details</h2>
-                    </div>
+                    <article
+                        class="rounded-2xl border border-tccGold/20 bg-[radial-gradient(circle_at_top_right,rgba(247,198,0,0.12),transparent_20rem),#0b0a08] p-5">
+                        <div class="flex items-center gap-3">
+                            <i class="pi pi-shopping-cart text-tccGold" aria-hidden="true" />
+                            <h2 class="font-poppins text-lg font-black text-white">Purchase Details</h2>
+                        </div>
 
-                    <div class="mt-5 grid gap-3 sm:grid-cols-2">
-                        <div class="rounded-xl border border-white/10 bg-white/[0.04] p-3.5">
-                            <span class="text-[10px] font-black uppercase tracking-[0.18em] text-white/45">Number of
-                                Allocations</span>
-                            <strong
-                                class="mt-2 inline-flex rounded-lg bg-tccGold/10 px-3 py-1.5 text-[13px] text-tccGold">
-                                {{ transaction.allocations }} slot
-                            </strong>
+                        <div class="mt-5 grid gap-3 sm:grid-cols-2">
+                            <div class="rounded-xl border border-white/10 bg-white/[0.04] p-3.5">
+                                <span class="text-[10px] font-black uppercase tracking-[0.18em] text-white/45">Number of
+                                    Allocations</span>
+                                <strong
+                                    class="mt-2 inline-flex rounded-lg bg-tccGold/10 px-3 py-1.5 text-[13px] text-tccGold">
+                                    {{ transaction.allocations }} slot
+                                </strong>
+                            </div>
+                            <div class="rounded-xl border border-white/10 bg-white/[0.04] p-3.5">
+                                <span
+                                    class="text-[10px] font-black uppercase tracking-[0.18em] text-white/45">Reference</span>
+                                <strong class="mt-2 block font-mono text-[13px] text-tccGold">{{ transaction.referenceId
+                                }}</strong>
+                            </div>
+                            <div class="rounded-xl border border-white/10 bg-white/[0.04] p-3.5">
+                                <span class="text-[10px] font-black uppercase tracking-[0.18em] text-white/45">Total
+                                    Investment</span>
+                                <strong class="mt-2 block font-poppins text-xl font-black text-tccGold">{{
+                                    formatCurrency(transaction.totalInvestment) }}</strong>
+                            </div>
+                            <div class="rounded-xl border border-white/10 bg-white/[0.04] p-3.5">
+                                <span
+                                    class="text-[10px] font-black uppercase tracking-[0.18em] text-white/45">Status</span>
+                                <span
+                                    class="mt-2 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-black"
+                                    :class="statusClass">
+                                    <i class="pi"
+                                        :class="transaction.paymentStatus === 'Funded' ? 'pi-check-circle' : 'pi-clock'"
+                                        aria-hidden="true" />
+                                    {{ transaction.paymentStatus }}
+                                </span>
+                            </div>
+                            <div class="rounded-xl border border-white/10 bg-white/[0.04] p-3.5">
+                                <span class="text-[10px] font-black uppercase tracking-[0.18em] text-white/45">Payment
+                                    Method</span>
+                                <strong
+                                    class="mt-2 inline-flex items-center gap-2 rounded-full bg-tccGold px-3 py-2 text-xs text-tccDarkNavy">
+                                    <i class="pi pi-building-columns text-xs" aria-hidden="true" />
+                                    {{ transaction.paymentMethod }}
+                                </strong>
+                            </div>
+                            <div class="rounded-xl border border-white/10 bg-white/[0.04] p-3.5">
+                                <span
+                                    class="text-[10px] font-black uppercase tracking-[0.18em] text-white/45">Date</span>
+                                <strong class="mt-2 block text-[13px] text-white">{{ transaction.signedDate }}</strong>
+                            </div>
                         </div>
-                        <div class="rounded-xl border border-white/10 bg-white/[0.04] p-3.5">
-                            <span
-                                class="text-[10px] font-black uppercase tracking-[0.18em] text-white/45">Reference</span>
-                            <strong class="mt-2 block font-mono text-[13px] text-tccGold">{{ transaction.referenceId
-                            }}</strong>
-                        </div>
-                        <div class="rounded-xl border border-white/10 bg-white/[0.04] p-3.5">
-                            <span class="text-[10px] font-black uppercase tracking-[0.18em] text-white/45">Total
-                                Investment</span>
-                            <strong class="mt-2 block font-poppins text-xl font-black text-tccGold">{{
-                                formatCurrency(transaction.totalInvestment) }}</strong>
-                        </div>
-                        <div class="rounded-xl border border-white/10 bg-white/[0.04] p-3.5">
-                            <span class="text-[10px] font-black uppercase tracking-[0.18em] text-white/45">Status</span>
-                            <span
-                                class="mt-2 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-black"
-                                :class="statusClass">
-                                <i class="pi"
-                                    :class="transaction.paymentStatus === 'Funded' ? 'pi-check-circle' : 'pi-clock'"
-                                    aria-hidden="true" />
-                                {{ transaction.paymentStatus }}
-                            </span>
-                        </div>
-                        <div class="rounded-xl border border-white/10 bg-white/[0.04] p-3.5">
-                            <span class="text-[10px] font-black uppercase tracking-[0.18em] text-white/45">Payment
-                                Method</span>
-                            <strong
-                                class="mt-2 inline-flex items-center gap-2 rounded-full bg-tccGold px-3 py-2 text-xs text-tccDarkNavy">
-                                <i class="pi pi-building-columns text-xs" aria-hidden="true" />
-                                {{ transaction.paymentMethod }}
-                            </strong>
-                        </div>
-                        <div class="rounded-xl border border-white/10 bg-white/[0.04] p-3.5">
-                            <span class="text-[10px] font-black uppercase tracking-[0.18em] text-white/45">Date</span>
-                            <strong class="mt-2 block text-[13px] text-white">{{ transaction.signedDate }}</strong>
-                        </div>
-                    </div>
 
-                    <div
-                        class="mt-5 rounded-xl border border-tccGold/25 bg-tccGold/10 p-3.5 text-[13px] leading-relaxed text-white/70">
-                        <i class="pi pi-info-circle mr-2 text-tccGold" aria-hidden="true" />
-                        {{ transaction.nextAction }}
-                    </div>
-                </article>
+                        <div
+                            class="mt-5 rounded-xl border border-tccGold/25 bg-tccGold/10 p-3.5 text-[13px] leading-relaxed text-white/70">
+                            <i class="pi pi-info-circle mr-2 text-tccGold" aria-hidden="true" />
+                            {{ transaction.nextAction }}
+                        </div>
+                    </article>
                 </div>
             </section>
         </template>
-        =======
-        <article
-            class="rounded-2xl border border-tccGold/20 bg-[radial-gradient(circle_at_top_right,rgba(247,198,0,0.12),transparent_20rem),#0b0a08] p-5">
-            <div class="flex items-center gap-3">
-                <i class="pi pi-shopping-cart text-tccGold" aria-hidden="true" />
-                <h2 class="font-poppins text-lg font-black text-white">Purchase Details</h2>
-            </div>
-
-            <div class="mt-5 grid gap-3 sm:grid-cols-2">
-                <div class="rounded-xl border border-white/10 bg-white/[0.04] p-3.5">
-                    <span class="text-[10px] font-black uppercase tracking-[0.18em] text-white/45">Number of
-                        Allocations</span>
-                    <strong class="mt-2 inline-flex rounded-lg bg-tccGold/10 px-3 py-1.5 text-[13px] text-tccGold">
-                        {{ transaction.allocations }} slot
-                    </strong>
-                </div>
-                <div class="rounded-xl border border-white/10 bg-white/[0.04] p-3.5">
-                    <span class="text-[10px] font-black uppercase tracking-[0.18em] text-white/45">Reference</span>
-                    <strong class="mt-2 block font-mono text-[13px] text-tccGold">{{ transaction.referenceId }}</strong>
-                </div>
-                <div class="rounded-xl border border-white/10 bg-white/[0.04] p-3.5">
-                    <span class="text-[10px] font-black uppercase tracking-[0.18em] text-white/45">Total
-                        Investment</span>
-                    <strong class="mt-2 block font-poppins text-xl font-black text-tccGold">{{
-                        formatCurrency(transaction.totalInvestment) }}</strong>
-                </div>
-                <div class="rounded-xl border border-white/10 bg-white/[0.04] p-3.5">
-                    <span class="text-[10px] font-black uppercase tracking-[0.18em] text-white/45">Status</span>
-                    <span
-                        class="mt-2 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-black"
-                        :class="statusClass">
-                        <i class="pi" :class="transaction.paymentStatus === 'Funded' ? 'pi-check-circle' : 'pi-clock'"
-                            aria-hidden="true" />
-                        {{ transaction.paymentStatus }}
-                    </span>
-                </div>
-                <div class="rounded-xl border border-white/10 bg-white/[0.04] p-3.5">
-                    <span class="text-[10px] font-black uppercase tracking-[0.18em] text-white/45">Payment Method</span>
-                    <strong
-                        class="mt-2 inline-flex items-center gap-2 rounded-full bg-tccGold px-3 py-2 text-xs text-tccDarkNavy">
-                        <i class="pi pi-building-columns text-xs" aria-hidden="true" />
-                        {{ transaction.paymentMethod }}
-                    </strong>
-                </div>
-                <div class="rounded-xl border border-white/10 bg-white/[0.04] p-3.5">
-                    <span class="text-[10px] font-black uppercase tracking-[0.18em] text-white/45">Date</span>
-                    <strong class="mt-2 block text-[13px] text-white">{{ transaction.signedDate }}</strong>
-                </div>
-            </div>
-
-            <div
-                class="mt-5 rounded-xl border border-tccGold/25 bg-tccGold/10 p-3.5 text-[13px] leading-relaxed text-white/70">
-                <i class="pi pi-info-circle mr-2 text-tccGold" aria-hidden="true" />
-                {{ transaction.nextAction }}
-            </div>
-        </article>
-        </div>
-        >>>>>>> dev-morshed
     </section>
 </template>
