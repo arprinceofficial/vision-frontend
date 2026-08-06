@@ -175,7 +175,7 @@ const submitContactForm = async () => {
 }
 
 useHead({
-    title: 'Contact Investor Support | The Car Crowd'
+    title: 'Contact Investor Support | Vision148'
 })
 </script>
 
@@ -221,115 +221,72 @@ useHead({
                     <template v-else>
                         <div class="mx-auto max-w-2xl space-y-3 text-center">
                             <span class="restomod-eyebrow">Support Desk</span>
-                            <h1 class="font-poppins text-4xl font-black leading-tight text-white">Contact Investor Support</h1>
+                            <h1 class="font-poppins text-4xl font-black leading-tight text-white">Contact Investor
+                                Support</h1>
                             <p class="text-sm font-light leading-relaxed text-tccMutedGray">
-                                Send a message to The Car Crowd team for onboarding, payment, or document support.
+                                Send a message to Vision148 team for onboarding, payment, or document support.
                             </p>
                         </div>
 
-                        <CitizenSharedActionNotice
-                            v-if="notice"
-                            class="mx-auto mt-6 max-w-2xl"
-                            :title="notice.title"
-                            :message="notice.message"
-                            :tone="notice.tone"
-                        />
+                        <CitizenSharedActionNotice v-if="notice" class="mx-auto mt-6 max-w-2xl" :title="notice.title"
+                            :message="notice.message" :tone="notice.tone" />
 
                         <form class="mx-auto mt-8 max-w-2xl space-y-5" @submit.prevent="submitContactForm">
                             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div class="space-y-1">
-                                    <label
-                                        for="contact-first-name"
-                                        class="block text-xs font-semibold uppercase tracking-wider text-tccNavy"
-                                    >
+                                    <label for="contact-first-name"
+                                        class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">
                                         First Name
                                     </label>
-                                    <input
-                                        id="contact-first-name"
-                                        v-model="contactForm.first_name"
-                                        type="text"
+                                    <input id="contact-first-name" v-model="contactForm.first_name" type="text"
                                         autocomplete="given-name"
                                         class="w-full rounded-lg border border-tccBorder px-4 py-2.5 text-sm"
                                         :class="validations_errors.first_name ? 'border-[#f44336!important]' : ''"
-                                        @focus="clearValidationError('first_name')"
-                                    >
-                                    <InputError
-                                        v-if="validations_errors.first_name"
-                                        :message="validations_errors.first_name"
-                                        text_size="text-sm"
-                                    />
+                                        @focus="clearValidationError('first_name')">
+                                    <InputError v-if="validations_errors.first_name"
+                                        :message="validations_errors.first_name" text_size="text-sm" />
                                 </div>
                                 <div class="space-y-1">
-                                    <label
-                                        for="contact-last-name"
-                                        class="block text-xs font-semibold uppercase tracking-wider text-tccNavy"
-                                    >
+                                    <label for="contact-last-name"
+                                        class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">
                                         Last Name
                                     </label>
-                                    <input
-                                        id="contact-last-name"
-                                        v-model="contactForm.last_name"
-                                        type="text"
+                                    <input id="contact-last-name" v-model="contactForm.last_name" type="text"
                                         autocomplete="family-name"
                                         class="w-full rounded-lg border border-tccBorder px-4 py-2.5 text-sm"
                                         :class="validations_errors.last_name ? 'border-[#f44336!important]' : ''"
-                                        @focus="clearValidationError('last_name')"
-                                    >
-                                    <InputError
-                                        v-if="validations_errors.last_name"
-                                        :message="validations_errors.last_name"
-                                        text_size="text-sm"
-                                    />
+                                        @focus="clearValidationError('last_name')">
+                                    <InputError v-if="validations_errors.last_name"
+                                        :message="validations_errors.last_name" text_size="text-sm" />
                                 </div>
                             </div>
                             <div class="space-y-1">
-                                <label
-                                    for="contact-email"
-                                    class="block text-xs font-semibold uppercase tracking-wider text-tccNavy"
-                                >
+                                <label for="contact-email"
+                                    class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">
                                     Email Address
                                 </label>
-                                <input
-                                    id="contact-email"
-                                    v-model="contactForm.email"
-                                    type="email"
-                                    autocomplete="email"
+                                <input id="contact-email" v-model="contactForm.email" type="email" autocomplete="email"
                                     class="w-full rounded-lg border border-tccBorder px-4 py-2.5 text-sm"
                                     :class="validations_errors.email ? 'border-[#f44336!important]' : ''"
-                                    @focus="clearValidationError('email')"
-                                >
-                                <InputError
-                                    v-if="validations_errors.email"
-                                    :message="validations_errors.email"
-                                    text_size="text-sm"
-                                />
+                                    @focus="clearValidationError('email')">
+                                <InputError v-if="validations_errors.email" :message="validations_errors.email"
+                                    text_size="text-sm" />
                             </div>
                             <div class="space-y-1">
-                                <label
-                                    for="contact-message"
-                                    class="block text-xs font-semibold uppercase tracking-wider text-tccNavy"
-                                >
+                                <label for="contact-message"
+                                    class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">
                                     Message
                                 </label>
-                                <textarea
-                                    id="contact-message"
-                                    v-model="contactForm.message"
-                                    rows="5"
+                                <textarea id="contact-message" v-model="contactForm.message" rows="5"
                                     class="w-full rounded-lg border border-tccBorder px-4 py-2.5 text-sm"
                                     :class="validations_errors.message ? 'border-[#f44336!important]' : ''"
-                                    @focus="clearValidationError('message')"
-                                />
-                                <InputError
-                                    v-if="validations_errors.message"
-                                    :message="validations_errors.message"
-                                    text_size="text-sm"
-                                />
+                                    @focus="clearValidationError('message')" />
+                                <InputError v-if="validations_errors.message" :message="validations_errors.message"
+                                    text_size="text-sm" />
                             </div>
-                            <button
-                                type="submit"
+                            <button type="submit"
                                 class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-tccGold px-6 py-3.5 font-poppins text-xs font-bold uppercase tracking-wider text-tccDarkNavy disabled:cursor-wait disabled:opacity-70"
-                                :disabled="isSubmitting"
-                            >
+                                :disabled="isSubmitting">
                                 <i v-if="isSubmitting" class="pi pi-spin pi-spinner text-sm" aria-hidden="true" />
                                 <span>{{ isSubmitting ? 'Sending...' : 'Send Message' }}</span>
                             </button>

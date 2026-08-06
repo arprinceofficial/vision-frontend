@@ -4,7 +4,7 @@ definePageMeta({
 })
 
 useHead({
-    title: 'My Assets | The Car Crowd'
+    title: 'My Assets | Vision148'
 })
 
 type AssetStatus = 'active' | 'pending' | 'funded' | 'exited'
@@ -307,8 +307,7 @@ const statusBadgeClass = (status: AssetStatus) => {
                             <div v-for="(statSkeleton, skeletonIndex) in summaryStatSkeletons"
                                 :key="`summary-stat-skeleton-${skeletonIndex}`"
                                 class="animate-pulse bg-tccDeepBlack/80 p-4 sm:p-5">
-                                <span class="block h-3 rounded-full bg-white/10"
-                                    :class="statSkeleton.labelWidth" />
+                                <span class="block h-3 rounded-full bg-white/10" :class="statSkeleton.labelWidth" />
                                 <span class="mt-3 block h-8 rounded-full bg-white/10"
                                     :class="statSkeleton.valueWidth" />
                                 <span class="mt-2 block h-3 rounded-full bg-white/10"
@@ -327,9 +326,9 @@ const statusBadgeClass = (status: AssetStatus) => {
                             <div v-for="stat in summaryStats" :key="stat.label" class="bg-tccDeepBlack/80 p-4 sm:p-5">
                                 <span
                                     class="block font-poppins text-[9px] font-semibold uppercase tracking-[0.22em] text-white/40">{{
-                                    stat.label }}</span>
+                                        stat.label }}</span>
                                 <strong class="mt-2 block font-poppins text-2xl font-black text-white">{{ stat.value
-                                    }}</strong>
+                                }}</strong>
                                 <p class="mt-1 text-[11px] text-white/50">{{ stat.helper }}</p>
                             </div>
                         </template>
@@ -378,7 +377,8 @@ const statusBadgeClass = (status: AssetStatus) => {
                             <div class="h-full w-full bg-white/10" />
                             <div
                                 class="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-tccDeepBlack to-transparent" />
-                            <span class="absolute left-4 top-4 h-7 w-24 rounded-full border border-white/10 bg-white/10" />
+                            <span
+                                class="absolute left-4 top-4 h-7 w-24 rounded-full border border-white/10 bg-white/10" />
                         </div>
 
                         <div class="p-5 sm:p-6">
@@ -430,7 +430,8 @@ const statusBadgeClass = (status: AssetStatus) => {
                             <div
                                 class="mt-6 flex flex-col gap-4 border-t border-white/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
                                 <span class="block h-3 w-full max-w-[260px] rounded-full bg-white/10" />
-                                <span class="block h-9 w-full shrink-0 rounded-full border border-white/10 bg-white/10 sm:w-36" />
+                                <span
+                                    class="block h-9 w-full shrink-0 rounded-full border border-white/10 bg-white/10 sm:w-36" />
                             </div>
                         </div>
                     </article>
@@ -473,12 +474,12 @@ const statusBadgeClass = (status: AssetStatus) => {
                                     <span
                                         class="block text-[10px] uppercase tracking-[0.18em] text-white/40">Return</span>
                                     <strong class="mt-1 block text-lg font-black text-tccGold">{{ asset.performance
-                                        }}</strong>
+                                    }}</strong>
                                 </div>
                             </div>
 
                             <p class="news-card-excerpt mt-4 text-sm leading-relaxed text-white/60">{{ asset.description
-                                }}</p>
+                            }}</p>
 
                             <div
                                 class="mt-6 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 min-[420px]:grid-cols-2">
@@ -486,14 +487,14 @@ const statusBadgeClass = (status: AssetStatus) => {
                                     <span
                                         class="block font-poppins text-[9px] uppercase tracking-[0.22em] text-white/40">Allocation</span>
                                     <strong class="mt-1 block text-sm font-semibold text-white">{{ asset.allocation
-                                        }}</strong>
+                                    }}</strong>
                                     <p class="mt-1 text-[11px] text-white/50">{{ asset.units }}</p>
                                 </div>
                                 <div class="bg-tccDeepBlack/80 p-4 text-right">
                                     <span
                                         class="block font-poppins text-[9px] uppercase tracking-[0.22em] text-white/40">Value</span>
                                     <strong class="mt-1 block text-sm font-semibold text-white">{{ asset.valuation
-                                        }}</strong>
+                                    }}</strong>
                                     <p class="mt-1 text-[11px] text-white/50">Latest estimate</p>
                                 </div>
                             </div>
@@ -509,14 +510,14 @@ const statusBadgeClass = (status: AssetStatus) => {
                                 </div>
                             </div>
 
-                            <div
+                            <!-- <div
                                 class="mt-6 flex flex-col gap-4 border-t border-white/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
                                 <p class="text-xs leading-relaxed text-white/50">{{ asset.nextStep }}</p>
                                 <NuxtLink :to="asset.actionRoute"
                                     class="w-full shrink-0 rounded-full border border-white/20 px-4 py-2 text-center font-poppins text-[10px] font-bold uppercase tracking-[0.18em] text-white transition-colors hover:border-tccGold hover:text-tccGold sm:w-auto sm:tracking-[0.2em]">
                                     {{ asset.actionLabel }}
                                 </NuxtLink>
-                            </div>
+                            </div> -->
                         </div>
                     </article>
                 </div>
@@ -528,8 +529,9 @@ const statusBadgeClass = (status: AssetStatus) => {
                         <h2 class="font-poppins text-lg font-bold text-white">Required Actions</h2>
                         <span v-if="shouldShowMyAssetsSkeleton"
                             class="h-6 w-8 animate-pulse rounded-full bg-tccGold/40" />
-                        <span v-else class="rounded-full bg-tccGold px-2.5 py-1 text-[10px] font-bold text-tccDarkNavy">{{
-                            upcomingActions.length }}</span>
+                        <span v-else
+                            class="rounded-full bg-tccGold px-2.5 py-1 text-[10px] font-bold text-tccDarkNavy">{{
+                                upcomingActions.length }}</span>
                     </div>
 
                     <div class="mt-5 space-y-3">
@@ -539,8 +541,10 @@ const statusBadgeClass = (status: AssetStatus) => {
                                 class="flex animate-pulse items-start gap-3 rounded-2xl border border-white/10 bg-white/5 p-4">
                                 <span class="mt-0.5 h-4 w-4 shrink-0 rounded-full bg-tccGold/40" />
                                 <div class="min-w-0 flex-1">
-                                    <span class="block h-4 rounded-full bg-white/10" :class="actionSkeleton.titleWidth" />
-                                    <span class="mt-2 block h-3 rounded-full bg-white/10" :class="actionSkeleton.metaWidth" />
+                                    <span class="block h-4 rounded-full bg-white/10"
+                                        :class="actionSkeleton.titleWidth" />
+                                    <span class="mt-2 block h-3 rounded-full bg-white/10"
+                                        :class="actionSkeleton.metaWidth" />
                                 </div>
                             </div>
                         </template>
@@ -576,26 +580,25 @@ const statusBadgeClass = (status: AssetStatus) => {
                                     <span class="h-4 w-4 rounded-full bg-tccGold/40" />
                                     <span class="h-4 rounded-full bg-white/10" :class="documentSkeleton.titleWidth" />
                                 </span>
-                                <span class="h-3 shrink-0 rounded-full bg-white/10" :class="documentSkeleton.countWidth" />
+                                <span class="h-3 shrink-0 rounded-full bg-white/10"
+                                    :class="documentSkeleton.countWidth" />
                             </div>
                         </template>
-                        <div v-else-if="myAssetsError"
-                            class="py-4 text-xs leading-relaxed text-white/60">
+                        <div v-else-if="myAssetsError" class="py-4 text-xs leading-relaxed text-white/60">
                             Portfolio documents are unavailable right now.
                         </div>
-                        <div v-else-if="!documents.length"
-                            class="py-4 text-xs leading-relaxed text-white/60">
+                        <div v-else-if="!documents.length" class="py-4 text-xs leading-relaxed text-white/60">
                             No portfolio documents are available right now.
                         </div>
                         <template v-else>
-                            <NuxtLink v-for="document in documents" :key="document.title" to="/profile"
+                            <div v-for="document in documents" :key="document.title" to="/profile"
                                 class="flex items-center justify-between gap-3 py-4 text-sm transition-colors hover:text-tccGold">
                                 <span class="flex min-w-0 items-center gap-3">
                                     <i class="pi pi-folder text-tccGold" aria-hidden="true" />
                                     <span class="truncate text-white/80">{{ document.title }}</span>
                                 </span>
-                                <span class="shrink-0 text-[11px] text-white/50">{{ document.count }}</span>
-                            </NuxtLink>
+                                <!-- <span class="shrink-0 text-[11px] text-white/50">{{ document.count }}</span> -->
+                            </div>
                         </template>
                     </div>
                 </section>

@@ -16,8 +16,10 @@ type TransactionData = {
 type SignedDocumentData = {
     title: string
     badge: string
-    pages: string
-    clauses: string[]
+    url: string
+    proxyUrl: string
+    embedUrl: string
+    downloadName: string
 }
 
 type DocumentInformationData = {
@@ -29,14 +31,21 @@ type DocumentInformationData = {
 type SignedDocumentsPageData = {
     transactions: TransactionData[]
     signatoryName: string
-    signedDocuments: SignedDocumentData[]
-    documentInformation: DocumentInformationData[]
+    signedDocumentsUrl: string
+    termsConditionsUrl: string
+}
+
+type SignedDocumentsPayload = {
+    transactions?: Array<Partial<TransactionData>>
+    signatoryName?: unknown
+    signed_documents?: unknown
+    terms_conditions?: unknown
 }
 
 type SignedDocumentsResponse = {
     status?: boolean
     message?: string
-    data?: Partial<SignedDocumentsPageData> | null
+    data?: SignedDocumentsPayload | null
 }
 
 const route = useRoute()
@@ -47,8 +56,8 @@ const settledSignedDocumentsSlug = ref('')
 const emptySignedDocumentsData: SignedDocumentsPageData = {
     transactions: [],
     signatoryName: '',
-    signedDocuments: [],
-    documentInformation: []
+    signedDocumentsUrl: '',
+    termsConditionsUrl: ''
 }
 
 const getStringValue = (value: unknown, fallback = '') => {
@@ -64,12 +73,6 @@ const getNumberValue = (value: unknown, fallback = 0) => {
 const getRouteParamValue = (value: unknown) => Array.isArray(value) ? value[0] : value
 const requestSlug = computed(() => getStringValue(getRouteParamValue(route.params.id)))
 
-const normalizeStringArray = (value: unknown) => (
-    Array.isArray(value)
-        ? value.map((item) => getStringValue(item)).filter(Boolean)
-        : []
-)
-
 const normalizeTransaction = (item: Partial<TransactionData> | null | undefined): TransactionData => ({
     id: getStringValue(item?.id),
     slug: getStringValue(item?.slug, requestSlug.value),
@@ -80,30 +83,13 @@ const normalizeTransaction = (item: Partial<TransactionData> | null | undefined)
     supportEmail: getStringValue(item?.supportEmail, 'support@vision148.com')
 })
 
-const normalizeSignedDocument = (item: Partial<SignedDocumentData> | null | undefined): SignedDocumentData => ({
-    title: getStringValue(item?.title),
-    badge: getStringValue(item?.badge),
-    pages: getStringValue(item?.pages),
-    clauses: normalizeStringArray(item?.clauses)
-})
-
-const normalizeDocumentInformation = (item: Partial<DocumentInformationData> | null | undefined): DocumentInformationData => ({
-    icon: getStringValue(item?.icon, 'pi-info-circle'),
-    title: getStringValue(item?.title),
-    copy: getStringValue(item?.copy)
-})
-
-const normalizeSignedDocumentsData = (payload: Partial<SignedDocumentsPageData> | null | undefined): SignedDocumentsPageData => ({
+const normalizeSignedDocumentsData = (payload: SignedDocumentsPayload | null | undefined): SignedDocumentsPageData => ({
     transactions: Array.isArray(payload?.transactions)
         ? payload.transactions.map((item) => normalizeTransaction(item))
         : [],
     signatoryName: getStringValue(payload?.signatoryName),
-    signedDocuments: Array.isArray(payload?.signedDocuments)
-        ? payload.signedDocuments.map((item) => normalizeSignedDocument(item)).filter((item) => item.title)
-        : [],
-    documentInformation: Array.isArray(payload?.documentInformation)
-        ? payload.documentInformation.map((item) => normalizeDocumentInformation(item)).filter((item) => item.title)
-        : []
+    signedDocumentsUrl: getStringValue(payload?.signed_documents),
+    termsConditionsUrl: getStringValue(payload?.terms_conditions)
 })
 
 const {
@@ -151,10 +137,52 @@ const transaction = computed<TransactionData>(() => pageData.value.transactions[
     supportEmail: 'support@vision148.com'
 })
 const transactionRouteId = computed(() => transaction.value.slug || requestSlug.value || transaction.value.id)
-const signedDocuments = computed(() => pageData.value.signedDocuments)
-const documentInformation = computed(() => pageData.value.documentInformation)
+const getDocumentProxyUrl = (url: string) => (
+    url ? `/api/agreement-document?url=${encodeURIComponent(url)}` : ''
+)
+const getDocumentEmbedUrl = (url: string) => {
+    const proxyUrl = getDocumentProxyUrl(url)
+    return proxyUrl ? `${proxyUrl}#toolbar=1&navpanes=0` : ''
+}
+const signedDocuments = computed<SignedDocumentData[]>(() => [
+    {
+        title: 'Signed Subscription Agreement',
+        badge: 'Document 1 of 2',
+        url: pageData.value.signedDocumentsUrl,
+        proxyUrl: getDocumentProxyUrl(pageData.value.signedDocumentsUrl),
+        embedUrl: getDocumentEmbedUrl(pageData.value.signedDocumentsUrl),
+        downloadName: `Signed Subscription Agreement-${transactionRouteId.value}.pdf`
+    },
+    {
+        title: 'Signed Terms & Conditions',
+        badge: 'Document 2 of 2',
+        url: pageData.value.termsConditionsUrl,
+        proxyUrl: getDocumentProxyUrl(pageData.value.termsConditionsUrl),
+        embedUrl: getDocumentEmbedUrl(pageData.value.termsConditionsUrl),
+        downloadName: `Signed Terms and Conditions-${transactionRouteId.value}.pdf`
+    }
+].filter((document) => document.url))
+const documentInformation = computed<DocumentInformationData[]>(() => [
+    {
+        icon: 'pi-check-circle',
+        title: 'Documents Signed',
+        copy: 'All documents have been signed'
+    },
+    {
+        icon: 'pi-eye',
+        title: 'Review Anytime',
+        copy: 'View your documents whenever needed'
+    },
+    {
+        icon: 'pi-download',
+        title: 'Download Copies',
+        copy: 'Save PDFs for your records'
+    }
+])
 const hasCachedCurrentSignedDocumentsData = computed(() => (
-    Boolean(requestSlug.value) && pageData.value.transactions.some((item) => item.slug === requestSlug.value)
+    Boolean(requestSlug.value) &&
+    pageData.value.transactions.some((item) => item.slug === requestSlug.value) &&
+    Boolean(pageData.value.signedDocumentsUrl || pageData.value.termsConditionsUrl)
 ))
 const hasLoadedCurrentSignedDocuments = computed(() => (
     hasCachedCurrentSignedDocumentsData.value ||
@@ -179,7 +207,7 @@ onMounted(() => {
 })
 
 useHead(() => ({
-    title: `${transaction.value.referenceId || 'Transaction'} Signed Documents | The Car Crowd`
+    title: `${transaction.value.referenceId || 'Transaction'} Signed Documents | Vision148`
 }))
 </script>
 
@@ -257,16 +285,16 @@ useHead(() => ({
                                 </span>
                             </div>
                             <div class="flex flex-wrap gap-2">
-                                <button type="button"
+                                <a :href="document.proxyUrl || undefined" target="_blank" rel="noopener"
                                     class="inline-flex items-center justify-center gap-2 rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-[11px] font-black uppercase tracking-[0.12em] text-white transition-colors hover:border-tccGold hover:text-tccGold">
                                     <i class="pi pi-window-maximize text-xs" aria-hidden="true" />
                                     Fullscreen
-                                </button>
-                                <button type="button"
+                                </a>
+                                <a :href="document.proxyUrl || undefined" :download="document.downloadName"
                                     class="inline-flex items-center justify-center gap-2 rounded-lg border border-tccGold/35 bg-tccGold/10 px-3 py-2 text-[11px] font-black uppercase tracking-[0.12em] text-tccGold transition-colors hover:bg-tccGold hover:text-tccDarkNavy">
                                     <i class="pi pi-download text-xs" aria-hidden="true" />
                                     Download
-                                </button>
+                                </a>
                             </div>
                         </header>
 
@@ -275,8 +303,8 @@ useHead(() => ({
                                 <div class="flex items-center gap-3">
                                     <i class="pi pi-bars" aria-hidden="true" />
                                     <i class="pi pi-search" aria-hidden="true" />
-                                    <span class="rounded border border-white/20 px-2 py-1 text-white">{{ document.pages
-                                    }}</span>
+                                    <span class="rounded border border-white/20 px-2 py-1 text-white">{{ document.badge
+                                        }}</span>
                                 </div>
                                 <div class="flex items-center gap-3">
                                     <i class="pi pi-minus" aria-hidden="true" />
@@ -286,27 +314,15 @@ useHead(() => ({
                             </div>
                         </div>
 
-                        <div class="pdf-viewer-surface max-h-[32rem] overflow-auto p-4 sm:p-5">
-                            <div class="pdf-preview-page mx-auto min-h-[28rem] max-w-2xl p-6 sm:p-8">
-                                <div class="border-t border-[#c6ccd6] pt-8">
-                                    <p class="pdf-preview-kicker text-[11px] font-black uppercase tracking-[0.18em]">
-                                        Dummy PDF Preview</p>
-                                    <h4 class="pdf-preview-title mt-5 font-poppins text-lg font-black">{{ document.title
-                                    }}</h4>
-                                    <div class="pdf-preview-copy mt-6 space-y-4 text-[13px] leading-relaxed">
-                                        <p v-for="clause in document.clauses" :key="clause">{{ clause }}</p>
-                                    </div>
-                                    <div class="pdf-preview-signature mt-12 rounded border border-dashed p-4">
-                                        <span
-                                            class="pdf-preview-kicker text-xs font-semibold uppercase tracking-[0.16em]">Signed
-                                            electronically</span>
-                                        <div
-                                            class="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                                            <strong class="pdf-preview-title">{{ pageData.signatoryName }}</strong>
-                                            <span class="pdf-preview-muted text-[13px]">{{ transaction.signedDate
-                                            }}</span>
-                                        </div>
-                                    </div>
+                        <div class="pdf-viewer-surface bg-white">
+                            <iframe v-if="document.embedUrl" :src="document.embedUrl" :title="document.title"
+                                class="block h-[72vh] min-h-[520px] w-full border-0 bg-white" />
+                            <div v-else
+                                class="grid min-h-[420px] place-items-center bg-gradient-to-b from-white to-slate-50 p-6">
+                                <div
+                                    class="rounded-lg border border-slate-200 bg-white px-5 py-4 text-center shadow-[0_18px_50px_rgba(15,23,42,0.12)]">
+                                    <i class="pi pi-spin pi-spinner text-tccGold" aria-hidden="true" />
+                                    <span class="ml-2 text-sm font-black text-tccDarkNavy">Loading document...</span>
                                 </div>
                             </div>
                         </div>
@@ -373,36 +389,6 @@ useHead(() => ({
 }
 
 .pdf-viewer-surface {
-    background:
-        linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 18rem),
-        #4a4a4a;
-}
-
-.pdf-preview-page {
-    color-scheme: light;
-    background-color: #fffdf8 !important;
-    color: #14110b !important;
-    box-shadow: 0 20px 44px rgba(0, 0, 0, 0.28);
-}
-
-.pdf-preview-title {
-    color: #14110b !important;
-}
-
-.pdf-preview-copy {
-    color: #334155 !important;
-}
-
-.pdf-preview-kicker {
-    color: #7b8794 !important;
-}
-
-.pdf-preview-muted {
-    color: #64748b !important;
-}
-
-.pdf-preview-signature {
-    border-color: #b8c0cc !important;
-    background-color: #ffffff !important;
+    background: #ffffff;
 }
 </style>

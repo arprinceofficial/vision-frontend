@@ -5,7 +5,7 @@ definePageMeta({
 })
 
 useHead({
-    title: 'KYC Identity Verification | The Car Crowd'
+    title: 'KYC Identity Verification | Vision148'
 })
 
 type NoticeTone = 'success' | 'warning' | 'error' | 'info'
@@ -349,8 +349,7 @@ const submitKyc = async () => {
                     </div>
 
                     <div class="space-y-1">
-                        <label for="lastName"
-                            class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">
+                        <label for="lastName" class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">
                             Last Name
                         </label>
                         <input id="lastName" v-model="form.lastName" type="text" placeholder="Doe"
@@ -454,14 +453,15 @@ const submitKyc = async () => {
 
                     <div class="space-y-1">
                         <label for="documentFile"
-                            class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">Upload ID Image</label>
-                        <input id="documentFile" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                            class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">Upload ID
+                            Image</label>
+                        <input id="documentFile" type="file"
+                            accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
                             class="w-full rounded-lg border px-4 py-2 text-xs file:mr-4 file:cursor-pointer file:rounded file:border-0 file:bg-tccNavy file:px-3 file:py-1.5 file:text-[11px] file:font-semibold file:text-white hover:file:bg-tccDarkNavy"
                             :class="hasError('documentFile') ? 'border-red-400 bg-red-50' : 'border-tccBorder'"
                             @change="handleFile">
                         <p class="text-[11px] text-tccMutedGray">JPG, JPEG, PNG, or WEBP only. Max 2 MB.</p>
-                        <div v-if="fileName"
-                            class="rounded-lg border border-tccBorder bg-white/[0.055] p-3 shadow-sm">
+                        <div v-if="fileName" class="rounded-lg border border-tccBorder bg-white/[0.055] p-3 shadow-sm">
                             <div class="flex items-center gap-3">
                                 <button v-if="canPreviewAttachment" type="button"
                                     class="group relative grid h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-white/10 bg-black"
@@ -514,8 +514,7 @@ const submitKyc = async () => {
                 <div class="flex flex-col items-center gap-4 border-t border-tccBorder pt-4 sm:flex-row">
                     <button type="button"
                         class="w-full rounded-lg border border-tccBorder px-6 py-3 font-poppins text-xs font-bold uppercase tracking-wider text-tccNavy transition-colors hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
-                        :disabled="isSubmitting || isSkipping"
-                        @click="skipKyc">
+                        :disabled="isSubmitting || isSkipping" @click="skipKyc">
                         <i class="pi pi-forward mr-1 text-[10px]" aria-hidden="true" />
                         <span v-if="isSkipping">Skipping...</span>
                         <span v-else>Skip KYC for 2 weeks</span>
@@ -539,7 +538,8 @@ const submitKyc = async () => {
                         <div
                             class="w-full max-w-4xl overflow-hidden rounded-2xl border border-white/18 bg-tccLightBg shadow-2xl">
                             <div class="flex items-center justify-between gap-4 border-b border-white/12 px-4 py-3">
-                                <p class="min-w-0 truncate text-xs font-semibold uppercase tracking-wider text-white/70">
+                                <p
+                                    class="min-w-0 truncate text-xs font-semibold uppercase tracking-wider text-white/70">
                                     {{ fileName }}
                                 </p>
                                 <button type="button"

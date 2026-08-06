@@ -55,7 +55,7 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      title: 'The Car Crowd - Invest in Collectible Classic Cars',
+      title: 'Vision148 - Invest in Collectible Classic Cars',
       meta: [
         {
           name: 'description',

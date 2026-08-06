@@ -145,7 +145,7 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('en-GB', {
 }).format(value)
 
 useHead(() => ({
-    title: `${transaction.value.referenceId || 'Transaction'} Transaction Details | The Car Crowd`
+    title: `${transaction.value.referenceId || 'Transaction'} Transaction Details | Vision148`
 }))
 
 const statusClass = computed(() => (
@@ -207,12 +207,14 @@ onMounted(() => {
                             <div>
                                 <span class="text-[10px] font-black uppercase tracking-[0.18em] text-white/45">Car
                                     Name</span>
-                                <h2 class="mt-1 font-poppins text-base font-black text-white">{{ transaction.carName }}</h2>
+                                <h2 class="mt-1 font-poppins text-base font-black text-white">{{ transaction.carName }}
+                                </h2>
                             </div>
                             <div>
                                 <span
                                     class="text-[10px] font-black uppercase tracking-[0.18em] text-white/45">Description</span>
-                                <p class="mt-2 text-[13px] leading-relaxed text-white/72">{{ transaction.description }}</p>
+                                <p class="mt-2 text-[13px] leading-relaxed text-white/72">{{ transaction.description }}
+                                </p>
                             </div>
                         </div>
                     </article>
@@ -237,7 +239,7 @@ onMounted(() => {
                                 <span
                                     class="text-[10px] font-black uppercase tracking-[0.18em] text-white/45">Reference</span>
                                 <strong class="mt-2 block font-mono text-[13px] text-tccGold">{{ transaction.referenceId
-                                    }}</strong>
+                                }}</strong>
                             </div>
                             <div class="rounded-xl border border-white/10 bg-white/[0.04] p-3.5">
                                 <span class="text-[10px] font-black uppercase tracking-[0.18em] text-white/45">Total
@@ -246,7 +248,8 @@ onMounted(() => {
                                     formatCurrency(transaction.totalInvestment) }}</strong>
                             </div>
                             <div class="rounded-xl border border-white/10 bg-white/[0.04] p-3.5">
-                                <span class="text-[10px] font-black uppercase tracking-[0.18em] text-white/45">Status</span>
+                                <span
+                                    class="text-[10px] font-black uppercase tracking-[0.18em] text-white/45">Status</span>
                                 <span
                                     class="mt-2 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-black"
                                     :class="statusClass">
@@ -266,7 +269,8 @@ onMounted(() => {
                                 </strong>
                             </div>
                             <div class="rounded-xl border border-white/10 bg-white/[0.04] p-3.5">
-                                <span class="text-[10px] font-black uppercase tracking-[0.18em] text-white/45">Date</span>
+                                <span
+                                    class="text-[10px] font-black uppercase tracking-[0.18em] text-white/45">Date</span>
                                 <strong class="mt-2 block text-[13px] text-white">{{ transaction.signedDate }}</strong>
                             </div>
                         </div>

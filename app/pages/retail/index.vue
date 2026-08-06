@@ -4,12 +4,12 @@ definePageMeta({
 })
 
 useHead({
-    title: 'Cars For Sale - The Car Crowd',
+    title: 'Cars For Sale - Vision148',
     meta: [
         {
             name: 'description',
             content:
-                'Browse The Car Crowd retail cars for sale and source collector-grade vehicles through our private network.'
+                'Browse Vision148 retail cars for sale and source collector-grade vehicles through our private network.'
         }
     ]
 })
@@ -215,7 +215,7 @@ const normalizeRetailCar = (car: CmsRetailCar): RetailCarCard | null => {
         make: getFirstValue(car.make),
         mileage: formatMileage(car.mileage),
         cardImage: getFirstValue(car.cardImage, car.card_image, car.heroImage, car.hero_image) || fallbackCarImage,
-        excerpt: getFirstValue(car.excerpt, car.description) || 'Contact The Car Crowd for the full ownership file and inspection details.',
+        excerpt: getFirstValue(car.excerpt, car.description) || 'Contact Vision148 for the full ownership file and inspection details.',
     }
 }
 
@@ -398,7 +398,7 @@ const shouldShowExpertiseCardsSkeleton = computed(() => (
         <section class="bg-tccDeepBlack text-white">
             <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
                 <div class="relative mt-6 overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/5">
-                    <img src="/frontend/assets/images/ferrari_berlinetta.png" alt="The Car Crowd syndicate event"
+                    <img src="/frontend/assets/images/ferrari_berlinetta.png" alt="Vision148 syndicate event"
                         class="absolute inset-0 h-full w-full object-cover opacity-45">
                     <div
                         class="absolute inset-0 bg-gradient-to-l from-tccDeepBlack via-tccDeepBlack/80 to-tccDeepBlack/30" />
@@ -438,8 +438,7 @@ const shouldShowExpertiseCardsSkeleton = computed(() => (
                             <span v-for="quoteWidth in testimonialSkeleton.quoteWidths" :key="quoteWidth"
                                 class="block h-3 rounded-full bg-white/10" :class="quoteWidth" />
                         </div>
-                        <span class="mt-6 block h-4 rounded-full bg-white/10"
-                            :class="testimonialSkeleton.nameWidth" />
+                        <span class="mt-6 block h-4 rounded-full bg-white/10" :class="testimonialSkeleton.nameWidth" />
                     </article>
                 </div>
                 <div v-else-if="testimonialsError"
@@ -482,7 +481,7 @@ const shouldShowExpertiseCardsSkeleton = computed(() => (
                         <div>
                             <span class="restomod-eyebrow">Source With Us</span>
                             <h2 class="mt-6 font-poppins text-3xl font-black leading-tight text-white sm:text-5xl">
-                                Source your car via The Car Crowd.
+                                Source your car via Vision148.
                             </h2>
                             <p class="mt-5 text-sm leading-relaxed text-white/65 sm:text-base">
                                 From brief to inspection, we combine collector network access with valuation discipline
@@ -553,7 +552,7 @@ const shouldShowExpertiseCardsSkeleton = computed(() => (
                     <article v-for="step in processSteps" :key="step.number"
                         class="rounded-[1.5rem] border border-white/10 bg-white/5 p-6">
                         <span class="font-poppins text-5xl font-black leading-none text-white/10">{{ step.number
-                            }}</span>
+                        }}</span>
                         <h3 class="mt-5 font-poppins text-lg font-bold text-white">{{ step.title }}</h3>
                         <p class="mt-3 text-sm leading-relaxed text-white/60">{{ step.text }}</p>
                     </article>
@@ -567,7 +566,7 @@ const shouldShowExpertiseCardsSkeleton = computed(() => (
                 <div>
                     <span class="restomod-eyebrow">Sourced By TCC</span>
                     <h2 class="mt-5 font-poppins text-4xl font-black leading-tight text-white sm:text-5xl">
-                        Sourced by The Car Crowd.
+                        Sourced by Vision148.
                     </h2>
                     <div class="mt-7 space-y-5 text-sm leading-relaxed text-white/65 sm:text-base">
                         <p>

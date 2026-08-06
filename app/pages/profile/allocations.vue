@@ -4,7 +4,7 @@ definePageMeta({
 })
 
 useHead({
-    title: 'My Allocations | The Car Crowd'
+    title: 'My Allocations | Vision148'
 })
 
 type AllocationTone = 'success' | 'warning'

@@ -195,37 +195,17 @@ const formatNumber = (value) => {
                             <table class="table table-auto">
                                 <thead class="sticky z-10 top-0">
                                     <tr>
-                                        <th width="16%">
-                                            <div class="flex flex-row items-center justify-start gap-2 text-gray-800 dark:text-gray-200">
-                                                <span>Item</span>
-                                            </div>
-                                        </th>
-                                        <th width="24%">
-                                            <div class="flex flex-row items-center justify-start gap-2 text-gray-800 dark:text-gray-200">
-                                                <span>Headline</span>
-                                            </div>
-                                        </th>
-                                        <th width="14%">
-                                            <div class="flex flex-row items-center justify-start gap-2 text-gray-800 dark:text-gray-200">
-                                                <span>Shares</span>
-                                            </div>
-                                        </th>
-                                        <th width="12%">
-                                            <div class="flex flex-row items-center justify-start gap-2 text-gray-800 dark:text-gray-200">
-                                                <span>Share Price</span>
-                                            </div>
-                                        </th>
-                                        <th width="12%">
-                                            <div class="flex flex-row items-center justify-start gap-2 text-gray-800 dark:text-gray-200">
-                                                <span>Asset</span>
-                                            </div>
-                                        </th>
-                                        <th width="12%">
-                                            <div class="flex flex-row items-center justify-center gap-2 text-gray-800 dark:text-gray-200">
-                                                <span>Flags</span>
-                                            </div>
-                                        </th>
                                         <th width="5%">
+                                            <div class="flex flex-row items-center justify-center gap-2 text-gray-800 dark:text-gray-200">
+                                                <span>Sl.</span>
+                                            </div>
+                                        </th>
+                                        <th width="75%">
+                                            <div class="flex flex-row items-center justify-start gap-2 text-gray-800 dark:text-gray-200">
+                                                <span>Info</span>
+                                            </div>
+                                        </th>
+                                        <th width="10%">
                                             <div class="flex flex-row items-center justify-center gap-2 text-gray-800 dark:text-gray-200">
                                                 <span>Status</span>
                                             </div>
@@ -240,13 +220,17 @@ const formatNumber = (value) => {
 
                                 <tbody v-if="isLoading">
                                     <tr v-for="index in 10" :key="index">
-                                        <td><Skeleton width="8rem" class="mb-2" /></td>
-                                        <td><Skeleton width="12rem" class="mb-2" /></td>
-                                        <td><Skeleton width="7rem" class="mb-2" /></td>
-                                        <td><Skeleton width="6rem" class="mb-2" /></td>
-                                        <td><Skeleton width="6rem" class="mb-2" /></td>
-                                        <td><div class="flex justify-center"><Skeleton width="5rem" class="mb-2" /></div></td>
-                                        <td><div class="flex justify-center"><Skeleton size="1.5rem" /></div></td>
+                                        <td class="text-center"><Skeleton width="2rem" class="mb-2 mx-auto" /></td>
+                                        <td>
+                                            <div class="flex items-center gap-4">
+                                                <Skeleton width="4rem" height="3rem" class="mb-2" />
+                                                <div class="flex flex-col gap-2">
+                                                    <Skeleton width="12rem" class="mb-2" />
+                                                    <Skeleton width="8rem" class="mb-2" />
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td><div class="flex justify-center"><Skeleton size="1.5rem" shape="circle" /></div></td>
                                         <td>
                                             <div class="flex justify-center items-center gap-2">
                                                 <Skeleton size="1.5rem" />
@@ -258,35 +242,31 @@ const formatNumber = (value) => {
 
                                 <tbody v-else>
                                     <tr v-for="(row, index) in data" :key="index">
-                                        <td class="text-gray-800 dark:text-gray-200 text-start">
-                                            <span class="text-sm font-semibold">{{ row.item_name || row.icon_item?.name || row.icon_item_id }}</span>
-                                            <p class="text-xs text-gray-500 mt-1">{{ row.icon_name || row.icon?.name || 'N/A' }}</p>
+                                        <td class="text-gray-800 dark:text-gray-200 text-center">
+                                            <span class="text-sm">{{ index + 1 }}</span>
                                         </td>
                                         <td class="text-gray-800 dark:text-gray-200 text-start">
-                                            <span class="text-sm font-semibold">{{ row.headline }}</span>
-                                            <p class="text-xs text-gray-500 mt-1">{{ row.subhead_line }}</p>
-                                        </td>
-                                        <td class="text-gray-800 dark:text-gray-200 text-start">
-                                            <span class="text-sm">{{ formatNumber(row.shares_available ?? row.available_shares) }}</span>
-                                            <span class="text-xs text-gray-500"> / {{ formatNumber(row.shares_total ?? row.total_shares) }}</span>
-                                        </td>
-                                        <td class="text-gray-800 dark:text-gray-200 text-start">
-                                            <span class="text-sm">{{ formatMoney(row.per_share_value ?? row.share_price) }}</span>
-                                        </td>
-                                        <td class="text-gray-800 dark:text-gray-200 text-start">
-                                            <span class="text-sm">{{ row.assetable_type || row.assetable?.type || 'N/A' }}</span>
-                                            <p class="text-xs text-gray-500 mt-1">{{ row.assetable_id || row.assetable?.id || 'N/A' }}</p>
-                                        </td>
-                                        <td class="text-center">
-                                            <div class="flex justify-center items-center gap-2 flex-wrap">
-                                                <span v-if="row.is_fractional" class="text-xs px-2 py-1 rounded bg-blue-100 text-blue-700">Fractional</span>
-                                                <span v-if="row.is_exclusive" class="text-xs px-2 py-1 rounded bg-purple-100 text-purple-700">Exclusive</span>
+                                            <div class="flex items-center gap-4">
+                                                <img v-if="row.portfolio_image || row.bg_image" :src="row.portfolio_image || row.bg_image" alt="Image" class="w-16 h-12 object-cover rounded shadow" />
+                                                <div v-else class="w-16 h-12 bg-gray-200 dark:bg-gray-700 rounded shadow flex items-center justify-center">
+                                                    <i class="fa fa-image text-gray-400"></i>
+                                                </div>
+                                                <div class="flex flex-col">
+                                                    <div class="flex items-center gap-2">
+                                                        <span class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ row.headline || row.item_name || 'Unknown Item' }}</span>
+                                                        <span v-if="row.is_fractional" class="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-700">Fractional</span>
+                                                        <span v-if="row.is_exclusive" class="text-[10px] px-1.5 py-0.5 rounded bg-purple-100 text-purple-700">Exclusive</span>
+                                                    </div>
+                                                    <p class="text-xs text-gray-500 mt-1">
+                                                        Share Price: {{ formatMoney(row.per_share_value ?? row.share_price) }}, Total Shares: {{ formatNumber(row.shares_total ?? row.total_shares) }}
+                                                    </p>
+                                                </div>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="flex justify-center items-center">
-                                                <span v-if="row.status == 1" class="text-green-600"><i class="fa fa-power-off" aria-hidden="true" /></span>
-                                                <span v-else class="text-red-500"><i class="fa fa-power-off" aria-hidden="true" /></span>
+                                                <i v-if="row.status > 0" class="fa-solid fa-circle-check text-green-500 text-xl" />
+                                                <i v-else class="fa-solid fa-circle-check text-gray-300 dark:text-gray-600 text-xl" />
                                             </div>
                                         </td>
                                         <td v-if="permissions.edit || permissions.delete">
@@ -296,9 +276,9 @@ const formatNumber = (value) => {
                                             </div>
                                             <div v-else class="flex justify-center items-center gap-2">
                                                 <i @click="editHandler(row)" v-if="permissions.edit"
-                                                    class="fa-solid fa-pen-to-square text-gray-800 dark:text-gray-200 hover:text-green-500 cursor-pointer transition duration-150 ease-in-out" />
+                                                    class="fa-solid fa-pen-to-square text-gray-600 dark:text-gray-400 hover:text-green-500 cursor-pointer transition duration-150 ease-in-out" />
                                                 <i @click="openDeleteModal(row.id)" v-if="permissions.delete"
-                                                    class="fa-solid fa-trash text-red-500 hover:text-red-800 cursor-pointer transition duration-150 ease-in-out" />
+                                                    class="fa-solid fa-trash text-gray-600 dark:text-gray-400 hover:text-red-500 cursor-pointer transition duration-150 ease-in-out" />
                                             </div>
                                         </td>
                                     </tr>

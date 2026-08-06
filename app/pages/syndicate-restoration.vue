@@ -1,6 +1,6 @@
 <script setup lang="ts">
 useHead({
-    title: 'Syndicated Restoration | The Car Crowd',
+    title: 'Syndicated Restoration | Vision148',
     meta: [
         {
             name: 'description',
@@ -258,7 +258,7 @@ const shouldShowAvailableSyndicatesSkeleton = computed(() => (
                             59
                         </span>
                     </div>
-                    <img src="/frontend/assets/images/TCClogowhite.png" alt="The Car Crowd" class="h-auto w-32">
+                    <img src="/frontend/assets/images/TCClogowhite.png" alt="Vision148" class="h-auto w-32">
                 </div>
             </div>
         </section>

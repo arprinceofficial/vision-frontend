@@ -4,7 +4,7 @@ definePageMeta({
 })
 
 useHead({
-    title: 'Register | The Car Crowd'
+    title: 'Register | Vision148'
 })
 
 type NoticeTone = 'success' | 'warning' | 'error' | 'info'
@@ -348,207 +348,219 @@ const resendOtp = async () => {
 
                     <ClientOnly>
                         <form class="space-y-6" @submit.prevent>
-                        <div v-show="currentStep === 1" class="space-y-6">
-                            <div class="space-y-2 text-center lg:text-left">
-                                <span class="font-poppins text-xs font-bold uppercase tracking-widest text-tccGold">{{
-                                    stepTitles[0] }}</span>
-                                <h1 class="font-poppins text-2xl font-semibold text-tccNavy">Let's Get Started</h1>
-                                <p class="text-xs text-tccMutedGray">In order to view our active classic car syndicates,
-                                    please register below.</p>
-                            </div>
+                            <div v-show="currentStep === 1" class="space-y-6">
+                                <div class="space-y-2 text-center lg:text-left">
+                                    <span
+                                        class="font-poppins text-xs font-bold uppercase tracking-widest text-tccGold">{{
+                                            stepTitles[0] }}</span>
+                                    <h1 class="font-poppins text-2xl font-semibold text-tccNavy">Let's Get Started</h1>
+                                    <p class="text-xs text-tccMutedGray">In order to view our active classic car
+                                        syndicates,
+                                        please register below.</p>
+                                </div>
 
-                            <div class="space-y-1">
-                                <label for="reg-email"
-                                    class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">Email
-                                    Address</label>
-                                <input id="reg-email" v-model="registration.email" type="email"
-                                    placeholder="john.doe@example.com"
-                                    class="w-full rounded-lg border border-tccBorder px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-tccNavy">
-                            </div>
-
-                            <button type="button"
-                                class="w-full rounded-lg bg-tccDarkNavy py-3.5 text-center font-poppins text-xs font-bold uppercase tracking-widest text-white shadow transition-colors hover:bg-tccNavy"
-                                @click="goToStep(2)">
-                                Continue &rarr;
-                            </button>
-                        </div>
-
-                        <div v-show="currentStep === 2" class="space-y-6">
-                            <div class="space-y-2 text-center lg:text-left">
-                                <span class="font-poppins text-xs font-bold uppercase tracking-widest text-tccGold">{{
-                                    stepTitles[1] }}</span>
-                                <h2 class="font-poppins text-2xl font-semibold text-tccNavy">What is Your Name?</h2>
-                                <p class="text-xs text-tccMutedGray">Please enter your legal first and last name.</p>
-                            </div>
-
-                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div class="space-y-1">
-                                    <label for="reg-first-name"
-                                        class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">First
-                                        Name</label>
-                                    <input id="reg-first-name" v-model="registration.firstName" type="text"
-                                        placeholder="John"
+                                    <label for="reg-email"
+                                        class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">Email
+                                        Address</label>
+                                    <input id="reg-email" v-model="registration.email" type="email"
+                                        placeholder="john.doe@example.com"
                                         class="w-full rounded-lg border border-tccBorder px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-tccNavy">
                                 </div>
-                                <div class="space-y-1">
-                                    <label for="reg-last-name"
-                                        class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">Last
-                                        Name</label>
-                                    <input id="reg-last-name" v-model="registration.lastName" type="text"
-                                        placeholder="Doe"
-                                        class="w-full rounded-lg border border-tccBorder px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-tccNavy">
-                                </div>
-                            </div>
 
-                            <div class="flex gap-3">
                                 <button type="button"
-                                    class="rounded-lg border border-tccBorder px-4 py-3 font-poppins text-xs font-bold uppercase tracking-wider text-tccNavy"
-                                    @click="goToStep(1)">Back</button>
-                                <button type="button"
-                                    class="flex-grow rounded-lg bg-tccDarkNavy py-3.5 text-center font-poppins text-xs font-bold uppercase tracking-widest text-white shadow transition-colors hover:bg-tccNavy"
-                                    @click="goToStep(3)">
+                                    class="w-full rounded-lg bg-tccDarkNavy py-3.5 text-center font-poppins text-xs font-bold uppercase tracking-widest text-white shadow transition-colors hover:bg-tccNavy"
+                                    @click="goToStep(2)">
                                     Continue &rarr;
                                 </button>
                             </div>
-                        </div>
 
-                        <div v-show="currentStep === 3" class="space-y-6">
-                            <div class="space-y-2 text-center lg:text-left">
-                                <span class="font-poppins text-xs font-bold uppercase tracking-widest text-tccGold">{{
-                                    stepTitles[2] }}</span>
-                                <h2 class="font-poppins text-2xl font-semibold text-tccNavy">Your Mobile Number</h2>
-                                <p class="text-xs text-tccMutedGray">Required for profile verification and security
-                                    alerts.</p>
-                            </div>
-
-                            <div class="space-y-1">
-                                <label for="reg-phone"
-                                    class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">Phone
-                                    Number</label>
-                                <div class="flex gap-2">
-                                    <select v-model="registration.phoneCode"
-                                        class="rounded-lg border border-tccBorder bg-white px-3 py-2.5 text-sm focus:outline-none">
-                                        <option value="+880">BD (+880)</option>
-                                        <option value="+44">GB (+44)</option>
-                                        <option value="+1">US (+1)</option>
-                                        <option value="+31">NL (+31)</option>
-                                        <option value="+49">DE (+49)</option>
-                                    </select>
-                                    <input id="reg-phone" v-model="registration.phone" type="tel"
-                                        placeholder="712345678"
-                                        class="min-w-0 flex-grow rounded-lg border border-tccBorder px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-tccNavy">
+                            <div v-show="currentStep === 2" class="space-y-6">
+                                <div class="space-y-2 text-center lg:text-left">
+                                    <span
+                                        class="font-poppins text-xs font-bold uppercase tracking-widest text-tccGold">{{
+                                            stepTitles[1] }}</span>
+                                    <h2 class="font-poppins text-2xl font-semibold text-tccNavy">What is Your Name?</h2>
+                                    <p class="text-xs text-tccMutedGray">Please enter your legal first and last name.
+                                    </p>
                                 </div>
-                            </div>
 
-                            <div class="flex gap-3">
-                                <button type="button"
-                                    class="rounded-lg border border-tccBorder px-4 py-3 font-poppins text-xs font-bold uppercase tracking-wider text-tccNavy"
-                                    @click="goToStep(2)">Back</button>
-                                <button type="button"
-                                    class="flex-grow rounded-lg bg-tccDarkNavy py-3.5 text-center font-poppins text-xs font-bold uppercase tracking-widest text-white shadow transition-colors hover:bg-tccNavy"
-                                    @click="goToStep(4)">
-                                    Continue &rarr;
-                                </button>
-                            </div>
-                        </div>
-
-                        <div v-show="currentStep === 4" class="space-y-6">
-                            <div class="space-y-2 text-center lg:text-left">
-                                <span class="font-poppins text-xs font-bold uppercase tracking-widest text-tccGold">{{
-                                    stepTitles[3] }}</span>
-                                <h2 class="font-poppins text-2xl font-semibold text-tccNavy">Create a Password</h2>
-                                <p class="text-xs text-tccMutedGray">Must contain min. 8 characters, an uppercase, a
-                                    number, and a symbol.</p>
-                            </div>
-
-                            <div class="space-y-4">
-                                <div class="space-y-1">
-                                    <label for="reg-password"
-                                        class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">Password</label>
-                                    <div class="relative">
-                                        <input id="reg-password" v-model="registration.password"
-                                            :type="showPassword ? 'text' : 'password'" placeholder="Password"
-                                            class="w-full rounded-lg border border-tccBorder px-4 py-2.5 pr-10 text-sm focus:outline-none">
-                                        <button type="button"
-                                            class="absolute inset-y-0 right-3 flex items-center text-gray-400"
-                                            :aria-label="showPassword ? 'Hide password' : 'Show password'"
-                                            @click="showPassword = !showPassword">
-                                            <i class="pi" :class="showPassword ? 'pi-eye' : 'pi-eye-slash'"
-                                                aria-hidden="true" />
-                                        </button>
+                                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                    <div class="space-y-1">
+                                        <label for="reg-first-name"
+                                            class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">First
+                                            Name</label>
+                                        <input id="reg-first-name" v-model="registration.firstName" type="text"
+                                            placeholder="John"
+                                            class="w-full rounded-lg border border-tccBorder px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-tccNavy">
+                                    </div>
+                                    <div class="space-y-1">
+                                        <label for="reg-last-name"
+                                            class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">Last
+                                            Name</label>
+                                        <input id="reg-last-name" v-model="registration.lastName" type="text"
+                                            placeholder="Doe"
+                                            class="w-full rounded-lg border border-tccBorder px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-tccNavy">
                                     </div>
                                 </div>
 
-                                <div class="space-y-1">
-                                    <label for="reg-confirm"
-                                        class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">Confirm
-                                        Password</label>
-                                    <div class="relative">
-                                        <input id="reg-confirm" v-model="registration.confirmPassword"
-                                            :type="showConfirmPassword ? 'text' : 'password'"
-                                            placeholder="Confirm password"
-                                            class="w-full rounded-lg border border-tccBorder px-4 py-2.5 pr-10 text-sm focus:outline-none">
-                                        <button type="button"
-                                            class="absolute inset-y-0 right-3 flex items-center text-gray-400"
-                                            :aria-label="showConfirmPassword ? 'Hide password' : 'Show password'"
-                                            @click="showConfirmPassword = !showConfirmPassword">
-                                            <i class="pi" :class="showConfirmPassword ? 'pi-eye' : 'pi-eye-slash'"
-                                                aria-hidden="true" />
-                                        </button>
-                                    </div>
+                                <div class="flex gap-3">
+                                    <button type="button"
+                                        class="rounded-lg border border-tccBorder px-4 py-3 font-poppins text-xs font-bold uppercase tracking-wider text-tccNavy"
+                                        @click="goToStep(1)">Back</button>
+                                    <button type="button"
+                                        class="flex-grow rounded-lg bg-tccDarkNavy py-3.5 text-center font-poppins text-xs font-bold uppercase tracking-widest text-white shadow transition-colors hover:bg-tccNavy"
+                                        @click="goToStep(3)">
+                                        Continue &rarr;
+                                    </button>
                                 </div>
                             </div>
 
-                            <div class="flex gap-3">
+                            <div v-show="currentStep === 3" class="space-y-6">
+                                <div class="space-y-2 text-center lg:text-left">
+                                    <span
+                                        class="font-poppins text-xs font-bold uppercase tracking-widest text-tccGold">{{
+                                            stepTitles[2] }}</span>
+                                    <h2 class="font-poppins text-2xl font-semibold text-tccNavy">Your Mobile Number</h2>
+                                    <p class="text-xs text-tccMutedGray">Required for profile verification and security
+                                        alerts.</p>
+                                </div>
+
+                                <div class="space-y-1">
+                                    <label for="reg-phone"
+                                        class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">Phone
+                                        Number</label>
+                                    <div class="flex gap-2">
+                                        <select v-model="registration.phoneCode"
+                                            class="rounded-lg border border-tccBorder bg-white px-3 py-2.5 text-sm focus:outline-none">
+                                            <option value="+880">BD (+880)</option>
+                                            <option value="+44">GB (+44)</option>
+                                            <option value="+1">US (+1)</option>
+                                            <option value="+31">NL (+31)</option>
+                                            <option value="+49">DE (+49)</option>
+                                        </select>
+                                        <input id="reg-phone" v-model="registration.phone" type="tel"
+                                            placeholder="712345678"
+                                            class="min-w-0 flex-grow rounded-lg border border-tccBorder px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-tccNavy">
+                                    </div>
+                                </div>
+
+                                <div class="flex gap-3">
+                                    <button type="button"
+                                        class="rounded-lg border border-tccBorder px-4 py-3 font-poppins text-xs font-bold uppercase tracking-wider text-tccNavy"
+                                        @click="goToStep(2)">Back</button>
+                                    <button type="button"
+                                        class="flex-grow rounded-lg bg-tccDarkNavy py-3.5 text-center font-poppins text-xs font-bold uppercase tracking-widest text-white shadow transition-colors hover:bg-tccNavy"
+                                        @click="goToStep(4)">
+                                        Continue &rarr;
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div v-show="currentStep === 4" class="space-y-6">
+                                <div class="space-y-2 text-center lg:text-left">
+                                    <span
+                                        class="font-poppins text-xs font-bold uppercase tracking-widest text-tccGold">{{
+                                            stepTitles[3] }}</span>
+                                    <h2 class="font-poppins text-2xl font-semibold text-tccNavy">Create a Password</h2>
+                                    <p class="text-xs text-tccMutedGray">Must contain min. 8 characters, an uppercase, a
+                                        number, and a symbol.</p>
+                                </div>
+
+                                <div class="space-y-4">
+                                    <div class="space-y-1">
+                                        <label for="reg-password"
+                                            class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">Password</label>
+                                        <div class="relative">
+                                            <input id="reg-password" v-model="registration.password"
+                                                :type="showPassword ? 'text' : 'password'" placeholder="Password"
+                                                class="w-full rounded-lg border border-tccBorder px-4 py-2.5 pr-10 text-sm focus:outline-none">
+                                            <button type="button"
+                                                class="absolute inset-y-0 right-3 flex items-center text-gray-400"
+                                                :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                                                @click="showPassword = !showPassword">
+                                                <i class="pi" :class="showPassword ? 'pi-eye' : 'pi-eye-slash'"
+                                                    aria-hidden="true" />
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="space-y-1">
+                                        <label for="reg-confirm"
+                                            class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">Confirm
+                                            Password</label>
+                                        <div class="relative">
+                                            <input id="reg-confirm" v-model="registration.confirmPassword"
+                                                :type="showConfirmPassword ? 'text' : 'password'"
+                                                placeholder="Confirm password"
+                                                class="w-full rounded-lg border border-tccBorder px-4 py-2.5 pr-10 text-sm focus:outline-none">
+                                            <button type="button"
+                                                class="absolute inset-y-0 right-3 flex items-center text-gray-400"
+                                                :aria-label="showConfirmPassword ? 'Hide password' : 'Show password'"
+                                                @click="showConfirmPassword = !showConfirmPassword">
+                                                <i class="pi" :class="showConfirmPassword ? 'pi-eye' : 'pi-eye-slash'"
+                                                    aria-hidden="true" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex gap-3">
+                                    <button type="button"
+                                        class="rounded-lg border border-tccBorder px-4 py-3 font-poppins text-xs font-bold uppercase tracking-wider text-tccNavy"
+                                        :disabled="isSubmitting" @click="goToStep(3)">Back</button>
+                                    <button type="button"
+                                        class="flex-grow rounded-lg bg-tccGold py-3.5 text-center font-poppins text-xs font-bold uppercase tracking-widest text-tccDarkNavy shadow transition-colors hover:bg-tccLightGold disabled:cursor-not-allowed disabled:opacity-70"
+                                        :disabled="isSubmitting" @click="submitRegister">
+                                        <span v-if="isSubmitting">Creating Account...</span>
+                                        <span v-else>Create Account &rarr;</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div v-show="currentStep === 5" class="space-y-6">
+                                <div class="space-y-2 text-center lg:text-left">
+                                    <span
+                                        class="font-poppins text-xs font-bold uppercase tracking-widest text-tccGold">{{
+                                            stepTitles[4] }}</span>
+                                    <h2 class="font-poppins text-2xl font-semibold text-tccNavy">Verify Your Account
+                                    </h2>
+                                    <p class="text-xs text-tccMutedGray">Enter the 6-digit OTP sent after registration.
+                                    </p>
+                                </div>
+
+                                <div class="flex justify-center gap-2 sm:gap-3">
+                                    <input v-for="(_, index) in registration.otp" :key="index"
+                                        :value="registration.otp[index]" type="text" maxlength="1" inputmode="numeric"
+                                        class="h-14 w-10 rounded-xl border border-tccBorder text-center font-poppins text-xl font-semibold focus:outline-none focus:ring-1 focus:ring-tccNavy sm:h-16 sm:w-12 sm:text-2xl"
+                                        @input="focusNext($event, index)" @paste="handleOtpPaste">
+                                </div>
+
                                 <button type="button"
-                                    class="rounded-lg border border-tccBorder px-4 py-3 font-poppins text-xs font-bold uppercase tracking-wider text-tccNavy"
-                                    :disabled="isSubmitting" @click="goToStep(3)">Back</button>
+                                    class="w-full rounded-lg border border-tccBorder py-3 text-center font-poppins text-xs font-bold uppercase tracking-widest text-tccNavy transition-colors hover:border-tccGold hover:text-tccGold disabled:cursor-not-allowed disabled:opacity-70"
+                                    :disabled="isSubmitting || isResendingOtp || resendCooldownSeconds > 0"
+                                    @click="resendOtp">
+                                    <span v-if="isResendingOtp">Sending Code...</span>
+                                    <span v-else-if="resendCooldownSeconds > 0">Resend OTP in {{ resendCooldownSeconds
+                                        }}s</span>
+                                    <span v-else>Resend OTP</span>
+                                </button>
+
                                 <button type="button"
-                                    class="flex-grow rounded-lg bg-tccGold py-3.5 text-center font-poppins text-xs font-bold uppercase tracking-widest text-tccDarkNavy shadow transition-colors hover:bg-tccLightGold disabled:cursor-not-allowed disabled:opacity-70"
-                                    :disabled="isSubmitting" @click="submitRegister">
-                                    <span v-if="isSubmitting">Creating Account...</span>
-                                    <span v-else>Create Account &rarr;</span>
+                                    class="w-full rounded-lg bg-tccGold py-3.5 text-center font-poppins text-xs font-bold uppercase tracking-widest text-tccDarkNavy shadow transition-colors hover:bg-tccLightGold disabled:cursor-not-allowed disabled:opacity-70"
+                                    :disabled="isSubmitting || isResendingOtp" @click="submitOtpVerify">
+                                    <span v-if="isSubmitting">Verifying...</span>
+                                    <span v-else>Verify Signup &rarr;</span>
                                 </button>
                             </div>
-                        </div>
 
-                        <div v-show="currentStep === 5" class="space-y-6">
-                            <div class="space-y-2 text-center lg:text-left">
-                                <span class="font-poppins text-xs font-bold uppercase tracking-widest text-tccGold">{{
-                                    stepTitles[4] }}</span>
-                                <h2 class="font-poppins text-2xl font-semibold text-tccNavy">Verify Your Account</h2>
-                                <p class="text-xs text-tccMutedGray">Enter the 6-digit OTP sent after registration.</p>
-                            </div>
-
-                            <div class="flex justify-center gap-2 sm:gap-3">
-                                <input v-for="(_, index) in registration.otp" :key="index"
-                                    :value="registration.otp[index]" type="text" maxlength="1" inputmode="numeric"
-                                    class="h-14 w-10 rounded-xl border border-tccBorder text-center font-poppins text-xl font-semibold focus:outline-none focus:ring-1 focus:ring-tccNavy sm:h-16 sm:w-12 sm:text-2xl"
-                                    @input="focusNext($event, index)" @paste="handleOtpPaste">
-                            </div>
-
-                            <button type="button"
-                                class="w-full rounded-lg border border-tccBorder py-3 text-center font-poppins text-xs font-bold uppercase tracking-widest text-tccNavy transition-colors hover:border-tccGold hover:text-tccGold disabled:cursor-not-allowed disabled:opacity-70"
-                                :disabled="isSubmitting || isResendingOtp || resendCooldownSeconds > 0" @click="resendOtp">
-                                <span v-if="isResendingOtp">Sending Code...</span>
-                                <span v-else-if="resendCooldownSeconds > 0">Resend OTP in {{ resendCooldownSeconds }}s</span>
-                                <span v-else>Resend OTP</span>
-                            </button>
-
-                            <button type="button"
-                                class="w-full rounded-lg bg-tccGold py-3.5 text-center font-poppins text-xs font-bold uppercase tracking-widest text-tccDarkNavy shadow transition-colors hover:bg-tccLightGold disabled:cursor-not-allowed disabled:opacity-70"
-                                :disabled="isSubmitting || isResendingOtp" @click="submitOtpVerify">
-                                <span v-if="isSubmitting">Verifying...</span>
-                                <span v-else>Verify Signup &rarr;</span>
-                            </button>
-                        </div>
-
-                        <p class="text-center text-xs font-light text-gray-500">
-                            Already have an account?
-                            <NuxtLink to="/login"
-                                class="ml-1 font-bold uppercase text-tccGold transition-colors hover:text-tccNavy">Log
-                                In</NuxtLink>
-                        </p>
+                            <p class="text-center text-xs font-light text-gray-500">
+                                Already have an account?
+                                <NuxtLink to="/login"
+                                    class="ml-1 font-bold uppercase text-tccGold transition-colors hover:text-tccNavy">
+                                    Log
+                                    In</NuxtLink>
+                            </p>
                         </form>
 
                         <template #fallback>

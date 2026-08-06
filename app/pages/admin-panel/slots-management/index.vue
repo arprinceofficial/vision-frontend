@@ -337,7 +337,7 @@ const handleVerifyPayment = async (id) => {
                     
                     <AddEdit :isOpenModal="isOpenModal" :item="item" :modalTitle="modalTitle" @close="cancelModal" @add_emit="receivedData" />
                     <RejectModal :isOpenModal="isOpenRejectModal" :item="selectedItemToReject"
-                        @close="closeRejectModal" @reject="handleReject" />
+                        @close="closeRejectModal" @submit="handleReject" />
                     <ViewModal :isOpenModal="isOpenViewModal" :item="selectedItemToView" @close="closeViewModal" />
                     
                     <ConfirmModal 
