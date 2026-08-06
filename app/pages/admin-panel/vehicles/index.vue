@@ -196,45 +196,23 @@ const onChangeHandler = () => {
                             <table class="table table-auto">
                                 <thead class="sticky z-10 top-0">
                                     <tr>
-                                        <th width="16%">
-                                            <div
-                                                class="flex flex-row items-center justify-start gap-2 text-gray-800 dark:text-gray-200">
-                                                <span>Name</span>
+                                        <th width="5%">
+                                            <div class="flex flex-row items-center justify-center gap-2 text-gray-800 dark:text-gray-200">
+                                                <span>Sl.</span>
                                             </div>
                                         </th>
-                                        <th width="12%">
-                                            <div
-                                                class="flex flex-row items-center justify-center gap-2 text-gray-800 dark:text-gray-200">
-                                                <span>Make</span>
+                                        <th width="75%">
+                                            <div class="flex flex-row items-center justify-start gap-2 text-gray-800 dark:text-gray-200">
+                                                <span>Info</span>
                                             </div>
                                         </th>
-                                        <th width="12%">
-                                            <div
-                                                class="flex flex-row items-center justify-center gap-2 text-gray-800 dark:text-gray-200">
-                                                <span>Model</span>
-                                            </div>
-                                        </th>
-                                        <th width="8%">
-                                            <div
-                                                class="flex flex-row items-center justify-center gap-2 text-gray-800 dark:text-gray-200">
-                                                <span>Year</span>
-                                            </div>
-                                        </th>
-                                        <th width="32%">
-                                            <div
-                                                class="flex flex-row items-center justify-start gap-2 text-gray-800 dark:text-gray-200">
-                                                <span>Description</span>
-                                            </div>
-                                        </th>
-                                        <th width="8%">
-                                            <div
-                                                class="flex flex-row items-center justify-center gap-2 text-gray-800 dark:text-gray-200">
+                                        <th width="10%">
+                                            <div class="flex flex-row items-center justify-center gap-2 text-gray-800 dark:text-gray-200">
                                                 <span>Status</span>
                                             </div>
                                         </th>
-                                        <th width="12%" v-if="(permissions.edit || permissions.delete) || isLoading">
-                                            <div
-                                                class="flex flex-row items-center justify-center gap-2 text-gray-800 dark:text-gray-200">
+                                        <th width="10%" v-if="(permissions.edit || permissions.delete) || isLoading">
+                                            <div class="flex flex-row items-center justify-center gap-2 text-gray-800 dark:text-gray-200">
                                                 <span>Action</span>
                                             </div>
                                         </th>
@@ -242,69 +220,62 @@ const onChangeHandler = () => {
                                 </thead>
                                 <tbody v-if="isLoading" class="">
                                     <tr v-for="(index) in 10" :key="index">
-                                        <td class="text-gray-800 dark:text-gray-200 text-start">
-                                            <Skeleton width="5rem" class="mb-2"></Skeleton>
-                                        </td>
-                                        <td class="text-gray-800 dark:text-gray-200 text-center">
-                                            <div class="flex justify-center items-center gap-2">
-                                                <Skeleton width="5rem" class="mb-2"></Skeleton>
+                                        <td class="text-center"><Skeleton width="2rem" class="mb-2 mx-auto" /></td>
+                                        <td>
+                                            <div class="flex items-center gap-4">
+                                                <div class="flex flex-col gap-2">
+                                                    <Skeleton width="12rem" class="mb-2" />
+                                                    <Skeleton width="8rem" class="mb-2" />
+                                                </div>
                                             </div>
                                         </td>
-                                        <td class="text-gray-800 dark:text-gray-200 text-center">
-                                            <div class="flex justify-center items-center gap-2">
-                                                <Skeleton width="5rem" class="mb-2"></Skeleton>
-                                            </div>
-                                        </td>
-                                        <td class="text-gray-800 dark:text-gray-200 text-center">
-                                            <div class="flex justify-center items-center gap-2">
-                                                <Skeleton width="4rem" class="mb-2"></Skeleton>
-                                            </div>
-                                        </td>
-                                        <td class="text-gray-800 dark:text-gray-200 text-start">
-                                            <Skeleton width="12rem" class="mb-2"></Skeleton>
-                                        </td>
+                                        <td><div class="flex justify-center"><Skeleton size="1.5rem" shape="circle" /></div></td>
                                         <td>
                                             <div class="flex justify-center items-center gap-2">
-                                                <Skeleton size="1.5rem"></Skeleton>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="flex justify-center items-center gap-2">
-                                                <Skeleton size="1.5rem"></Skeleton>
-                                                <Skeleton size="1.5rem"></Skeleton>
+                                                <Skeleton size="1.5rem" />
+                                                <Skeleton size="1.5rem" />
                                             </div>
                                         </td>
                                     </tr>
                                 </tbody>
                                 <tbody v-else class="">
                                     <tr v-for="(item, index) in data" :key="index">
-                                        <td class="text-gray-800 dark:text-gray-200 text-start">{{ item.name }}</td>
-                                        <td class="text-gray-800 dark:text-gray-200 text-center">{{ item.make }}</td>
-                                        <td class="text-gray-800 dark:text-gray-200 text-center">{{ item.model }}</td>
-                                        <td class="text-gray-800 dark:text-gray-200 text-center">{{ item.year }}</td>
+                                        <td class="text-gray-800 dark:text-gray-200 text-center">
+                                            <span class="text-sm">{{ index + 1 }}</span>
+                                        </td>
                                         <td class="text-gray-800 dark:text-gray-200 text-start">
-                                            <div class="max-w-xs truncate" :title="item.description">
-                                                {{ item.description }}
+                                            <div class="flex items-center gap-4">
+                                                <img v-if="item.asset_image || item.card_image || item.hero_image" :src="item.asset_image || item.card_image || item.hero_image" alt="Image" class="w-16 h-12 object-cover rounded shadow" />
+                                                <div v-else class="w-16 h-12 bg-gray-200 dark:bg-gray-700 rounded shadow flex items-center justify-center min-w-[4rem]">
+                                                    <i class="fa fa-image text-gray-400"></i>
+                                                </div>
+                                                <div class="flex flex-col">
+                                                    <span class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ item.name }}</span>
+                                                    <p class="text-xs text-gray-500 mt-1">
+                                                        Make: {{ item.make }}, Model: {{ item.model }}, Year: {{ item.year }}
+                                                    </p>
+                                                    <p class="text-xs text-gray-400 mt-0.5 truncate max-w-lg" :title="item.description" v-if="item.description">
+                                                        {{ item.description }}
+                                                    </p>
+                                                </div>
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="flex justify-center items-center">
-                                                <span :class="isActiveStatus(item.status) ? 'text-green-600' : 'text-red-500'">
-                                                    {{ getVehicleStatusName(item.status) }}
-                                                </span>
+                                            <div class="flex justify-center items-center" :title="getVehicleStatusName(item.status)">
+                                                <i v-if="isActiveStatus(item.status)" class="fa-solid fa-circle-check text-green-500 text-xl" />
+                                                <i v-else class="fa-solid fa-circle-check text-gray-300 dark:text-gray-600 text-xl" />
                                             </div>
                                         </td>
                                         <td v-if="permissions.edit || permissions.delete">
-                                            <div v-if="status.key == 'trashed' && permissions.delete"
-                                                class="flex justify-center items-center gap-2">
+                                            <div v-if="status.key == 'trashed' && permissions.delete" class="flex justify-center items-center gap-2">
                                                 <i @click="restoreHandler(item.id)"
-                                                    class="fa-solid fa-trash-restore text-green-500 hover:text-green-800 cursor-pointer transition duration-150 ease-in-out"></i>
+                                                    class="fa-solid fa-trash-restore text-green-500 hover:text-green-800 cursor-pointer transition duration-150 ease-in-out" />
                                             </div>
                                             <div v-else class="flex justify-center items-center gap-2">
                                                 <i @click="editHandler(item)" v-if="permissions.edit"
-                                                    class="fa-solid fa-pen-to-square text-gray-800 dark:text-gray-200 hover:text-green-500 cursor-pointer transition duration-150 ease-in-out"></i>
+                                                    class="fa-solid fa-pen-to-square text-gray-600 dark:text-gray-400 hover:text-green-500 cursor-pointer transition duration-150 ease-in-out" />
                                                 <i @click="openDeleteModal(item.id)" v-if="permissions.delete"
-                                                    class="fa-solid fa-trash text-red-500 hover:text-red-800 cursor-pointer transition duration-150 ease-in-out"></i>
+                                                    class="fa-solid fa-trash text-gray-600 dark:text-gray-400 hover:text-red-500 cursor-pointer transition duration-150 ease-in-out" />
                                             </div>
                                         </td>
                                     </tr>
