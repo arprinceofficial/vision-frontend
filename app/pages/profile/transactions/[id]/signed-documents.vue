@@ -179,7 +179,7 @@ onMounted(() => {
 })
 
 useHead(() => ({
-    title: `${transaction.value.referenceId || 'Transaction'} Signed Documents | The Car Crowd`
+    title: `${transaction.value.referenceId || 'Transaction'} Signed Documents | Vision148`
 }))
 </script>
 
@@ -233,7 +233,7 @@ useHead(() => ({
                             <span
                                 class="text-[10px] font-black uppercase tracking-[0.16em] text-white/45">Reference</span>
                             <strong class="mt-1 block font-mono text-[13px] text-tccGold">{{ transaction.referenceId
-                            }}</strong>
+                                }}</strong>
                         </div>
                     </div>
                 </section>
@@ -276,7 +276,7 @@ useHead(() => ({
                                     <i class="pi pi-bars" aria-hidden="true" />
                                     <i class="pi pi-search" aria-hidden="true" />
                                     <span class="rounded border border-white/20 px-2 py-1 text-white">{{ document.pages
-                                    }}</span>
+                                        }}</span>
                                 </div>
                                 <div class="flex items-center gap-3">
                                     <i class="pi pi-minus" aria-hidden="true" />
@@ -292,7 +292,7 @@ useHead(() => ({
                                     <p class="pdf-preview-kicker text-[11px] font-black uppercase tracking-[0.18em]">
                                         Dummy PDF Preview</p>
                                     <h4 class="pdf-preview-title mt-5 font-poppins text-lg font-black">{{ document.title
-                                    }}</h4>
+                                        }}</h4>
                                     <div class="pdf-preview-copy mt-6 space-y-4 text-[13px] leading-relaxed">
                                         <p v-for="clause in document.clauses" :key="clause">{{ clause }}</p>
                                     </div>
@@ -304,7 +304,7 @@ useHead(() => ({
                                             class="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                                             <strong class="pdf-preview-title">{{ pageData.signatoryName }}</strong>
                                             <span class="pdf-preview-muted text-[13px]">{{ transaction.signedDate
-                                            }}</span>
+                                                }}</span>
                                         </div>
                                     </div>
                                 </div>

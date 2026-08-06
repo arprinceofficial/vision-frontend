@@ -306,12 +306,13 @@ const buildAllocTrendChart = () => {
     const d = new Date(now.getFullYear(), now.getMonth() - (6 - i), 1);
     return months[d.getMonth()] + ' ' + String(d.getFullYear()).slice(2);
   });
+  const trends = fo.value.allocation_trend || last7.map(() => 0);
   chartAllocTrend.value = {
     data: {
       labels: last7,
       datasets: [{
         label: 'Requests',
-        data: last7.map(() => 0),
+        data: trends,
         fill: true, tension: 0.4,
         borderColor: '#6366f1',
         backgroundColor: 'rgba(99,102,241,0.12)',
@@ -331,13 +332,15 @@ const buildRevenueTrendChart = () => {
     const d = new Date(now.getFullYear(), now.getMonth() - (6 - i), 1);
     return months[d.getMonth()] + ' ' + String(d.getFullYear()).slice(2);
   });
+  const rTrend = fo.value.revenue_trend || last7.map(() => 0);
+  const pTrend = fo.value.pending_revenue_trend || last7.map(() => 0);
   chartRevenueTrend.value = {
     data: {
       labels: last7,
       datasets: [
         {
           label: 'Revenue (£)',
-          data: last7.map(() => 0),
+          data: rTrend,
           fill: true, tension: 0.4,
           borderColor: '#10b981',
           backgroundColor: 'rgba(16,185,129,0.12)',
@@ -346,7 +349,7 @@ const buildRevenueTrendChart = () => {
         },
         {
           label: 'Pending (£)',
-          data: last7.map(() => 0),
+          data: pTrend,
           fill: false, tension: 0.4,
           borderDash: [5,5],
           borderColor: '#f59e0b',

@@ -4,7 +4,7 @@ definePageMeta({
 })
 
 useHead({
-    title: 'Forgot Password | The Car Crowd'
+    title: 'Forgot Password | Vision148'
 })
 
 type NoticeTone = 'success' | 'warning' | 'error' | 'info'
@@ -463,7 +463,8 @@ onBeforeUnmount(() => {
                             <p class="pt-2 text-center text-xs font-light text-gray-500">
                                 Remembered your password?
                                 <NuxtLink to="/login"
-                                    class="ml-1 font-bold uppercase text-tccGold transition-colors hover:text-tccLightGold">Log
+                                    class="ml-1 font-bold uppercase text-tccGold transition-colors hover:text-tccLightGold">
+                                    Log
                                     In</NuxtLink>
                             </p>
                         </form>
@@ -501,7 +502,7 @@ onBeforeUnmount(() => {
                                 :disabled="isAnyRequestLoading || resendCooldownSeconds > 0" @click="resendOtp">
                                 <span v-if="isResendingOtp">Sending Code...</span>
                                 <span v-else-if="resendCooldownSeconds > 0">Resend OTP in {{ resendCooldownSeconds
-                                    }}s</span>
+                                }}s</span>
                                 <span v-else>Resend OTP</span>
                             </button>
                         </form>
@@ -546,7 +547,8 @@ onBeforeUnmount(() => {
                                         <button type="button"
                                             class="absolute inset-y-0 right-3 flex items-center text-gray-400 transition-colors hover:text-tccLightGold"
                                             :aria-label="showConfirmPassword ? 'Hide password' : 'Show password'"
-                                            :disabled="isSettingPassword" @click="showConfirmPassword = !showConfirmPassword">
+                                            :disabled="isSettingPassword"
+                                            @click="showConfirmPassword = !showConfirmPassword">
                                             <i class="pi" :class="showConfirmPassword ? 'pi-eye' : 'pi-eye-slash'"
                                                 aria-hidden="true" />
                                         </button>
@@ -586,7 +588,8 @@ onBeforeUnmount(() => {
 
                             <div class="space-y-2">
                                 <span class="restomod-eyebrow mx-auto">Password Updated</span>
-                                <h1 class="font-poppins text-3xl font-black leading-tight text-white">Reset Complete</h1>
+                                <h1 class="font-poppins text-3xl font-black leading-tight text-white">Reset Complete
+                                </h1>
                                 <p class="mx-auto max-w-sm text-sm leading-relaxed text-white/60">
                                     Your password has been reset successfully. You can now sign in with your new
                                     credentials.

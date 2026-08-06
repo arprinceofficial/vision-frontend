@@ -892,7 +892,7 @@ const completePaymentConfirmation = () => {
 }
 
 useHead(() => ({
-    title: `Agreement ${agreement.value.reference} - The Car Crowd`,
+    title: `Agreement ${agreement.value.reference} - Vision148`,
     meta: [
         {
             name: 'description',

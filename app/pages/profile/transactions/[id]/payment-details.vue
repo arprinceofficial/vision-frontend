@@ -190,7 +190,7 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('en-GB', {
 }).format(value)
 
 useHead(() => ({
-    title: `${transaction.value.referenceId || 'Transaction'} Payment Details | The Car Crowd`
+    title: `${transaction.value.referenceId} Payment Details | Vision148`
 }))
 
 watch(requestSlug, () => {

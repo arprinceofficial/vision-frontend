@@ -4,7 +4,7 @@ definePageMeta({
 })
 
 useHead({
-    title: 'Transaction History | The Car Crowd'
+    title: 'Transaction History | Vision148'
 })
 
 type TransactionTone = 'success' | 'warning' | 'pending'
@@ -135,8 +135,7 @@ onMounted(() => {
         <ProfileDashboardShell active-section="transactions">
             <ProfileTransactionsListSkeleton v-if="shouldShowTransactionsSkeleton" />
 
-            <section
-                v-else
+            <section v-else
                 class="overflow-hidden rounded-2xl border border-tccGold/20 bg-[#090806] text-white shadow-[0_28px_90px_rgba(0,0,0,0.34)]">
                 <div
                     class="border-b border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(247,198,0,0.16),transparent_24rem),#0b0a08] p-5 sm:p-6">

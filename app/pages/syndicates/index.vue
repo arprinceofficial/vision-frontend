@@ -1,10 +1,10 @@
 <script setup lang="ts">
 useHead({
-    title: 'Syndicates | The Car Crowd',
+    title: 'Syndicates | Vision148',
     meta: [
         {
             name: 'description',
-            content: 'Join The Car Crowd syndicates for curated collectible car opportunities, funded assets, and member-managed ownership.'
+            content: 'Join Vision148 syndicates for curated collectible car opportunities, funded assets, and member-managed ownership.'
         }
     ]
 })
@@ -309,7 +309,7 @@ const shouldShowExpertPanelsSkeleton = computed(() => (
     <div class="bg-tccDeepBlack font-poppins text-white">
         <section
             class="relative flex min-h-[430px] items-end overflow-hidden bg-[#101515] pb-12 pt-20 text-white sm:min-h-[500px] lg:min-h-[560px]">
-            <img src="/frontend/assets/images/porsche.jpeg" alt="The Car Crowd syndicate collectible car"
+            <img src="/frontend/assets/images/porsche.jpeg" alt="Vision148 syndicate collectible car"
                 class="absolute inset-0 h-full w-full object-cover">
             <div class="absolute inset-0 bg-black/55" />
             <div class="absolute inset-0 bg-gradient-to-r from-black/75 via-black/30 to-black/45" />
@@ -392,7 +392,7 @@ const shouldShowExpertPanelsSkeleton = computed(() => (
 
                         <div class="absolute inset-x-0 bottom-0 p-5 sm:p-6">
                             <h3 class="text-[24px] font-semibold leading-none text-white sm:text-[28px]">{{ item.title
-                                }}</h3>
+                            }}</h3>
                             <p class="mt-2 text-[13px] font-medium text-white/75">{{ item.marque }}</p>
                             <NuxtLink :to="item.to"
                                 class="mt-5 inline-flex items-center gap-3 text-[13px] font-semibold text-white/85 transition-colors hover:text-tccGold">
@@ -444,7 +444,7 @@ const shouldShowExpertPanelsSkeleton = computed(() => (
                         <div class="absolute inset-0 bg-gradient-to-t from-black via-black/35 to-black/5" />
                         <div class="absolute inset-x-0 bottom-0 p-5 sm:p-6">
                             <h3 class="text-[24px] font-semibold leading-none text-white sm:text-[28px]">{{ item.title
-                                }}</h3>
+                            }}</h3>
                             <p class="mt-2 text-[13px] font-medium text-white/75">{{ item.model }}</p>
                             <NuxtLink :to="item.to"
                                 class="mt-5 inline-flex items-center gap-3 text-[13px] font-semibold text-white/85 transition-colors hover:text-tccGold">
