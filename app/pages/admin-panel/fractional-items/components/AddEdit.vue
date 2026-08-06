@@ -144,13 +144,18 @@ const getDefaultStorySection = () => ({
 
 const getDefaultFormData = () => ({
     id: null,
-    assetable_type: '',
+    assetable_type: 'vehicle',
     assetable_id: '',
     headline: '',
     subhead_line: '',
     total_shares: '',
     available_shares: '',
     share_price: '',
+    total_value: '',
+    historical_value: '',
+    annual_fees: '',
+    aum_trust_fee: '',
+    portfolio_video: '',
     is_exclusive: false,
     is_fractional: true,
     bg_image: '',
@@ -223,6 +228,34 @@ const getDefaultFormData = () => ({
 const formData = ref(getDefaultFormData());
 const validations_errors = ref({});
 
+const isVehiclesLoading = ref(false);
+const vehicles = ref([]);
+
+const normalizeVehiclesResponse = (value) => {
+    if (Array.isArray(value?.data?.data)) return value.data.data;
+    if (Array.isArray(value?.data)) return value.data;
+    if (Array.isArray(value)) return value;
+    return [];
+};
+
+const loadVehicles = async () => {
+    isVehiclesLoading.value = true;
+    try {
+        const getData = await $fetchAdmin('v1/admin/vehicles', {
+            method: 'GET',
+        });
+        vehicles.value = normalizeVehiclesResponse(getData);
+    } catch (e) {
+        vehicles.value = [];
+    } finally {
+        isVehiclesLoading.value = false;
+    }
+};
+
+onMounted(() => {
+    loadVehicles();
+});
+
 const normalizeExperienceSection = (section) => {
     const value = section || {};
     return {
@@ -288,12 +321,17 @@ watch(() => props.item, (value) => {
         formData.value = {
             id: value.id || null,
             assetable_type: value.assetable_type || value.assetable?.type || '',
-            assetable_id: toInputValue(value.assetable_id ?? value.assetable?.id ?? value.icon_item_id ?? value.icon_item?.id),
+            assetable_id: (value.assetable_id ?? value.assetable?.id ?? value.icon_item_id ?? value.icon_item?.id) ? Number(value.assetable_id ?? value.assetable?.id ?? value.icon_item_id ?? value.icon_item?.id) : '',
             headline: value.headline || '',
             subhead_line: value.subhead_line || '',
             total_shares: toInputValue(value.total_shares ?? value.shares_total),
             available_shares: toInputValue(value.available_shares ?? value.shares_available),
             share_price: toInputValue(value.share_price ?? value.per_share_value),
+            total_value: toInputValue(value.total_value),
+            historical_value: toInputValue(value.historical_value),
+            annual_fees: toInputValue(value.annual_fees),
+            aum_trust_fee: toInputValue(value.aum_trust_fee),
+            portfolio_video: value.portfolio_video || '',
             is_exclusive: isTruthy(value.is_exclusive),
             is_fractional: value.is_fractional === undefined ? true : isTruthy(value.is_fractional),
             bg_image: value.bg_image || '',
@@ -513,6 +551,11 @@ const serializeSubmitData = () => {
         total_shares: toNumber(formData.value.total_shares),
         available_shares: toNumber(formData.value.available_shares),
         share_price: toNumber(formData.value.share_price),
+        total_value: toNumber(formData.value.total_value),
+        historical_value: toNumber(formData.value.historical_value),
+        annual_fees: toNumber(formData.value.annual_fees),
+        aum_trust_fee: toNumber(formData.value.aum_trust_fee),
+        portfolio_video: formData.value.portfolio_video,
         is_exclusive: !!formData.value.is_exclusive,
         is_fractional: !!formData.value.is_fractional,
         bg_image: formData.value.bg_image,
@@ -698,18 +741,13 @@ const createHandler = async () => {
 
             <div class="max-h-[70vh] overflow-y-auto pr-1">
                 <div v-show="activeTab === 'basic'" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                <label class="font-semibold">Assetable Type</label>
-                <LazyInputText v-model="formData.assetable_type" class="w-full"
-                    :class="validations_errors.assetable_type ? 'border-[#f44336!important]' : ''" autocomplete="off"
-                    @focus="validations_errors.assetable_type = ''" />
-                <LazyInputError class="text-sm mt-1" :message="validations_errors.assetable_type" />
-            </div>
+
 
             <div>
-                <label class="font-semibold">Assetable ID</label>
-                <LazyInputText v-model="formData.assetable_id" type="number" class="w-full"
-                    :class="validations_errors.assetable_id ? 'border-[#f44336!important]' : ''" autocomplete="off"
+                <label class="font-semibold">Vehicle <span class="text-red-500">*</span></label>
+                <Select v-model="formData.assetable_id" :options="vehicles" filter optionLabel="name" optionValue="id"
+                    placeholder="Select Vehicle" class="w-full" :loading="isVehiclesLoading"
+                    :class="validations_errors.assetable_id ? 'border-[#f44336!important]' : ''"
                     @focus="validations_errors.assetable_id = ''" />
                 <LazyInputError class="text-sm mt-1" :message="validations_errors.assetable_id" />
             </div>
@@ -775,6 +813,38 @@ const createHandler = async () => {
                     :class="validations_errors.share_price ? 'border-[#f44336!important]' : ''" autocomplete="off"
                     @focus="validations_errors.share_price = ''" />
                 <LazyInputError class="text-sm mt-1" :message="validations_errors.share_price" />
+            </div>
+
+            <div>
+                <label class="font-semibold">Total Value</label>
+                <LazyInputText v-model="formData.total_value" type="number" step="0.01" class="w-full"
+                    :class="validations_errors.total_value ? 'border-[#f44336!important]' : ''" autocomplete="off"
+                    @focus="validations_errors.total_value = ''" />
+                <LazyInputError class="text-sm mt-1" :message="validations_errors.total_value" />
+            </div>
+
+            <div>
+                <label class="font-semibold">Historical Value</label>
+                <LazyInputText v-model="formData.historical_value" type="number" step="0.01" class="w-full"
+                    :class="validations_errors.historical_value ? 'border-[#f44336!important]' : ''" autocomplete="off"
+                    @focus="validations_errors.historical_value = ''" />
+                <LazyInputError class="text-sm mt-1" :message="validations_errors.historical_value" />
+            </div>
+
+            <div>
+                <label class="font-semibold">Annual Fees</label>
+                <LazyInputText v-model="formData.annual_fees" type="number" step="0.01" class="w-full"
+                    :class="validations_errors.annual_fees ? 'border-[#f44336!important]' : ''" autocomplete="off"
+                    @focus="validations_errors.annual_fees = ''" />
+                <LazyInputError class="text-sm mt-1" :message="validations_errors.annual_fees" />
+            </div>
+
+            <div>
+                <label class="font-semibold">AUM Trust Fee</label>
+                <LazyInputText v-model="formData.aum_trust_fee" type="number" step="0.01" class="w-full"
+                    :class="validations_errors.aum_trust_fee ? 'border-[#f44336!important]' : ''" autocomplete="off"
+                    @focus="validations_errors.aum_trust_fee = ''" />
+                <LazyInputError class="text-sm mt-1" :message="validations_errors.aum_trust_fee" />
             </div>
 
             <div>
@@ -1110,6 +1180,14 @@ const createHandler = async () => {
                         <MediaGallery :getPhoto="formData.portfolio_image" @set_photo="setPortfolioImage" />
                     </div>
                     <LazyInputError class="text-sm mt-1" :message="validations_errors.portfolio_image" />
+                </div>
+
+                <div>
+                    <label class="font-semibold">Portfolio Video</label>
+                    <LazyInputText v-model="formData.portfolio_video" class="w-full mt-2"
+                        placeholder="https://example.com/video.mp4" autocomplete="off"
+                        @focus="validations_errors.portfolio_video = ''" />
+                    <LazyInputError class="text-sm mt-1" :message="validations_errors.portfolio_video" />
                 </div>
 
                 <div>
