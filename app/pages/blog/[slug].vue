@@ -436,8 +436,7 @@ useHead(() => ({
       <span class="restomod-eyebrow">Journal</span>
       <h1 class="mt-5 font-poppins text-3xl font-black text-white">Blog post not found</h1>
       <p class="mt-4 text-sm leading-relaxed text-white/60">
-        {{ articleError ? 'The article could not be loaded right now. Please refresh and try again.' : 'The article is
-        unavailable right now or may have been removed.' }}
+        {{ articleError ? 'The article could not be loaded right now. Please refresh and try again.' : 'The article is unavailable right now or may have been removed.' }}
       </p>
       <NuxtLink to="/blog"
         class="mt-7 inline-flex items-center justify-center gap-2 rounded-full bg-tccGold px-5 py-3 font-poppins text-xs font-bold uppercase tracking-[0.2em] text-tccDarkNavy transition-colors hover:bg-tccLightGold">

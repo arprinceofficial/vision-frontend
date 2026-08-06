@@ -387,8 +387,7 @@ onMounted(() => {
                     <h1 class="font-poppins text-2xl font-semibold text-tccNavy">
                         {{ finalResult?.title || 'Suitability Verified Successfully' }}</h1>
                     <p class="mx-auto max-w-sm text-xs text-tccMutedGray">
-                        {{ finalResult?.message || 'Thank you for completing the suitability steps. Your classification
-                        and quiz records are securely logged.' }}
+                        {{ finalResult?.message || 'Thank you for completing the suitability steps. Your classification and quiz records are securely logged.' }}
                     </p>
                 </div>
 
