@@ -4,7 +4,7 @@ definePageMeta({
 })
 
 useHead({
-    title: 'Login | The Car Crowd'
+    title: 'Login | Vision148'
 })
 
 type NoticeTone = 'success' | 'warning' | 'error' | 'info'
@@ -157,7 +157,8 @@ const submitLogin = async () => {
                             <p class="pt-2 text-center text-xs font-light text-gray-500">
                                 Don't have an account?
                                 <NuxtLink to="/register"
-                                    class="ml-1 font-bold uppercase text-tccGold transition-colors hover:text-tccLightGold">Register
+                                    class="ml-1 font-bold uppercase text-tccGold transition-colors hover:text-tccLightGold">
+                                    Register
                                     Now</NuxtLink>
                             </p>
                         </form>

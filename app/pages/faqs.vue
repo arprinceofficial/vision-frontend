@@ -4,11 +4,11 @@ definePageMeta({
 })
 
 useHead({
-    title: 'Frequently Asked Questions - The Car Crowd',
+    title: 'Frequently Asked Questions - Vision148',
     meta: [
         {
             name: 'description',
-            content: 'Frequently asked questions about The Car Crowd syndicates and retail cars for sale.'
+            content: 'Frequently asked questions about Vision148 syndicates and retail cars for sale.'
         }
     ]
 })
@@ -137,7 +137,7 @@ const toggleFaq = (index: number) => {
     <div class="bg-tccDeepBlack text-white">
         <section class="relative min-h-[560px] overflow-hidden border-b border-white/10 bg-tccDeepBlack text-white">
             <div class="absolute inset-0">
-                <img src="/generated/faqs/question-cars.png" alt="The Car Crowd cars"
+                <img src="/generated/faqs/question-cars.png" alt="Vision148 cars"
                     class="h-full w-full object-cover opacity-60">
                 <div
                     class="absolute inset-0 bg-gradient-to-b from-tccDeepBlack/45 via-tccDeepBlack/65 to-tccDeepBlack" />
@@ -188,7 +188,8 @@ const toggleFaq = (index: number) => {
                     <div class="space-y-4">
                         <template v-if="shouldShowFaqSkeleton">
                             <span class="sr-only">Loading FAQs...</span>
-                            <article v-for="(questionWidth, index) in faqSkeletonRows" :key="`${questionWidth}-${index}`"
+                            <article v-for="(questionWidth, index) in faqSkeletonRows"
+                                :key="`${questionWidth}-${index}`"
                                 class="overflow-hidden rounded-[1.25rem] border bg-white/5 transition-colors"
                                 :class="index === 0 ? 'border-tccGold/45' : 'border-white/10'">
                                 <div class="flex w-full items-center justify-between gap-4 px-5 py-5 sm:px-6">

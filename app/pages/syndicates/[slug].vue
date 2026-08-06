@@ -219,7 +219,7 @@ const normalizeNews = (items: unknown): NewsCard[] => (
                     date: getFirstValue(item?.date),
                     day: getFirstValue(item?.day),
                     month: getFirstValue(item?.month),
-                    author: getFirstValue(item?.author) || 'The Car Crowd',
+                    author: getFirstValue(item?.author) || 'Vision148',
                     image: getFirstValue(item?.image) || fallbackSyndicateImage,
                     excerpt: getFirstValue(item?.excerpt)
                 }
@@ -503,11 +503,11 @@ watchEffect(() => {
 })
 
 useHead(() => ({
-    title: `${syndicate.value?.title || 'Syndicate'} - The Car Crowd`,
+    title: `${syndicate.value?.title || 'Syndicate'} - Vision148`,
     meta: [
         {
             name: 'description',
-            content: syndicate.value?.summary || 'View The Car Crowd syndicate detail page.'
+            content: syndicate.value?.summary || 'View Vision148 syndicate detail page.'
         }
     ]
 }))
@@ -795,7 +795,7 @@ useHead(() => ({
                                 <div v-for="spec in syndicate.specs" :key="spec.label"
                                     class="border-b border-white/12 px-3 py-3 text-center last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0">
                                     <strong class="block font-poppins text-lg font-black text-white">{{ spec.value
-                                        }}</strong>
+                                    }}</strong>
                                     <span
                                         class="mt-2 block text-[9px] font-bold uppercase tracking-[0.18em] text-white/38">{{
                                             spec.label }}</span>
@@ -1045,7 +1045,7 @@ useHead(() => ({
                                             {{ metric.label }}
                                         </span>
                                         <strong class="mt-2 block text-sm font-black text-white">{{ metric.value
-                                            }}</strong>
+                                        }}</strong>
                                     </div>
                                 </div>
                             </div>
@@ -1081,7 +1081,7 @@ useHead(() => ({
                                         class="block break-words text-[9px] font-black uppercase tracking-[0.18em] text-white/35">{{
                                             item.label }}</span>
                                     <strong class="mt-1 block break-words text-sm leading-snug text-white">{{ item.value
-                                        }}</strong>
+                                    }}</strong>
                                 </div>
                             </div>
                         </div>
@@ -1148,7 +1148,7 @@ useHead(() => ({
                                     {{ post.title }}
                                 </h3>
                                 <p class="news-card-excerpt mt-4 text-sm leading-relaxed text-white/58">{{ post.excerpt
-                                    }}
+                                }}
                                 </p>
                                 <div
                                     class="mt-auto flex items-center justify-between gap-4 border-t border-white/10 pt-5">
@@ -1157,7 +1157,7 @@ useHead(() => ({
                                             class="h-9 w-9 shrink-0 rounded-full border border-white/20">
                                         <div class="min-w-0">
                                             <span class="block truncate text-xs font-bold text-white/75">{{ post.author
-                                                }}</span>
+                                            }}</span>
                                             <span class="block text-[10px] text-white/40">{{ post.date }}</span>
                                         </div>
                                     </div>
@@ -1179,8 +1179,9 @@ useHead(() => ({
             <ClientOnly>
                 <CitizenSyndicatesIncompleteAllocationModal :is-open-modal="isAllocationModalVisible"
                     :title="syndicate.title" :slots="modalAllocationSlots" :allocation-cost="modalAllocationCost"
-                    :progress="modalAllocationProgress" :current-step="modalAllocationStep" @close="closeAllocationModal"
-                    @start-fresh="startFreshAllocationFlow" @continue-existing="continueExistingAllocationFlow" />
+                    :progress="modalAllocationProgress" :current-step="modalAllocationStep"
+                    @close="closeAllocationModal" @start-fresh="startFreshAllocationFlow"
+                    @continue-existing="continueExistingAllocationFlow" />
             </ClientOnly>
         </template>
     </div>

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 useHead({
-    title: 'Private Portfolios | The Car Crowd',
+    title: 'Private Portfolios | Vision148',
     meta: [
         {
             name: 'description',
-            content: 'Private collectible car portfolio curation, sourcing, custody, and realisation from The Car Crowd.'
+            content: 'Private collectible car portfolio curation, sourcing, custody, and realisation from Vision148.'
         }
     ]
 })

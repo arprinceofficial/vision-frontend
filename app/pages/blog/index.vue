@@ -4,12 +4,12 @@ definePageMeta({
 })
 
 useHead({
-    title: 'Blog & News - The Car Crowd',
+    title: 'Blog & News - Vision148',
     meta: [
         {
             name: 'description',
             content:
-                'Read The Car Crowd journal for collectible car market notes, build updates, ownership education, and member event stories.'
+                'Read Vision148 journal for collectible car market notes, build updates, ownership education, and member event stories.'
         }
     ]
 })
@@ -254,8 +254,8 @@ const normalizeBlogPost = (post: CmsBlogPost): BlogPost | null => {
         readTime: getFirstValue(post.readTime, post.read_time) || 'Read time',
         image: getFirstValue(post.image) || fallbackBlogImage,
         title,
-        excerpt: getFirstValue(post.excerpt) || details[0] || 'Read the latest from The Car Crowd journal.',
-        author: getFirstValue(post.author) || 'The Car Crowd',
+        excerpt: getFirstValue(post.excerpt) || details[0] || 'Read the latest from Vision148 journal.',
+        author: getFirstValue(post.author) || 'Vision148',
         stat: getFirstValue(post.stat) || category,
         body: body.length ? body : details,
         takeaways: normalizeTextList(post.takeaways),
@@ -401,7 +401,7 @@ watch(totalPages, (newTotalPages) => {
                     <span class="restomod-eyebrow">Blog &amp; News</span>
                     <h1
                         class="mt-6 max-w-5xl font-poppins text-5xl font-black leading-[0.95] tracking-normal text-white sm:text-6xl lg:text-7xl">
-                        The Car Crowd Journal
+                        Vision148 Journal
                     </h1>
                     <p class="mt-6 max-w-2xl text-base leading-relaxed text-white/70 sm:text-lg">
                         Market notes, build-room updates, ownership education, and member stories from the world of
@@ -414,7 +414,7 @@ watch(totalPages, (newTotalPages) => {
                             <span v-if="shouldShowBlogPostsSkeleton"
                                 class="mt-2 block h-7 w-10 animate-pulse rounded-full bg-tccGold/20" />
                             <strong v-else class="mt-1 block text-2xl font-black text-tccGold">{{ allPosts.length
-                                }}</strong>
+                            }}</strong>
                         </div>
                         <div class="border-l border-tccGold/50 pl-4">
                             <span
@@ -422,7 +422,7 @@ watch(totalPages, (newTotalPages) => {
                             <span v-if="shouldShowCategoriesSkeleton"
                                 class="mt-2 block h-7 w-10 animate-pulse rounded-full bg-tccGold/20" />
                             <strong v-else class="mt-1 block text-2xl font-black text-tccGold">{{ categories.length - 1
-                            }}</strong>
+                                }}</strong>
                         </div>
                         <div class="border-l border-tccGold/50 pl-4">
                             <span
@@ -665,7 +665,8 @@ watch(totalPages, (newTotalPages) => {
                     <div class="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 p-1">
                         <button type="button"
                             class="flex h-9 w-9 items-center justify-center rounded-full text-white/70 transition-colors hover:text-tccGold disabled:cursor-not-allowed disabled:text-white/30 disabled:hover:text-white/30"
-                            aria-label="Previous page" :disabled="currentPage === 1" @click="selectPage(currentPage - 1)">
+                            aria-label="Previous page" :disabled="currentPage === 1"
+                            @click="selectPage(currentPage - 1)">
                             <i class="pi pi-chevron-left text-xs" aria-hidden="true" />
                         </button>
                         <button v-for="pageNumber in pageNumbers" :key="pageNumber" type="button"

@@ -204,7 +204,7 @@ const normalizeRetailCar = (car: CmsRetailCar | null | undefined): RetailCar | n
 
     const cardImage = getFirstValue(car.cardImage, car.card_image, car.heroImage, car.hero_image) || fallbackCarImage
     const heroImage = getFirstValue(car.heroImage, car.hero_image, cardImage) || fallbackCarImage
-    const excerpt = getFirstValue(car.excerpt, car.description) || 'Contact The Car Crowd for the full ownership file and inspection details.'
+    const excerpt = getFirstValue(car.excerpt, car.description) || 'Contact Vision148 for the full ownership file and inspection details.'
     const exteriorGallery = normalizeStringArray(car.gallery?.exterior)
     const interiorGallery = normalizeStringArray(car.gallery?.interior)
 
@@ -212,7 +212,7 @@ const normalizeRetailCar = (car: CmsRetailCar | null | undefined): RetailCar | n
         slug: slugValue,
         status: getFirstValue(car.status) || 'Open to enquiries',
         title,
-        subtitle: getFirstValue(car.subtitle, car.description, car.excerpt) || 'Contact The Car Crowd for the full ownership file and inspection details.',
+        subtitle: getFirstValue(car.subtitle, car.description, car.excerpt) || 'Contact Vision148 for the full ownership file and inspection details.',
         price: getFirstValue(car.price) || 'Price on application',
         year: getFirstValue(car.year),
         make: getFirstValue(car.make),
@@ -341,11 +341,11 @@ const whatsappUrl = computed(() => {
 })
 
 useHead(() => ({
-    title: `${car.value?.title || 'Cars For Sale'} - The Car Crowd`,
+    title: `${car.value?.title || 'Cars For Sale'} - Vision148`,
     meta: [
         {
             name: 'description',
-            content: car.value?.excerpt || 'View The Car Crowd cars for sale detail page.'
+            content: car.value?.excerpt || 'View Vision148 cars for sale detail page.'
         }
     ]
 }))
@@ -549,25 +549,25 @@ useHead(() => ({
                                 <span
                                     class="block font-poppins text-[10px] font-bold uppercase tracking-[0.22em] text-white/40">Price</span>
                                 <strong class="mt-1 block text-sm font-bold text-tccGold sm:text-base">{{ car.price
-                                    }}</strong>
+                                }}</strong>
                             </div>
                             <div class="border-l border-tccGold/50 pl-4">
                                 <span
                                     class="block font-poppins text-[10px] font-bold uppercase tracking-[0.22em] text-white/40">Mileage</span>
                                 <strong class="mt-1 block text-sm font-bold text-white sm:text-base">{{ car.mileage
-                                    }}</strong>
+                                }}</strong>
                             </div>
                             <div class="border-l border-tccGold/50 pl-4">
                                 <span
                                     class="block font-poppins text-[10px] font-bold uppercase tracking-[0.22em] text-white/40">Gearbox</span>
                                 <strong class="mt-1 block text-sm font-bold text-white sm:text-base">{{ car.transmission
-                                    }}</strong>
+                                }}</strong>
                             </div>
                             <div class="border-l border-tccGold/50 pl-4">
                                 <span
                                     class="block font-poppins text-[10px] font-bold uppercase tracking-[0.22em] text-white/40">Location</span>
                                 <strong class="mt-1 block text-sm font-bold text-white sm:text-base">{{ car.location
-                                    }}</strong>
+                                }}</strong>
                             </div>
                         </div>
                     </div>
@@ -736,7 +736,7 @@ useHead(() => ({
                             </div>
                             <div class="flex flex-1 flex-col p-5">
                                 <span class="text-[10px] text-white/40">{{ relatedCar.year }} - {{ relatedCar.mileage
-                                    }}</span>
+                                }}</span>
                                 <h3
                                     class="mt-3 font-poppins text-lg font-bold leading-tight text-white transition-colors group-hover:text-tccGold">
                                     {{ relatedCar.title }}

@@ -4,7 +4,7 @@ definePageMeta({
 })
 
 useHead({
-  title: 'Change Password | The Car Crowd'
+  title: 'Change Password | Vision148'
 })
 
 type NoticeTone = 'success' | 'warning' | 'error' | 'info'
@@ -111,17 +111,14 @@ onMounted(() => {
 <template>
   <ClientOnly>
     <ProfileDashboardShell v-if="isProfileViewReady" active-section="security">
-      <CitizenSharedActionNotice
-        v-if="notice"
-        class="mb-5"
-        :title="notice.title"
-        :message="notice.message"
-        :tone="notice.tone"
-      />
+      <CitizenSharedActionNotice v-if="notice" class="mb-5" :title="notice.title" :message="notice.message"
+        :tone="notice.tone" />
 
-      <section class="rounded-2xl border border-white/12 bg-white/[0.06] p-5 text-white shadow-[0_24px_80px_rgba(0,0,0,0.24)] sm:p-6">
+      <section
+        class="rounded-2xl border border-white/12 bg-white/[0.06] p-5 text-white shadow-[0_24px_80px_rgba(0,0,0,0.24)] sm:p-6">
         <div>
-          <span class="inline-flex items-center gap-2 rounded-full border border-tccGold/35 bg-tccGold/10 px-3 py-1.5 font-poppins text-[9px] font-black uppercase tracking-[0.18em] text-tccGold">
+          <span
+            class="inline-flex items-center gap-2 rounded-full border border-tccGold/35 bg-tccGold/10 px-3 py-1.5 font-poppins text-[9px] font-black uppercase tracking-[0.18em] text-tccGold">
             <i class="pi pi-lock text-[10px]" aria-hidden="true" />
             Account Security
           </span>
@@ -131,55 +128,49 @@ onMounted(() => {
 
         <form class="mt-6 max-w-lg space-y-5" @submit.prevent="updatePassword">
           <div class="space-y-2">
-            <label for="new_password" class="block text-[10px] font-black uppercase tracking-[0.16em] text-white/55">New Password</label>
+            <label for="new_password" class="block text-[10px] font-black uppercase tracking-[0.16em] text-white/55">New
+              Password</label>
             <div class="relative">
-              <input id="new_password" v-model="password.next" :type="showNewPassword ? 'text' : 'password'" autocomplete="new-password" placeholder="Min. 8 characters" class="w-full rounded-xl border border-white/14 px-4 py-2.5 pr-12 text-[13px] focus:outline-none">
-              <button
-                type="button"
+              <input id="new_password" v-model="password.next" :type="showNewPassword ? 'text' : 'password'"
+                autocomplete="new-password" placeholder="Min. 8 characters"
+                class="w-full rounded-xl border border-white/14 px-4 py-2.5 pr-12 text-[13px] focus:outline-none">
+              <button type="button"
                 class="absolute inset-y-0 right-4 flex items-center text-white/45 transition-colors hover:text-tccGold focus:outline-none"
                 :aria-label="showNewPassword ? 'Hide new password' : 'Show new password'"
-                @click="showNewPassword = !showNewPassword"
-              >
+                @click="showNewPassword = !showNewPassword">
                 <i class="pi" :class="showNewPassword ? 'pi-eye' : 'pi-eye-slash'" aria-hidden="true" />
               </button>
             </div>
           </div>
           <div class="space-y-2">
-            <label for="confirm_password" class="block text-[10px] font-black uppercase tracking-[0.16em] text-white/55">Confirm New Password</label>
+            <label for="confirm_password"
+              class="block text-[10px] font-black uppercase tracking-[0.16em] text-white/55">Confirm New
+              Password</label>
             <div class="relative">
-              <input id="confirm_password" v-model="password.confirm" :type="showConfirmPassword ? 'text' : 'password'" autocomplete="new-password" placeholder="Confirm password" class="w-full rounded-xl border border-white/14 px-4 py-2.5 pr-12 text-[13px] focus:outline-none">
-              <button
-                type="button"
+              <input id="confirm_password" v-model="password.confirm" :type="showConfirmPassword ? 'text' : 'password'"
+                autocomplete="new-password" placeholder="Confirm password"
+                class="w-full rounded-xl border border-white/14 px-4 py-2.5 pr-12 text-[13px] focus:outline-none">
+              <button type="button"
                 class="absolute inset-y-0 right-4 flex items-center text-white/45 transition-colors hover:text-tccGold focus:outline-none"
                 :aria-label="showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'"
-                @click="showConfirmPassword = !showConfirmPassword"
-              >
+                @click="showConfirmPassword = !showConfirmPassword">
                 <i class="pi" :class="showConfirmPassword ? 'pi-eye' : 'pi-eye-slash'" aria-hidden="true" />
               </button>
             </div>
           </div>
 
           <div class="grid grid-cols-1 gap-2 text-[11px] text-white/65 sm:grid-cols-2">
-            <div
-              v-for="requirement in passwordRequirements"
-              :key="requirement.label"
-              class="flex items-center gap-2"
-              :class="requirement.passed ? 'text-tccGold' : 'text-white/55'"
-            >
-              <i
-                class="pi text-[10px]"
-                :class="requirement.passed ? 'pi-check-circle' : 'pi-circle'"
-                aria-hidden="true"
-              />
+            <div v-for="requirement in passwordRequirements" :key="requirement.label" class="flex items-center gap-2"
+              :class="requirement.passed ? 'text-tccGold' : 'text-white/55'">
+              <i class="pi text-[10px]" :class="requirement.passed ? 'pi-check-circle' : 'pi-circle'"
+                aria-hidden="true" />
               <span>{{ requirement.label }}</span>
             </div>
           </div>
 
-          <button
-            type="submit"
+          <button type="submit"
             class="w-full rounded-full bg-tccGold py-3 text-center font-poppins text-[10px] font-black uppercase tracking-[0.16em] text-tccDarkNavy shadow-lg shadow-tccGold/20 transition-colors hover:bg-tccLightGold disabled:cursor-not-allowed disabled:opacity-70"
-            :disabled="isUpdatingPassword"
-          >
+            :disabled="isUpdatingPassword">
             {{ isUpdatingPassword ? 'Updating Password...' : 'Update Password' }}
           </button>
         </form>

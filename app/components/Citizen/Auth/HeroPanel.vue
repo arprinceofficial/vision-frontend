@@ -5,11 +5,10 @@ defineProps<{
 </script>
 
 <template>
-  <aside class="relative flex min-h-[520px] flex-col justify-between overflow-hidden bg-tccDeepBlack p-8 text-white sm:p-12 lg:col-span-5 lg:min-h-screen">
-    <div
-      class="absolute inset-0 bg-cover bg-center opacity-70"
-      style="background-image: url('/generated/restoration-workshop.png');"
-    />
+  <aside
+    class="relative flex min-h-[520px] flex-col justify-between overflow-hidden bg-tccDeepBlack p-8 text-white sm:p-12 lg:col-span-5 lg:min-h-screen">
+    <div class="absolute inset-0 bg-cover bg-center opacity-70"
+      style="background-image: url('/generated/restoration-workshop.png');" />
     <div class="absolute inset-0 bg-gradient-to-b from-tccDeepBlack/80 via-tccDeepBlack/60 to-tccDeepBlack" />
 
     <!-- <div class="relative z-10">
@@ -20,7 +19,7 @@ defineProps<{
     </div> -->
 
     <div class="relative z-10 my-auto space-y-6 py-12">
-      <img src="/TCC-Logo.jpeg" alt="The Car Crowd" class="h-10 w-auto">
+      <img src="/TCC-Logo.jpeg" alt="Vision148" class="h-10 w-auto">
       <div class="space-y-2">
         <span class="restomod-eyebrow">Member Access</span>
         <h1 class="font-poppins text-4xl font-black leading-[0.95] text-white sm:text-5xl">
@@ -31,7 +30,7 @@ defineProps<{
     </div>
 
     <p class="relative z-10 text-[10px] font-light uppercase tracking-[0.18em] text-white/40">
-      &copy; 2026 The Car Crowd. Security-focused investment platform.
+      &copy; 2026 Vision148. Security-focused investment platform.
     </p>
   </aside>
 </template>

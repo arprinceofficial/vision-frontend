@@ -189,7 +189,7 @@ const shouldShowSyndicateDetailSkeleton = computed(() => (
 ))
 
 useHead(() => ({
-    title: `${carDetail.value?.title || 'Syndicate Detail'} | The Car Crowd`
+    title: `${carDetail.value?.title || 'Syndicate Detail'} | Vision148`
 }))
 </script>
 
@@ -229,8 +229,7 @@ useHead(() => ({
                     </div>
                 </div>
 
-                <div v-else-if="syndicateDetailError"
-                    class="restomod-panel rounded-[2rem] p-8 text-center sm:p-12">
+                <div v-else-if="syndicateDetailError" class="restomod-panel rounded-[2rem] p-8 text-center sm:p-12">
                     <h1 class="font-poppins text-3xl font-black text-white">Syndicate unavailable</h1>
                     <p class="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-white/60">
                         This syndicate detail could not be loaded right now. Please refresh and try again.
@@ -283,8 +282,7 @@ useHead(() => ({
 
                             <div v-if="carDetail.gallery.length" class="grid grid-cols-2 gap-3">
                                 <img v-for="image in carDetail.gallery" :key="`${image.src}-${image.alt}`"
-                                    :src="image.src" :alt="image.alt"
-                                    class="h-40 w-full rounded-lg object-cover">
+                                    :src="image.src" :alt="image.alt" class="h-40 w-full rounded-lg object-cover">
                             </div>
                         </div>
                     </div>

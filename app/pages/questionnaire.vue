@@ -5,7 +5,7 @@ definePageMeta({
 })
 
 useHead({
-    title: 'Suitability Questionnaire | The Car Crowd'
+    title: 'Suitability Questionnaire | Vision148'
 })
 
 type Stage = 'facts' | 'quiz' | 'success'
@@ -295,7 +295,7 @@ onMounted(() => {
                         <h2 class="flex items-center gap-2 font-poppins text-sm font-bold text-tccNavy">
                             <span
                                 class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-tccNavy text-[10px] text-white">{{
-                                index + 1 }}</span>
+                                    index + 1 }}</span>
                             {{ fact.title }}
                         </h2>
                         <p class="pl-7 text-xs font-light leading-relaxed text-gray-600">{{ fact.body }}</p>
@@ -387,7 +387,8 @@ onMounted(() => {
                     <h1 class="font-poppins text-2xl font-semibold text-tccNavy">
                         {{ finalResult?.title || 'Suitability Verified Successfully' }}</h1>
                     <p class="mx-auto max-w-sm text-xs text-tccMutedGray">
-                        {{ finalResult?.message || 'Thank you for completing the suitability steps. Your classification and quiz records are securely logged.' }}
+                        {{ finalResult?.message || 'Thank you for completing the suitability steps. Your classification
+                        and quiz records are securely logged.' }}
                     </p>
                 </div>
 

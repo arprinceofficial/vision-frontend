@@ -5,7 +5,7 @@ definePageMeta({
 })
 
 useHead({
-    title: 'Investor Self-Certification | The Car Crowd'
+    title: 'Investor Self-Certification | Vision148'
 })
 
 type NoticeTone = 'success' | 'warning' | 'error' | 'info'
@@ -471,8 +471,7 @@ onMounted(() => {
                                     </div>
 
                                     <ol v-if="option.statements?.length" class="space-y-2">
-                                        <li v-for="(statement, statementIndex) in option.statements"
-                                            :key="statement"
+                                        <li v-for="(statement, statementIndex) in option.statements" :key="statement"
                                             class="flex items-start gap-3 text-sm leading-relaxed text-white/70">
                                             <span
                                                 class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border border-tccGold/60 text-[10px] font-bold text-tccGold">
@@ -594,8 +593,7 @@ onMounted(() => {
                     <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-center">
                         <button type="button"
                             class="rounded-full border border-tccBorder px-10 py-3 font-poppins text-xs font-bold uppercase tracking-wider text-white transition-colors hover:border-tccGold hover:text-tccGold"
-                            :disabled="isBusy"
-                            @click="backFromSupport">
+                            :disabled="isBusy" @click="backFromSupport">
                             Back
                         </button>
                         <a href="mailto:support@thecarcrowd.co.uk"

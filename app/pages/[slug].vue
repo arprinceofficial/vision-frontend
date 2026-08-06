@@ -36,7 +36,7 @@ const pageMap: Record<string, PageConfig> = {
     'reset-password': {
         title: 'Create New Password',
         eyebrow: 'Password Reset',
-        description: 'Choose a new password for your The Car Crowd portal access.',
+        description: 'Choose a new password for your Vision148 portal access.',
         type: 'auth',
         primary: { label: 'Update Password', to: '/login' },
         secondary: { label: 'Back to Login', to: '/login' }
@@ -287,7 +287,7 @@ const page = computed<PageConfig>(() => pageMap[slug.value] || {
 })
 
 useHead(() => ({
-    title: `${page.value.title} | The Car Crowd`
+    title: `${page.value.title} | Vision148`
 }))
 
 const notice = ref<{ title: string, message: string, tone: NoticeTone } | null>(null)
@@ -364,7 +364,7 @@ const detailImage = computed(() => {
     <div v-if="page.type === 'auth'" class="restomod-shell flex min-h-screen flex-col justify-between">
         <div class="grid flex-grow grid-cols-1 lg:grid-cols-12">
             <CitizenAuthHeroPanel
-                description="Recover or verify your secure The Car Crowd investor account before returning to syndicated restoration." />
+                description="Recover or verify your secure Vision148 investor account before returning to syndicated restoration." />
 
             <section class="flex items-center justify-center bg-white/5 p-8 sm:p-16 lg:col-span-7">
                 <div class="w-full max-w-md space-y-8">
@@ -439,15 +439,17 @@ const detailImage = computed(() => {
                     <div class="min-w-0 max-w-4xl space-y-7">
                         <span class="restomod-eyebrow">{{ page.eyebrow }}</span>
                         <h1 class="font-poppins text-4xl font-black leading-[0.95] text-white sm:text-7xl">{{ page.title
-                            }}</h1>
+                        }}</h1>
                         <p class="max-w-2xl text-base font-light leading-relaxed text-white/70">{{ page.description }}
                         </p>
                         <div class="flex flex-wrap gap-3">
                             <NuxtLink to="#live-grid"
-                                class="rounded-full bg-tccGold px-5 py-3.5 font-poppins text-xs font-bold uppercase tracking-[0.16em] text-tccDarkNavy sm:px-6 sm:tracking-[0.22em]">View
+                                class="rounded-full bg-tccGold px-5 py-3.5 font-poppins text-xs font-bold uppercase tracking-[0.16em] text-tccDarkNavy sm:px-6 sm:tracking-[0.22em]">
+                                View
                                 Live Assets</NuxtLink>
                             <NuxtLink to="/funded-assets"
-                                class="rounded-full border border-white/20 bg-white/10 px-5 py-3.5 font-poppins text-xs font-bold uppercase tracking-[0.16em] text-white sm:px-6 sm:tracking-[0.22em]">Funded
+                                class="rounded-full border border-white/20 bg-white/10 px-5 py-3.5 font-poppins text-xs font-bold uppercase tracking-[0.16em] text-white sm:px-6 sm:tracking-[0.22em]">
+                                Funded
                                 Archive</NuxtLink>
                         </div>
                     </div>
@@ -459,20 +461,24 @@ const detailImage = computed(() => {
                 <div v-if="page.type === 'asset-list'" class="mb-8 space-y-2">
                     <span class="restomod-eyebrow">{{ page.eyebrow }}</span>
                     <h1 class="mt-5 font-poppins text-4xl font-black leading-tight text-white sm:text-5xl">{{ page.title
-                        }}</h1>
+                    }}</h1>
                     <p class="mt-3 max-w-2xl text-sm leading-relaxed text-white/60">{{ page.description }}</p>
                 </div>
 
                 <div class="mb-8 flex flex-wrap gap-3">
                     <NuxtLink to="/syndicate-restoration"
-                        class="rounded border border-tccBorder bg-white px-4 py-2 font-poppins text-xs font-semibold uppercase text-tccNavy">Syndicated
+                        class="rounded border border-tccBorder bg-white px-4 py-2 font-poppins text-xs font-semibold uppercase text-tccNavy">
+                        Syndicated
                         Restoration</NuxtLink>
                     <NuxtLink to="/live-syndicate"
-                        class="rounded border border-tccBorder bg-white px-4 py-2 font-poppins text-xs font-semibold uppercase text-tccNavy">Live</NuxtLink>
+                        class="rounded border border-tccBorder bg-white px-4 py-2 font-poppins text-xs font-semibold uppercase text-tccNavy">
+                        Live</NuxtLink>
                     <NuxtLink to="/funded-assets"
-                        class="rounded border border-tccBorder bg-white px-4 py-2 font-poppins text-xs font-semibold uppercase text-tccNavy">Funded</NuxtLink>
+                        class="rounded border border-tccBorder bg-white px-4 py-2 font-poppins text-xs font-semibold uppercase text-tccNavy">
+                        Funded</NuxtLink>
                     <NuxtLink to="/coming-soon-assets"
-                        class="rounded border border-tccBorder bg-white px-4 py-2 font-poppins text-xs font-semibold uppercase text-tccNavy">Coming
+                        class="rounded border border-tccBorder bg-white px-4 py-2 font-poppins text-xs font-semibold uppercase text-tccNavy">
+                        Coming
                         Soon</NuxtLink>
                 </div>
 
@@ -486,7 +492,7 @@ const detailImage = computed(() => {
                             <div class="flex items-center justify-between gap-3">
                                 <span
                                     class="rounded bg-tccLightBg px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-tccGold">{{
-                                    asset.tag }}</span>
+                                        asset.tag }}</span>
                                 <span class="text-xs font-semibold text-tccNavy">{{ asset.value }}</span>
                             </div>
                             <div>
@@ -579,16 +585,18 @@ const detailImage = computed(() => {
                         </div>
                         <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
                             <NuxtLink v-if="page.primary" :to="page.primary.to"
-                                class="rounded bg-tccDarkNavy px-6 py-3 font-poppins text-xs font-bold uppercase tracking-wider text-white">{{
-                                page.primary.label }}</NuxtLink>
+                                class="rounded bg-tccDarkNavy px-6 py-3 font-poppins text-xs font-bold uppercase tracking-wider text-white">
+                                {{
+                                    page.primary.label }}</NuxtLink>
                             <NuxtLink v-if="page.secondary" :to="page.secondary.to"
-                                class="rounded border border-tccBorder px-6 py-3 font-poppins text-xs font-bold uppercase tracking-wider text-tccNavy">{{
-                                page.secondary.label }}</NuxtLink>
+                                class="rounded border border-tccBorder px-6 py-3 font-poppins text-xs font-bold uppercase tracking-wider text-tccNavy">
+                                {{
+                                    page.secondary.label }}</NuxtLink>
                         </div>
                     </div>
 
-                    <form v-else-if="page.type === 'form'"
-                        class="mx-auto mt-8 max-w-2xl space-y-5" @submit.prevent="processAction(page.primary?.to)">
+                    <form v-else-if="page.type === 'form'" class="mx-auto mt-8 max-w-2xl space-y-5"
+                        @submit.prevent="processAction(page.primary?.to)">
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div class="space-y-1">
                                 <label class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">First
@@ -607,7 +615,8 @@ const detailImage = computed(() => {
                             <input type="email" class="w-full rounded-lg border border-tccBorder px-4 py-2.5 text-sm">
                         </div>
                         <div class="space-y-1">
-                            <label class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">Investor Notes</label>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-tccNavy">Investor
+                                Notes</label>
                             <textarea rows="5" class="w-full rounded-lg border border-tccBorder px-4 py-2.5 text-sm" />
                         </div>
                         <button type="submit"
@@ -661,7 +670,8 @@ const detailImage = computed(() => {
                                 </div>
                                 <div class="flex justify-between"><span>Fees</span><strong>Included</strong></div>
                                 <div class="flex justify-between border-t border-tccBorder pt-2 text-tccNavy">
-                                    <span>Total</span><strong>GBP 8,500.00</strong></div>
+                                    <span>Total</span><strong>GBP 8,500.00</strong>
+                                </div>
                             </div>
                             <button v-if="page.primary" type="button"
                                 class="w-full rounded bg-tccDarkNavy px-5 py-3 font-poppins text-xs font-bold uppercase tracking-wider text-white"

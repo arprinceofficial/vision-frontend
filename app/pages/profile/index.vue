@@ -4,7 +4,7 @@ definePageMeta({
 })
 
 useHead({
-  title: 'Profile Information | The Car Crowd'
+  title: 'Profile Information | Vision148'
 })
 
 type NoticeTone = 'success' | 'warning' | 'error' | 'info'
@@ -371,46 +371,35 @@ onMounted(() => {
 <template>
   <ClientOnly>
     <ProfileDashboardShell v-if="isProfileViewReady" active-section="profile">
-      <CitizenSharedActionNotice
-        v-if="notice"
-        class="mb-5"
-        :title="notice.title"
-        :message="notice.message"
-        :tone="notice.tone"
-      />
+      <CitizenSharedActionNotice v-if="notice" class="mb-5" :title="notice.title" :message="notice.message"
+        :tone="notice.tone" />
 
-      <div
-        v-if="validationErrorEntries.length"
-        class="mb-5 rounded-xl border border-red-400/30 bg-red-500/10 p-4 text-sm text-red-100"
-      >
+      <div v-if="validationErrorEntries.length"
+        class="mb-5 rounded-xl border border-red-400/30 bg-red-500/10 p-4 text-sm text-red-100">
         <p class="font-poppins text-[10px] font-black uppercase tracking-[0.18em] text-red-200">Validation Errors</p>
         <div class="mt-3 space-y-2">
-          <p
-            v-for="[field, message] in validationErrorEntries"
-            :key="field"
-          >
+          <p v-for="[field, message] in validationErrorEntries" :key="field">
             <span class="font-semibold text-red-100">{{ formatValidationFieldLabel(field) }}:</span>
             <span class="ml-1 text-red-100/85">{{ message }}</span>
           </p>
         </div>
       </div>
 
-      <section class="space-y-5 rounded-2xl border border-white/12 bg-white/[0.06] p-5 text-white shadow-[0_24px_80px_rgba(0,0,0,0.24)] sm:p-6">
+      <section
+        class="space-y-5 rounded-2xl border border-white/12 bg-white/[0.06] p-5 text-white shadow-[0_24px_80px_rgba(0,0,0,0.24)] sm:p-6">
         <div class="flex flex-col gap-3 border-b border-white/10 pb-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <span class="inline-flex items-center gap-2 rounded-full border border-tccGold/35 bg-tccGold/10 px-3 py-1.5 font-poppins text-[9px] font-black uppercase tracking-[0.18em] text-tccGold">
+            <span
+              class="inline-flex items-center gap-2 rounded-full border border-tccGold/35 bg-tccGold/10 px-3 py-1.5 font-poppins text-[9px] font-black uppercase tracking-[0.18em] text-tccGold">
               <i class="pi pi-user text-[10px]" aria-hidden="true" />
               Investor Profile
             </span>
             <h2 class="mt-3 font-poppins text-xl font-black text-white sm:text-2xl">Profile Information</h2>
             <p class="mt-1 text-[13px] text-white/55">Manage your personal details and investor classification.</p>
           </div>
-          <button
-            v-if="!editingProfile"
-            type="button"
+          <button v-if="!editingProfile" type="button"
             class="inline-flex items-center justify-center gap-2 rounded-full bg-tccGold px-4 py-2.5 font-poppins text-[10px] font-black uppercase tracking-[0.16em] text-tccDarkNavy transition-colors hover:bg-tccLightGold"
-            @click="editingProfile = true"
-          >
+            @click="editingProfile = true">
             <i class="pi pi-pencil text-[10px]" aria-hidden="true" />
             Edit Info
           </button>
@@ -419,42 +408,46 @@ onMounted(() => {
         <form class="space-y-5" @submit.prevent="saveProfile">
           <div class="space-y-2">
             <label class="block text-[13px] font-black text-white">Upload Profile Image</label>
-            <div
-              class="profile-photo-upload w-full max-w-[250px]"
-              :class="[
-                !editingProfile || isSavingProfile ? 'pointer-events-none opacity-75' : '',
-                validations_errors.photo ? 'profile-photo-upload-error' : ''
-              ]"
-            >
-              <PhotoBlockPhoto
-                :getPhoto="profile.photo"
+            <div class="profile-photo-upload w-full max-w-[250px]" :class="[
+              !editingProfile || isSavingProfile ? 'pointer-events-none opacity-75' : '',
+              validations_errors.photo ? 'profile-photo-upload-error' : ''
+            ]">
+              <PhotoBlockPhoto :getPhoto="profile.photo"
                 button-color-class="bg-tccGold hover:bg-tccLightGold focus-visible:outline-tccGold"
-                button-text-color-class="!text-black"
-                @set_photo="setProfilePhoto"
-              />
+                button-text-color-class="!text-black" @set_photo="setProfilePhoto" />
             </div>
             <LazyInputError :message="profileFieldErrorText('photo')" />
           </div>
 
           <div class="grid gap-4 md:grid-cols-2">
             <div class="space-y-2">
-              <label for="first_name" class="block text-[10px] font-black uppercase tracking-[0.16em] text-white/55">First Name</label>
-              <input id="first_name" v-model="profile.first_name" :disabled="!editingProfile || isSavingProfile" class="w-full rounded-xl border border-white/14 px-4 py-2.5 text-[13px] focus:outline-none disabled:opacity-75" :class="profileFieldErrorClass('first_name')" @focus="handleProfileFieldFocus('first_name')">
+              <label for="first_name"
+                class="block text-[10px] font-black uppercase tracking-[0.16em] text-white/55">First Name</label>
+              <input id="first_name" v-model="profile.first_name" :disabled="!editingProfile || isSavingProfile"
+                class="w-full rounded-xl border border-white/14 px-4 py-2.5 text-[13px] focus:outline-none disabled:opacity-75"
+                :class="profileFieldErrorClass('first_name')" @focus="handleProfileFieldFocus('first_name')">
               <LazyInputError :message="profileFieldErrorText('first_name')" />
             </div>
             <div class="space-y-2">
-              <label for="last_name" class="block text-[10px] font-black uppercase tracking-[0.16em] text-white/55">Last Name</label>
-              <input id="last_name" v-model="profile.last_name" :disabled="!editingProfile || isSavingProfile" class="w-full rounded-xl border border-white/14 px-4 py-2.5 text-[13px] focus:outline-none disabled:opacity-75" :class="profileFieldErrorClass('last_name')" @focus="handleProfileFieldFocus('last_name')">
+              <label for="last_name" class="block text-[10px] font-black uppercase tracking-[0.16em] text-white/55">Last
+                Name</label>
+              <input id="last_name" v-model="profile.last_name" :disabled="!editingProfile || isSavingProfile"
+                class="w-full rounded-xl border border-white/14 px-4 py-2.5 text-[13px] focus:outline-none disabled:opacity-75"
+                :class="profileFieldErrorClass('last_name')" @focus="handleProfileFieldFocus('last_name')">
               <LazyInputError :message="profileFieldErrorText('last_name')" />
             </div>
             <div class="space-y-2">
-              <label for="dob" class="block text-[10px] font-black uppercase tracking-[0.16em] text-white/55">Date of Birth</label>
-              <input id="dob" v-model="profile.dob" type="date" :disabled="!editingProfile || isSavingProfile" class="w-full rounded-xl border border-white/14 px-4 py-2.5 text-[13px] focus:outline-none disabled:opacity-75" :class="profileFieldErrorClass('dob')" @focus="handleProfileFieldFocus('dob')">
+              <label for="dob" class="block text-[10px] font-black uppercase tracking-[0.16em] text-white/55">Date of
+                Birth</label>
+              <input id="dob" v-model="profile.dob" type="date" :disabled="!editingProfile || isSavingProfile"
+                class="w-full rounded-xl border border-white/14 px-4 py-2.5 text-[13px] focus:outline-none disabled:opacity-75"
+                :class="profileFieldErrorClass('dob')" @focus="handleProfileFieldFocus('dob')">
               <LazyInputError :message="profileFieldErrorText('dob')" />
             </div>
             <div class="space-y-2">
               <span class="block text-[10px] font-black uppercase tracking-[0.16em] text-white/55">Investor Class</span>
-              <div class="flex min-h-11 items-center justify-between rounded-xl border border-tccGold/25 bg-tccGold/10 px-4 py-2.5 text-[13px]">
+              <div
+                class="flex min-h-11 items-center justify-between rounded-xl border border-tccGold/25 bg-tccGold/10 px-4 py-2.5 text-[13px]">
                 <span class="font-semibold text-white">{{ investorClass }}</span>
                 <span class="font-poppins text-[9px] font-black uppercase tracking-[0.14em] text-tccGold">
                   <i class="pi pi-check-circle mr-1" aria-hidden="true" />
@@ -469,44 +462,46 @@ onMounted(() => {
             <div class="grid gap-4 md:grid-cols-2">
               <div class="space-y-2">
                 <label for="username" class="block text-[10px] font-semibold text-white/55">Username</label>
-                <input id="username" v-model="profile.username" :disabled="!editingProfile || isSavingProfile" class="w-full rounded-xl border border-white/14 px-4 py-2.5 text-[13px] disabled:opacity-75" :class="profileFieldErrorClass('username')" @focus="handleProfileFieldFocus('username')">
+                <input id="username" v-model="profile.username" :disabled="!editingProfile || isSavingProfile"
+                  class="w-full rounded-xl border border-white/14 px-4 py-2.5 text-[13px] disabled:opacity-75"
+                  :class="profileFieldErrorClass('username')" @focus="handleProfileFieldFocus('username')">
                 <LazyInputError :message="profileFieldErrorText('username')" />
               </div>
               <div class="space-y-2">
                 <label for="middle_name" class="block text-[10px] font-semibold text-white/55">Middle Name</label>
-                <input id="middle_name" v-model="profile.middle_name" :disabled="!editingProfile || isSavingProfile" class="w-full rounded-xl border border-white/14 px-4 py-2.5 text-[13px] disabled:opacity-75" :class="profileFieldErrorClass('middle_name')" @focus="handleProfileFieldFocus('middle_name')">
+                <input id="middle_name" v-model="profile.middle_name" :disabled="!editingProfile || isSavingProfile"
+                  class="w-full rounded-xl border border-white/14 px-4 py-2.5 text-[13px] disabled:opacity-75"
+                  :class="profileFieldErrorClass('middle_name')" @focus="handleProfileFieldFocus('middle_name')">
                 <LazyInputError :message="profileFieldErrorText('middle_name')" />
               </div>
               <div class="space-y-2">
                 <label for="email" class="block text-[10px] font-semibold text-white/55">Email Address</label>
-                <input id="email" v-model="profile.email" type="email" :disabled="!editingProfile || isSavingProfile" class="w-full rounded-xl border border-white/14 px-4 py-2.5 text-[13px] disabled:opacity-75" :class="profileFieldErrorClass('email')" @focus="handleProfileFieldFocus('email')">
+                <input id="email" v-model="profile.email" type="email" :disabled="!editingProfile || isSavingProfile"
+                  class="w-full rounded-xl border border-white/14 px-4 py-2.5 text-[13px] disabled:opacity-75"
+                  :class="profileFieldErrorClass('email')" @focus="handleProfileFieldFocus('email')">
                 <LazyInputError :message="profileFieldErrorText('email')" />
               </div>
               <div class="space-y-2">
                 <label for="ccode" class="block text-[10px] font-semibold text-white/55">Country Code</label>
-                <input id="ccode" v-model="profile.ccode" type="tel" :disabled="!editingProfile || isSavingProfile" class="w-full rounded-xl border border-white/14 px-4 py-2.5 text-[13px] disabled:opacity-75" :class="profileFieldErrorClass('ccode')" @focus="handleProfileFieldFocus('ccode')">
+                <input id="ccode" v-model="profile.ccode" type="tel" :disabled="!editingProfile || isSavingProfile"
+                  class="w-full rounded-xl border border-white/14 px-4 py-2.5 text-[13px] disabled:opacity-75"
+                  :class="profileFieldErrorClass('ccode')" @focus="handleProfileFieldFocus('ccode')">
                 <LazyInputError :message="profileFieldErrorText('ccode')" />
               </div>
               <div class="space-y-2">
                 <label for="mobile" class="block text-[10px] font-semibold text-white/55">Mobile</label>
-                <input id="mobile" v-model="profile.mobile" type="tel" :disabled="!editingProfile || isSavingProfile" class="w-full rounded-xl border border-white/14 px-4 py-2.5 text-[13px] disabled:opacity-75" :class="profileFieldErrorClass('mobile')" @focus="handleProfileFieldFocus('mobile')">
+                <input id="mobile" v-model="profile.mobile" type="tel" :disabled="!editingProfile || isSavingProfile"
+                  class="w-full rounded-xl border border-white/14 px-4 py-2.5 text-[13px] disabled:opacity-75"
+                  :class="profileFieldErrorClass('mobile')" @focus="handleProfileFieldFocus('mobile')">
                 <LazyInputError :message="profileFieldErrorText('mobile')" />
               </div>
               <div class="space-y-2">
                 <label for="gender" class="block text-[10px] font-semibold text-white/55">Gender</label>
-                <Dropdown
-                  v-model="selectedGender"
-                  input-id="gender"
-                  :options="genderOptions"
-                  optionLabel="name"
-                  placeholder="Select gender"
-                  class="profile-option-dropdown w-full"
-                  panelClass="profile-option-dropdown-panel"
-                  :loading="isGendersLoading"
+                <Dropdown v-model="selectedGender" input-id="gender" :options="genderOptions" optionLabel="name"
+                  placeholder="Select gender" class="profile-option-dropdown w-full"
+                  panelClass="profile-option-dropdown-panel" :loading="isGendersLoading"
                   :disabled="!editingProfile || isSavingProfile || isGendersLoading"
-                  :class="profileFieldErrorClass('gender')"
-                  @focus="handleProfileFieldFocus('gender')"
-                >
+                  :class="profileFieldErrorClass('gender')" @focus="handleProfileFieldFocus('gender')">
                   <template #value="slotProps">
                     <span v-if="slotProps.value" class="block truncate">{{ slotProps.value.name }}</span>
                     <span v-else class="block truncate text-white/45">{{ slotProps.placeholder }}</span>
@@ -519,27 +514,19 @@ onMounted(() => {
               </div>
               <div class="space-y-2">
                 <label for="nationality_id" class="block text-[10px] font-semibold text-white/55">Nationality</label>
-                <Dropdown
-                  v-model="selectedNationality"
-                  input-id="nationality_id"
-                  :options="nationalityOptions"
-                  optionLabel="name"
-                  placeholder="Select nationality"
-                  class="profile-option-dropdown w-full"
-                  panelClass="profile-option-dropdown-panel"
-                  filter
-                  :loading="isCountriesLoading"
+                <Dropdown v-model="selectedNationality" input-id="nationality_id" :options="nationalityOptions"
+                  optionLabel="name" placeholder="Select nationality" class="profile-option-dropdown w-full"
+                  panelClass="profile-option-dropdown-panel" filter :loading="isCountriesLoading"
                   :disabled="!editingProfile || isSavingProfile || isCountriesLoading"
-                  :class="profileFieldErrorClass('nationality_id')"
-                  @focus="handleProfileFieldFocus('nationality_id')"
-                >
+                  :class="profileFieldErrorClass('nationality_id')" @focus="handleProfileFieldFocus('nationality_id')">
                   <template #value="slotProps">
                     <span v-if="slotProps.value" class="block truncate">{{ slotProps.value.name }}</span>
                     <span v-else class="block truncate text-white/45">{{ slotProps.placeholder }}</span>
                   </template>
                   <template #option="slotProps">
                     <div class="flex items-center gap-2">
-                      <span v-if="slotProps.option.code" class="font-mono text-[10px] uppercase text-tccGold/70">{{ slotProps.option.code }}</span>
+                      <span v-if="slotProps.option.code" class="font-mono text-[10px] uppercase text-tccGold/70">{{
+                        slotProps.option.code }}</span>
                       <span>{{ slotProps.option.name }}</span>
                     </div>
                   </template>
@@ -554,27 +541,19 @@ onMounted(() => {
             <div class="grid gap-4 md:grid-cols-2">
               <div class="space-y-2">
                 <label for="pre_country" class="block text-[10px] font-semibold text-white/55">Country</label>
-                <Dropdown
-                  v-model="selectedPrimaryCountry"
-                  input-id="pre_country"
-                  :options="nationalityOptions"
-                  optionLabel="name"
-                  placeholder="Select country"
-                  class="profile-option-dropdown w-full"
-                  panelClass="profile-option-dropdown-panel"
-                  filter
-                  :loading="isCountriesLoading"
+                <Dropdown v-model="selectedPrimaryCountry" input-id="pre_country" :options="nationalityOptions"
+                  optionLabel="name" placeholder="Select country" class="profile-option-dropdown w-full"
+                  panelClass="profile-option-dropdown-panel" filter :loading="isCountriesLoading"
                   :disabled="!editingProfile || isSavingProfile || isCountriesLoading"
-                  :class="profileFieldErrorClass('pre_country')"
-                  @focus="handleProfileFieldFocus('pre_country')"
-                >
+                  :class="profileFieldErrorClass('pre_country')" @focus="handleProfileFieldFocus('pre_country')">
                   <template #value="slotProps">
                     <span v-if="slotProps.value" class="block truncate">{{ slotProps.value.name }}</span>
                     <span v-else class="block truncate text-white/45">{{ slotProps.placeholder }}</span>
                   </template>
                   <template #option="slotProps">
                     <div class="flex items-center gap-2">
-                      <span v-if="slotProps.option.code" class="font-mono text-[10px] uppercase text-tccGold/70">{{ slotProps.option.code }}</span>
+                      <span v-if="slotProps.option.code" class="font-mono text-[10px] uppercase text-tccGold/70">{{
+                        slotProps.option.code }}</span>
                       <span>{{ slotProps.option.name }}</span>
                     </div>
                   </template>
@@ -582,42 +561,49 @@ onMounted(() => {
                 <LazyInputError :message="profileFieldErrorText('pre_country')" />
               </div>
               <div class="space-y-2">
-                <label for="pre_srteet_address" class="block text-[10px] font-semibold text-white/55">Street Address</label>
-                <input id="pre_srteet_address" v-model="profile.pre_srteet_address" :disabled="!editingProfile || isSavingProfile" class="w-full rounded-xl border border-white/14 px-4 py-2.5 text-[13px] disabled:opacity-75" :class="profileFieldErrorClass('pre_srteet_address')" @focus="handleProfileFieldFocus('pre_srteet_address')">
+                <label for="pre_srteet_address" class="block text-[10px] font-semibold text-white/55">Street
+                  Address</label>
+                <input id="pre_srteet_address" v-model="profile.pre_srteet_address"
+                  :disabled="!editingProfile || isSavingProfile"
+                  class="w-full rounded-xl border border-white/14 px-4 py-2.5 text-[13px] disabled:opacity-75"
+                  :class="profileFieldErrorClass('pre_srteet_address')"
+                  @focus="handleProfileFieldFocus('pre_srteet_address')">
                 <LazyInputError :message="profileFieldErrorText('pre_srteet_address')" />
               </div>
               <div class="space-y-2">
                 <label for="pre_city" class="block text-[10px] font-semibold text-white/55">Town/City</label>
-                <input id="pre_city" v-model="profile.pre_city" :disabled="!editingProfile || isSavingProfile" class="w-full rounded-xl border border-white/14 px-4 py-2.5 text-[13px] disabled:opacity-75" :class="profileFieldErrorClass('pre_city')" @focus="handleProfileFieldFocus('pre_city')">
+                <input id="pre_city" v-model="profile.pre_city" :disabled="!editingProfile || isSavingProfile"
+                  class="w-full rounded-xl border border-white/14 px-4 py-2.5 text-[13px] disabled:opacity-75"
+                  :class="profileFieldErrorClass('pre_city')" @focus="handleProfileFieldFocus('pre_city')">
                 <LazyInputError :message="profileFieldErrorText('pre_city')" />
               </div>
               <div class="space-y-2">
                 <label for="pre_provience" class="block text-[10px] font-semibold text-white/55">Province</label>
-                <input id="pre_provience" v-model="profile.pre_provience" :disabled="!editingProfile || isSavingProfile" class="w-full rounded-xl border border-white/14 px-4 py-2.5 text-[13px] disabled:opacity-75" :class="profileFieldErrorClass('pre_provience')" @focus="handleProfileFieldFocus('pre_provience')">
+                <input id="pre_provience" v-model="profile.pre_provience" :disabled="!editingProfile || isSavingProfile"
+                  class="w-full rounded-xl border border-white/14 px-4 py-2.5 text-[13px] disabled:opacity-75"
+                  :class="profileFieldErrorClass('pre_provience')" @focus="handleProfileFieldFocus('pre_provience')">
                 <LazyInputError :message="profileFieldErrorText('pre_provience')" />
               </div>
               <div class="space-y-2">
                 <label for="pre_zip" class="block text-[10px] font-semibold text-white/55">Postcode</label>
-                <input id="pre_zip" v-model="profile.pre_zip" :disabled="!editingProfile || isSavingProfile" class="w-full rounded-xl border border-white/14 px-4 py-2.5 text-[13px] disabled:opacity-75" :class="profileFieldErrorClass('pre_zip')" @focus="handleProfileFieldFocus('pre_zip')">
+                <input id="pre_zip" v-model="profile.pre_zip" :disabled="!editingProfile || isSavingProfile"
+                  class="w-full rounded-xl border border-white/14 px-4 py-2.5 text-[13px] disabled:opacity-75"
+                  :class="profileFieldErrorClass('pre_zip')" @focus="handleProfileFieldFocus('pre_zip')">
                 <LazyInputError :message="profileFieldErrorText('pre_zip')" />
               </div>
             </div>
           </div>
 
-          <div v-if="editingProfile" class="flex flex-col gap-3 border-t border-white/10 pt-5 sm:flex-row sm:justify-end">
-            <button
-              type="button"
+          <div v-if="editingProfile"
+            class="flex flex-col gap-3 border-t border-white/10 pt-5 sm:flex-row sm:justify-end">
+            <button type="button"
               class="rounded-full border border-white/20 px-4 py-2.5 font-poppins text-[10px] font-black uppercase tracking-[0.14em] text-white/70 transition-colors hover:border-tccGold hover:text-tccGold"
-              :disabled="isSavingProfile"
-              @click="cancelEdit"
-            >
+              :disabled="isSavingProfile" @click="cancelEdit">
               Cancel
             </button>
-            <button
-              type="submit"
+            <button type="submit"
               class="rounded-full bg-tccGold px-5 py-2.5 font-poppins text-[10px] font-black uppercase tracking-[0.14em] text-tccDarkNavy transition-colors hover:bg-tccLightGold disabled:cursor-not-allowed disabled:opacity-70"
-              :disabled="isSavingProfile"
-            >
+              :disabled="isSavingProfile">
               {{ isSavingProfile ? 'Saving...' : 'Save Changes' }}
             </button>
           </div>
