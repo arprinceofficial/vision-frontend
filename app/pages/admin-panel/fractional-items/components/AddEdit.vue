@@ -9,6 +9,20 @@ const props = defineProps({
 const emit = defineEmits(['add_emit', 'close']);
 const { $formatDateForApi, $parseDateValue, $slugify } = useNuxtApp();
 
+const STATUS_DRAFT = 0;
+const STATUS_UPCOMING = 1;
+const STATUS_LIVE = 2;
+const STATUS_SOLD = 3;
+const STATUS_INACTIVE = 4;
+
+const statusOptions = [
+    { name: 'Draft', value: STATUS_DRAFT },
+    { name: 'Upcoming', value: STATUS_UPCOMING },
+    { name: 'Live', value: STATUS_LIVE },
+    { name: 'Sold', value: STATUS_SOLD },
+    { name: 'Inactive', value: STATUS_INACTIVE }
+];
+
 const formTabs = [
     { key: 'basic', label: 'Basic' },
     { key: 'analysis', label: 'Analysis' },
@@ -161,7 +175,7 @@ const getDefaultFormData = () => ({
     bg_image: '',
     summary_image: '',
     portfolio_image: '',
-    status: false,
+    status: 0,
     slug: '',
     reveal_bg_image: '',
     item_name: '',
@@ -337,7 +351,7 @@ watch(() => props.item, (value) => {
             bg_image: value.bg_image || '',
             summary_image: value.summary_image || '',
             portfolio_image: value.portfolio_image || '',
-            status: isTruthy(value.status),
+            status: Number(value.status ?? 0),
             slug: value.slug || '',
             reveal_bg_image: value.reveal_bg_image || '',
             item_name: value.item_name || '',
@@ -515,6 +529,17 @@ const removeNewsItem = (index) => {
 const requiredFields = [
     'assetable_type',
     'assetable_id',
+    'headline',
+    'subhead_line',
+    'total_shares',
+    'available_shares',
+    'share_price',
+    'total_value',
+    'bg_image',
+    'slug',
+    'item_name',
+    'item_second_name',
+    'item_details',
 ];
 
 const validateForm = () => {
@@ -561,7 +586,7 @@ const serializeSubmitData = () => {
         bg_image: formData.value.bg_image,
         summary_image: formData.value.summary_image,
         portfolio_image: formData.value.portfolio_image,
-        status: formData.value.status ? 1 : 0,
+        status: formData.value.status,
         slug: formData.value.slug,
         reveal_bg_image: formData.value.reveal_bg_image,
         item_name: formData.value.item_name,
@@ -753,7 +778,7 @@ const createHandler = async () => {
             </div>
 
             <div>
-                <label class="font-semibold">Slug</label>
+                <label class="font-semibold">Slug <span class="text-red-500">*</span></label>
                 <LazyInputText v-model="formData.slug" class="w-full"
                     :class="validations_errors.slug ? 'border-[#f44336!important]' : ''" autocomplete="off"
                     @focus="validations_errors.slug = ''" />
@@ -761,7 +786,7 @@ const createHandler = async () => {
             </div>
 
             <div>
-                <label class="font-semibold">Headline</label>
+                <label class="font-semibold">Headline <span class="text-red-500">*</span></label>
                 <LazyInputText v-model="formData.headline" class="w-full"
                     :class="validations_errors.headline ? 'border-[#f44336!important]' : ''" autocomplete="off"
                     @focus="validations_errors.headline = ''" />
@@ -769,7 +794,7 @@ const createHandler = async () => {
             </div>
 
             <div>
-                <label class="font-semibold">Subhead Line</label>
+                <label class="font-semibold">Subhead Line <span class="text-red-500">*</span></label>
                 <LazyInputText v-model="formData.subhead_line" class="w-full"
                     :class="validations_errors.subhead_line ? 'border-[#f44336!important]' : ''" autocomplete="off"
                     @focus="validations_errors.subhead_line = ''" />
@@ -777,7 +802,7 @@ const createHandler = async () => {
             </div>
 
             <div>
-                <label class="font-semibold">Item Name</label>
+                <label class="font-semibold">Item Name <span class="text-red-500">*</span></label>
                 <LazyInputText v-model="formData.item_name" class="w-full"
                     :class="validations_errors.item_name ? 'border-[#f44336!important]' : ''" autocomplete="off"
                     @focus="validations_errors.item_name = ''" />
@@ -785,14 +810,14 @@ const createHandler = async () => {
             </div>
 
             <div>
-                <label class="font-semibold">Item Second Name</label>
+                <label class="font-semibold">Item Second Name <span class="text-red-500">*</span></label>
                 <LazyInputText v-model="formData.item_second_name" class="w-full" autocomplete="off"
                     @focus="validations_errors.item_second_name = ''" />
                 <LazyInputError class="text-sm mt-1" :message="validations_errors.item_second_name" />
             </div>
 
             <div>
-                <label class="font-semibold">Total Shares</label>
+                <label class="font-semibold">Total Shares <span class="text-red-500">*</span></label>
                 <LazyInputText v-model="formData.total_shares" type="number" class="w-full"
                     :class="validations_errors.total_shares ? 'border-[#f44336!important]' : ''" autocomplete="off"
                     @focus="validations_errors.total_shares = ''" />
@@ -800,7 +825,7 @@ const createHandler = async () => {
             </div>
 
             <div>
-                <label class="font-semibold">Available Shares</label>
+                <label class="font-semibold">Available Shares <span class="text-red-500">*</span></label>
                 <LazyInputText v-model="formData.available_shares" type="number" class="w-full"
                     :class="validations_errors.available_shares ? 'border-[#f44336!important]' : ''" autocomplete="off"
                     @focus="validations_errors.available_shares = ''" />
@@ -808,7 +833,7 @@ const createHandler = async () => {
             </div>
 
             <div>
-                <label class="font-semibold">Share Price</label>
+                <label class="font-semibold">Share Price <span class="text-red-500">*</span></label>
                 <LazyInputText v-model="formData.share_price" type="number" step="0.01" class="w-full"
                     :class="validations_errors.share_price ? 'border-[#f44336!important]' : ''" autocomplete="off"
                     @focus="validations_errors.share_price = ''" />
@@ -816,7 +841,7 @@ const createHandler = async () => {
             </div>
 
             <div>
-                <label class="font-semibold">Total Value</label>
+                <label class="font-semibold">Total Value <span class="text-red-500">*</span></label>
                 <LazyInputText v-model="formData.total_value" type="number" step="0.01" class="w-full"
                     :class="validations_errors.total_value ? 'border-[#f44336!important]' : ''" autocomplete="off"
                     @focus="validations_errors.total_value = ''" />
@@ -960,7 +985,7 @@ const createHandler = async () => {
             </div>
 
             <div class="sm:col-span-3">
-                <label class="font-semibold">Item Details</label>
+                <label class="font-semibold">Item Details <span class="text-red-500">*</span></label>
                 <Textarea v-model="formData.item_details" rows="4" class="w-full" autocomplete="off" />
                 <LazyInputError class="text-sm mt-1" :message="validations_errors.item_details" />
             </div>
@@ -1159,7 +1184,7 @@ const createHandler = async () => {
                 <div v-show="activeTab === 'media'" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div class="col-span-1 sm:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-4 border border-gray-200 rounded-lg p-4">
                 <div>
-                    <label class="font-semibold">Background Image</label>
+                    <label class="font-semibold">Background Image <span class="text-red-500">*</span></label>
                     <div class="w-full mt-2">
                         <MediaGallery :getPhoto="formData.bg_image" @set_photo="setBgImage" />
                     </div>
@@ -1629,7 +1654,7 @@ const createHandler = async () => {
 
             <div class="flex items-center gap-3">
                 <label class="font-semibold">Status</label>
-                <ToggleSwitch v-model="formData.status" @focus="validations_errors.status = ''" />
+                <Select v-model="formData.status" :options="statusOptions" optionLabel="name" optionValue="value" placeholder="Select Status" @change="validations_errors.status = ''" class="w-40" />
             </div>
                 </div>
             </div>
