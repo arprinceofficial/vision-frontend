@@ -233,8 +233,6 @@ const handleVerifyPayment = async (id) => {
                 <div class="w-full md:w-auto flex flex-wrap gap-4">
                     <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200">Allotted Slots</h3>
                 </div>
-                <Skeleton v-if="isLoading" width="8rem" height="2.5rem" borderRadius="10px"></Skeleton>
-                <Button v-else-if="permissions?.add" label="Create Request" @click="addNew" class="text-xs" />
             </div>
 
             <div class="w-full flex flex-wrap md:flex-nowrap items-center gap-4 mb-8">
