@@ -437,9 +437,9 @@ watch(totalPages, (newTotalPages) => {
         <section class="border-b border-white/10 bg-[#080705] py-16 text-white">
             <div class="mx-auto grid max-w-7xl grid-cols-1 gap-6 px-4 sm:px-6 lg:grid-cols-[1.3fr_0.7fr] lg:px-8">
                 <article v-if="shouldShowBlogPostsSkeleton"
-                    class="restomod-image-card animate-pulse overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/5">
-                    <div class="grid grid-cols-1 lg:grid-cols-[0.95fr_1.05fr]">
-                        <div class="min-h-[320px] bg-white/10" />
+                    class="restomod-image-card animate-pulse overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/5 h-full">
+                    <div class="grid h-full grid-cols-1 lg:grid-cols-[0.95fr_1.05fr]">
+                        <div class="min-h-[320px] bg-white/10 lg:min-h-full" />
                         <div class="flex flex-col justify-between p-6 sm:p-8">
                             <div>
                                 <div class="flex flex-wrap items-center gap-3">
@@ -469,11 +469,11 @@ watch(totalPages, (newTotalPages) => {
                     Blog posts are unavailable right now. Please refresh and try again.
                 </div>
                 <article v-else-if="featuredPost"
-                    class="restomod-image-card overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/5">
-                    <div class="grid grid-cols-1 lg:grid-cols-[0.95fr_1.05fr]">
-                        <div class="relative min-h-[320px] overflow-hidden bg-tccDeepBlack">
+                    class="restomod-image-card h-full overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/5">
+                    <div class="grid h-full grid-cols-1 lg:grid-cols-[0.95fr_1.05fr]">
+                        <div class="relative min-h-[320px] overflow-hidden bg-tccDeepBlack lg:min-h-full">
                             <img :src="featuredPost.image" :alt="featuredPost.title"
-                                class="h-full w-full object-cover opacity-90">
+                                class="absolute inset-0 h-full w-full object-cover opacity-90">
                             <span
                                 class="absolute left-5 top-5 rounded-full border border-tccGold/35 bg-tccDeepBlack/75 px-4 py-1.5 font-poppins text-[9px] font-bold uppercase tracking-[0.22em] text-tccGold">
                                 Featured
@@ -511,12 +511,12 @@ watch(totalPages, (newTotalPages) => {
                     Blog posts are unavailable right now.
                 </div>
 
-                <aside class="restomod-panel rounded-[1.75rem] p-6 sm:p-8">
+                <aside class="restomod-panel self-start w-full rounded-[1.75rem] p-6 sm:p-8">
                     <span class="font-poppins text-[10px] font-bold uppercase tracking-[0.24em] text-tccGold">Editor
                         Notes</span>
                     <h2 class="mt-4 font-poppins text-2xl font-black leading-tight text-white">This month in the garage
                     </h2>
-                    <div class="mt-7 space-y-5">
+                    <div class="mt-7 h-[320px] space-y-5 overflow-y-auto pr-3 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/10 hover:[&::-webkit-scrollbar-thumb]:bg-white/20 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-1.5">
                         <template v-if="shouldShowIssueNotesSkeleton">
                             <div v-for="(noteSkeleton, skeletonIndex) in issueNoteSkeletonRows"
                                 :key="`issue-note-skeleton-${skeletonIndex}`"
