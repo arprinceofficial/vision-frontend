@@ -114,6 +114,7 @@ const groupedData = computed(() => {
     if (!data.value || !data.value.length) return groups;
     
     data.value.forEach(req => {
+        if (Number(req.status) !== 3) return;
         const carName = req.fractional_item?.assetable?.asset_name || req.fractional_item?.item_name || 'Unknown Item';
         if (!groups[carName]) {
             groups[carName] = [];
@@ -260,52 +261,63 @@ const handleVerifyPayment = async (id) => {
                             No rejected slots found.
                         </div>
                         
-                        <div v-for="(requests, carName) in groupedData" :key="carName" class="mb-8">
-                            <h4 class="text-[15px] text-gray-500 dark:text-gray-400 font-medium mb-2 px-1">{{ carName }}</h4>
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-left text-xs whitespace-nowrap border-collapse">
-                                    <thead class="bg-[#1e2f4a] text-white">
-                                        <tr>
-                                            <th class="py-2.5 px-3 font-semibold">User Name</th>
-                                            <th class="py-2.5 px-3 font-semibold">Email</th>
-                                            <th class="py-2.5 px-3 font-semibold">Number of Allocations</th>
-                                            <th class="py-2.5 px-3 font-semibold">Reference ID</th>
-                                            <th class="py-2.5 px-3 font-semibold">Allocation Amount</th>
-                                            <th class="py-2.5 px-3 font-semibold">Payment Method</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="(requestItem, idx) in requests" :key="requestItem.id" 
-                                            class="border-b border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                                            :class="idx % 2 === 0 ? 'bg-gray-100 dark:bg-gray-800' : 'bg-white dark:bg-gray-900'"
-                                        >
-                                            <td class="py-2.5 px-3 text-gray-800 dark:text-gray-200 font-medium">
-                                                {{ requestItem.user?.user_info?.first_name || requestItem.user?.first_name || requestItem.user?.name || 'N/A' }} {{ requestItem.user?.user_info?.last_name || requestItem.user?.last_name || '' }}
-                                            </td>
-                                            <td class="py-2.5 px-3 text-gray-800 dark:text-gray-200">
-                                                {{ requestItem.user?.email }}
-                                            </td>
-                                            <td class="py-2.5 px-3 text-gray-800 dark:text-gray-200">
-                                                {{ requestItem.shares_count }}
-                                            </td>
-                                            <td class="py-2.5 px-3 text-gray-800 dark:text-gray-200 uppercase">
-                                                {{ requestItem.slug || 'N/A' }}
-                                            </td>
-                                            <td class="py-2.5 px-3 text-gray-800 dark:text-gray-200">
-                                                {{ formatCurrency(requestItem.total_amount) }}
-                                            </td>
-                                            <td class="py-2.5 px-3 text-gray-800 dark:text-gray-200">
-                                                {{ requestItem.payment_method || 'Bank Transfer' }}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                        <Accordion :value="0" class="border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden shadow-sm bg-white dark:bg-gray-900">
+                            <AccordionPanel v-for="(requests, carName, gIdx) in groupedData" :key="carName" :value="gIdx">
+                                <AccordionHeader>
+                                    <div class="flex items-center justify-between w-full pr-4">
+                                        <span class="font-bold text-gray-900 dark:text-white">{{ carName }}</span>
+                                        <span class="inline-flex items-center justify-center bg-[#1e2f4a] dark:bg-gray-800 text-white text-xs font-semibold rounded-full px-2.5 py-0.5 ml-3">
+                                            {{ requests.length }}
+                                        </span>
+                                    </div>
+                                </AccordionHeader>
+                                <AccordionContent class="p-0 border-t border-gray-200 dark:border-gray-800">
+                                    <div class="overflow-x-auto">
+                                        <table class="w-full text-left text-xs whitespace-nowrap border-collapse">
+                                            <thead class="bg-[#1e2f4a] text-white">
+                                                <tr>
+                                                    <th class="py-2.5 px-3 font-semibold">User Name</th>
+                                                    <th class="py-2.5 px-3 font-semibold">Email</th>
+                                                    <th class="py-2.5 px-3 font-semibold">Number of Allocations</th>
+                                                    <th class="py-2.5 px-3 font-semibold">Reference ID</th>
+                                                    <th class="py-2.5 px-3 font-semibold">Allocation Amount</th>
+                                                    <th class="py-2.5 px-3 font-semibold">Payment Method</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-for="(requestItem, idx) in requests" :key="requestItem.id" 
+                                                    class="border-b border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                                                    :class="idx % 2 === 0 ? 'bg-gray-100 dark:bg-gray-800' : 'bg-white dark:bg-gray-900'"
+                                                >
+                                                    <td class="py-2.5 px-3 text-gray-800 dark:text-gray-200 font-medium">
+                                                        {{ requestItem.user?.user_info?.first_name || requestItem.user?.first_name || requestItem.user?.name || 'N/A' }} {{ requestItem.user?.user_info?.last_name || requestItem.user?.last_name || '' }}
+                                                    </td>
+                                                    <td class="py-2.5 px-3 text-gray-800 dark:text-gray-200">
+                                                        {{ requestItem.user?.email }}
+                                                    </td>
+                                                    <td class="py-2.5 px-3 text-gray-800 dark:text-gray-200">
+                                                        {{ requestItem.shares_count }}
+                                                    </td>
+                                                    <td class="py-2.5 px-3 text-gray-800 dark:text-gray-200 uppercase">
+                                                        {{ requestItem.slug || 'N/A' }}
+                                                    </td>
+                                                    <td class="py-2.5 px-3 text-gray-800 dark:text-gray-200">
+                                                        {{ formatCurrency(requestItem.total_amount) }}
+                                                    </td>
+                                                    <td class="py-2.5 px-3 text-gray-800 dark:text-gray-200">
+                                                        {{ requestItem.payment_method || 'Bank Transfer' }}
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </AccordionContent>
+                            </AccordionPanel>
+                        </Accordion>
                     </template>
                 </div>
                     
-                    <LazyPagination v-if="!isLoading && lastPage > 1" class="px-4" :config="paginationConfig" @loadData="loadData" />
+                    <LazyPagination v-if="!isLoading" class="px-4" :config="paginationConfig" @loadData="loadData" />
                     <LazyResponseModal :response_modal="response_modal" />
                     
                     <AddEdit :isOpenModal="isOpenModal" :item="item" :modalTitle="modalTitle" @close="cancelModal" @add_emit="receivedData" />
@@ -315,3 +327,9 @@ const handleVerifyPayment = async (id) => {
             </div>
         </div>
 </template>
+
+<style scoped>
+:deep(.p-accordioncontent-content) {
+    padding: 0 !important;
+}
+</style>

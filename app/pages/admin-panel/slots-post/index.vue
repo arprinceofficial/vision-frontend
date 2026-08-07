@@ -65,7 +65,7 @@ const submitSlots = async (item) => {
             assetable_id: item.assetable_id
         };
 
-        const res = await $fetchAdmin(`v1/admin/fractional-items/${item.id}`, {
+        const res = await $fetchAdmin(`v1/admin/slots-post/${item.id}`, {
             method: 'PUT',
             body: payload
         });
