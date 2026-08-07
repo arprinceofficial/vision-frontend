@@ -71,15 +71,24 @@ const submitSlots = async (item) => {
         });
         
         if (res.success || res.status) {
-            item.shares_total = item.input_slots;
-            item.total_shares = item.input_slots;
-            item.input_slots = '';
-            // update available shares if needed based on response, but for now just clear input
+            if (res.data && res.data.shares_total !== undefined) {
+                item.shares_total = res.data.shares_total;
+                item.total_shares = res.data.shares_total;
+            } else {
+                item.shares_total = (Number(item.shares_total) || 0) + Number(item.input_slots);
+                item.total_shares = (Number(item.total_shares) || 0) + Number(item.input_slots);
+            }
+
             if (res.data && res.data.shares_available !== undefined) {
                 item.shares_available = res.data.shares_available;
             } else if (res.data && res.data.available_shares !== undefined) {
                 item.available_shares = res.data.available_shares;
+            } else {
+                item.shares_available = (Number(item.shares_available) || 0) + Number(item.input_slots);
+                item.available_shares = (Number(item.available_shares) || 0) + Number(item.input_slots);
             }
+
+            item.input_slots = '';
         }
     } catch (e) {
         console.error(e);
@@ -126,7 +135,7 @@ const submitSlots = async (item) => {
                             <input 
                                 type="number" 
                                 v-model="item.input_slots" 
-                                placeholder="Enter total no. of slots" 
+                                placeholder="Enter slots to add" 
                                 class="flex-grow border border-gray-300 dark:border-gray-600 rounded-l-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-transparent text-gray-900 dark:text-white"
                                 @keyup.enter="submitSlots(item)"
                             />
