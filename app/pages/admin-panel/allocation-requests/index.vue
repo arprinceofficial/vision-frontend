@@ -141,6 +141,15 @@ onMounted(() => {
     loadData(1);
 });
 
+const filteredData = computed(() => {
+    if (!data.value) return [];
+    if (activeTab.value === 'all') return data.value;
+    if (activeTab.value === 'missing_docs') return data.value;
+    
+    const targetStatus = Number(getStatusForTab());
+    return data.value.filter(item => Number(item.status) === targetStatus);
+});
+
 // Create/Edit Modal
 const isOpenModal = ref(false);
 const item = ref({});
@@ -325,10 +334,10 @@ const handleVerifyPayment = async (id) => {
                                     </tr>
                                 </tbody>
                                 <tbody v-else>
-                                    <tr v-if="data.length === 0">
+                                    <tr v-if="filteredData.length === 0">
                                         <td colspan="10" class="text-center py-6 text-gray-500">No requests found.</td>
                                     </tr>
-                                    <tr v-for="(requestItem, index) in data" :key="index" class="border-b last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800" v-else>
+                                    <tr v-for="(requestItem, index) in filteredData" :key="index" class="border-b last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800" v-else>
                                         <!-- Reference -->
                                         <td class="py-3 px-3 text-gray-800 dark:text-gray-200">
                                             <span class="text-gray-500 font-medium">{{ requestItem.slug || 'N/A' }}</span>
@@ -405,7 +414,7 @@ const handleVerifyPayment = async (id) => {
                         </div>
                     </div>
                     
-                    <LazyPagination v-if="!isLoading && lastPage > 1" class="px-4" :config="paginationConfig" @loadData="loadData" />
+                    <LazyPagination v-if="!isLoading" class="px-4" :config="paginationConfig" @loadData="loadData" />
                     <LazyResponseModal :response_modal="response_modal" />
                     
                     <AddEdit :isOpenModal="isOpenModal" :item="item" :modalTitle="modalTitle" @close="cancelModal" @add_emit="receivedData" />
