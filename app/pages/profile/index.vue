@@ -150,8 +150,12 @@ const decodeHtmlEntities = (value: unknown) => {
 const countries = computed(() => countriesData.value ?? [])
 const genders = computed(() => gendersData.value ?? [])
 
-const getCountryOptionLabel = (country: Country) => {
+const getNationalityOptionLabel = (country: Country) => {
   return decodeHtmlEntities(country.nationality || country.en_short_name || country.id)
+}
+
+const getCountryNameLabel = (country: Country) => {
+  return decodeHtmlEntities(country.en_short_name || country.nationality || country.id)
 }
 
 const nationalityOptions = computed<NationalityOption[]>(() => (
@@ -160,7 +164,18 @@ const nationalityOptions = computed<NationalityOption[]>(() => (
       ...country,
       id: getStringValue(country.id),
       code: getStringValue(country.alpha_2_code).toLowerCase(),
-      name: getCountryOptionLabel(country)
+      name: getNationalityOptionLabel(country)
+    }))
+    .filter((country) => country.id && country.name)
+))
+
+const countryOptions = computed<NationalityOption[]>(() => (
+  countries.value
+    .map((country) => ({
+      ...country,
+      id: getStringValue(country.id),
+      code: getStringValue(country.alpha_2_code).toLowerCase(),
+      name: getCountryNameLabel(country)
     }))
     .filter((country) => country.id && country.name)
 ))
@@ -197,7 +212,7 @@ const selectedNationality = computed<NationalityOption | null>({
 })
 
 const selectedPrimaryCountry = computed<NationalityOption | null>({
-  get: () => findOptionByIdOrName(nationalityOptions.value, profile.pre_country),
+  get: () => findOptionByIdOrName(countryOptions.value, profile.pre_country),
   set: (country) => {
     profile.pre_country = country?.id || ''
     clearValidationError('pre_country')
@@ -221,7 +236,7 @@ const normalizedNationalityId = computed(() => (
 ))
 
 const normalizedPrimaryCountryId = computed(() => (
-  findOptionByIdOrName(nationalityOptions.value, profile.pre_country)?.id || profile.pre_country
+  findOptionByIdOrName(countryOptions.value, profile.pre_country)?.id || profile.pre_country
 ))
 
 const investorClass = computed(() => {
@@ -305,12 +320,21 @@ const formatValidationFieldLabel = (field: string) => (
     .replace(/\b\w/g, (char) => char.toUpperCase())
 )
 
-const getProfilePayload = () => ({
-  ...profile,
-  gender: normalizedGenderId.value,
-  nationality_id: normalizedNationalityId.value,
-  pre_country: normalizedPrimaryCountryId.value
-})
+const getProfilePayload = () => {
+  const payload: Record<string, any> = {
+    ...profile,
+    gender: normalizedGenderId.value,
+    nationality_id: normalizedNationalityId.value,
+    pre_country: normalizedPrimaryCountryId.value
+  }
+
+  const originalPhoto = getStringValue(currentUser.value?.user_info?.photo || currentUser.value?.photo)
+  if (!profile.photo || profile.photo === originalPhoto) {
+    delete payload.photo
+  }
+
+  return payload
+}
 
 const setProfilePhoto = (photo: string) => {
   profile.photo = photo
@@ -551,7 +575,7 @@ onMounted(() => {
             <div class="grid gap-4 md:grid-cols-2">
               <div class="space-y-2">
                 <label for="pre_country" class="block text-[10px] font-semibold text-white/55">Country</label>
-                <Dropdown v-model="selectedPrimaryCountry" input-id="pre_country" :options="nationalityOptions"
+                <Dropdown v-model="selectedPrimaryCountry" input-id="pre_country" :options="countryOptions"
                   optionLabel="name" placeholder="Select country" class="profile-option-dropdown w-full"
                   panelClass="profile-option-dropdown-panel" filter :loading="isCountriesLoading"
                   :disabled="!editingProfile || isSavingProfile || isCountriesLoading"
