@@ -9,10 +9,53 @@ const props = defineProps({
 const emit = defineEmits(['add_emit', 'close']);
 const { $slugify } = useNuxtApp();
 
+const activeTab = ref('basic');
+
+const formTabs = [
+    { key: 'basic', label: 'Basic Info', desc: 'Core vehicle info & description', icon: 'pi pi-info-circle' },
+    { key: 'financials', label: 'Syndicate', desc: 'Syndicate total & allocation cost', icon: 'pi pi-dollar' },
+    { key: 'media', label: 'Media & Gallery', desc: 'Asset images & highlights list', icon: 'pi pi-images' },
+    { key: 'sections', label: 'Page Sections', desc: 'Custom content headers & bullets', icon: 'pi pi-file-edit' },
+    { key: 'technical', label: 'Tech Details', desc: 'Engine specs, mileage, and gallery', icon: 'pi pi-cog' },
+];
+
+const statusOptions = [
+    { name: 'Inactive', value: 0 },
+    { name: 'Active', value: 1 },
+    { name: 'Retail', value: 2 },
+    { name: 'Basic', value: 3 },
+    { name: 'Regular', value: 4 },
+    { name: 'Upcoming', value: 5 },
+    { name: 'On Live', value: 6 },
+];
+
+const currentTabIndex = computed(() => formTabs.findIndex(tab => tab.key === activeTab.value));
+const isFirstTab = computed(() => currentTabIndex.value === 0);
+const isLastTab = computed(() => currentTabIndex.value === formTabs.length - 1);
+
+const nextTab = () => {
+    if (currentTabIndex.value < formTabs.length - 1) {
+        activeTab.value = formTabs[currentTabIndex.value + 1].key;
+    }
+};
+
+const prevTab = () => {
+    if (currentTabIndex.value > 0) {
+        activeTab.value = formTabs[currentTabIndex.value - 1].key;
+    }
+};
+
 const visible = computed({
     get: () => props.isOpenModal,
     set: (value) => {
         if (!value) emit('close');
+    }
+});
+
+// Reset tab when modal opens
+watch(() => props.isOpenModal, (newVal) => {
+    if (newVal) {
+        activeTab.value = 'basic';
     }
 });
 
@@ -89,7 +132,7 @@ const getInitialDetailData = () => ({
     mileage: null,
     condition_grade: '',
     gallery: [],
-    status: false,
+    status: 0,
     engine: '',
     power: null,
     torque: null,
@@ -108,7 +151,7 @@ const getInitialFormData = () => ({
     model: '',
     year: null,
     description: '',
-    status: false,
+    status: 0,
     syndicate_name: '',
     syndicate_total: null,
     allocation_cost: null,
@@ -141,7 +184,7 @@ const normalizeDetailData = (value = {}) => ({
     mileage: toInputNumber(value.mileage),
     condition_grade: value.condition_grade || '',
     gallery: normalizeGallery(value.gallery),
-    status: isTruthy(value.status),
+    status: value.status !== undefined && value.status !== null ? Number(value.status) : 0,
     engine: value.engine || '',
     power: toInputNumber(value.power),
     torque: toInputNumber(value.torque),
@@ -168,7 +211,7 @@ watch(() => props.item, (value) => {
             model: value.model || '',
             year: toInputNumber(value.year),
             description: value.description || '',
-            status: isTruthy(value.status),
+            status: value.status !== undefined && value.status !== null ? Number(value.status) : 0,
             syndicate_name: value.syndicate_name ?? value.syndicateName ?? '',
             syndicate_total: toInputNumber(value.syndicate_total),
             allocation_cost: toInputNumber(value.allocation_cost ?? value.allocation_Cost),
@@ -233,7 +276,7 @@ const serializeDetailData = (value) => ({
     mileage: toNumber(value.mileage),
     condition_grade: value.condition_grade,
     gallery: normalizeGallery(value.gallery),
-    status: !!value.status,
+    status: Number(value.status),
     engine: value.engine,
     power: toNumber(value.power),
     torque: toNumber(value.torque),
@@ -252,7 +295,7 @@ const serializeSubmitData = () => {
         model: formData.value.model,
         year: toNumber(formData.value.year),
         description: formData.value.description,
-        status: !!formData.value.status,
+        status: Number(formData.value.status),
         syndicate_name: formData.value.syndicate_name,
         syndicate_total: toNumber(formData.value.syndicate_total),
         allocation_cost: toNumber(formData.value.allocation_cost),
@@ -369,6 +412,10 @@ const setDetailGallery = (photos) => {
     formData.value.detail.gallery = normalizeGallery(photos);
 };
 
+const setDetailVideo = (photo) => {
+    formData.value.detail.video_path = getImagePath(photo);
+};
+
 const addListItem = (field) => {
     formData.value[field].push('');
 };
@@ -403,398 +450,555 @@ const removeSectionListItem = (sectionIndex, field, itemIndex) => {
 </script>
 
 <template>
-    <Dialog v-model:visible="visible" modal :closable="false"
-        :style="{ width: '88rem', maxWidth: 'calc(100vw - 2rem)' }">
-        <template #header>
-            <div class="flex items-center justify-center w-full gap-2">
-                <h4 class="text-xl font-semibold">{{ modalTitle }} Vehicle</h4>
-            </div>
-        </template>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-                <label class="font-semibold">Name</label>
-                <LazyInputText v-model="formData.name" class="w-full" placeholder="i.e. 911 Carrera"
-                    :class="validations_errors.name ? 'border-[#f44336!important]' : ''" autocomplete="off"
-                    @focus="validations_errors.name = ''" />
-                <LazyInputError class="text-sm mt-1" :message="validations_errors.name" />
-            </div>
-
-            <div>
-                <label class="font-semibold">Slug</label>
-                <LazyInputText v-model="formData.slug" class="w-full" placeholder="i.e. 1967-ford-mustang-fastback"
-                    :class="validations_errors.slug ? 'border-[#f44336!important]' : ''" autocomplete="off"
-                    @focus="validations_errors.slug = ''" />
-                <LazyInputError class="text-sm mt-1" :message="validations_errors.slug" />
-            </div>
-
-            <div>
-                <label class="font-semibold">Retail Status</label>
-                <LazyInputText v-model="formData.retail_status" class="w-full"
-                    :class="validations_errors.retail_status ? 'border-[#f44336!important]' : ''" autocomplete="off"
-                    @focus="validations_errors.retail_status = ''" />
-                <LazyInputError class="text-sm mt-1" :message="validations_errors.retail_status" />
-            </div>
-
-            <div>
-                <label class="font-semibold">Make</label>
-                <LazyInputText v-model="formData.make" class="w-full" placeholder="i.e. Porsche"
-                    :class="validations_errors.make ? 'border-[#f44336!important]' : ''" autocomplete="off"
-                    @focus="validations_errors.make = ''" />
-                <LazyInputError class="text-sm mt-1" :message="validations_errors.make" />
-            </div>
-
-            <div>
-                <label class="font-semibold">Model</label>
-                <LazyInputText v-model="formData.model" class="w-full" placeholder="i.e. Carrera"
-                    :class="validations_errors.model ? 'border-[#f44336!important]' : ''" autocomplete="off"
-                    @focus="validations_errors.model = ''" />
-                <LazyInputError class="text-sm mt-1" :message="validations_errors.model" />
-            </div>
-
-            <div>
-                <label class="font-semibold">Year</label>
-                <InputNumber v-model="formData.year" class="w-full" :useGrouping="false" :maxFractionDigits="0"
-                    placeholder="i.e. 2025" :class="validations_errors.year ? 'border-[#f44336!important]' : ''"
-                    autocomplete="off" @focus="validations_errors.year = ''" />
-                <LazyInputError class="text-sm mt-1" :message="validations_errors.year" />
-            </div>
-
-            <div class="md:col-span-2">
-                <label class="font-semibold">Subtitle</label>
-                <LazyInputText v-model="formData.subtitle" class="w-full" autocomplete="off"
-                    @focus="validations_errors.subtitle = ''" />
-                <LazyInputError class="text-sm mt-1" :message="validations_errors.subtitle" />
-            </div>
-
-            <div>
-                <label class="font-semibold">Price</label>
-                <LazyInputText v-model="formData.price" class="w-full" autocomplete="off"
-                    @focus="validations_errors.price = ''" />
-                <LazyInputError class="text-sm mt-1" :message="validations_errors.price" />
-            </div>
-
-            <div>
-                <label class="font-semibold">Exterior Colour</label>
-                <LazyInputText v-model="formData.exterior_colour" class="w-full" autocomplete="off"
-                    @focus="validations_errors.exterior_colour = ''" />
-                <LazyInputError class="text-sm mt-1" :message="validations_errors.exterior_colour" />
-            </div>
-
-            <div>
-                <label class="font-semibold">Interior Colour</label>
-                <LazyInputText v-model="formData.interior_colour" class="w-full" autocomplete="off"
-                    @focus="validations_errors.interior_colour = ''" />
-                <LazyInputError class="text-sm mt-1" :message="validations_errors.interior_colour" />
-            </div>
-
-            <div>
-                <label class="font-semibold">Location</label>
-                <LazyInputText v-model="formData.location" class="w-full" autocomplete="off"
-                    @focus="validations_errors.location = ''" />
-                <LazyInputError class="text-sm mt-1" :message="validations_errors.location" />
-            </div>
-
-            <div class="flex items-center gap-4">
-                <label class="font-semibold">Status</label>
-                <div class="flex-auto">
-                    <ToggleSwitch v-model="formData.status" @focus="validations_errors.status = ''" />
-                    <LazyInputError class="text-sm mt-1" :message="validations_errors.status" />
-                </div>
-            </div>
-
-            <div class="md:col-span-3">
-                <label class="font-semibold">Excerpt</label>
-                <Textarea v-model="formData.excerpt" class="w-full" rows="3" autocomplete="off"
-                    @focus="validations_errors.excerpt = ''" />
-                <LazyInputError class="text-sm mt-1" :message="validations_errors.excerpt" />
-            </div>
-
-            <div class="md:col-span-3">
-                <label class="font-semibold">Description</label>
-                <Textarea v-model="formData.description" class="w-full" rows="4"
-                    placeholder="i.e. Write your vehicle description here"
-                    :class="validations_errors.description ? 'border-[#f44336!important]' : ''"
-                    autocomplete="off" @focus="validations_errors.description = ''" />
-                <LazyInputError class="text-sm mt-1" :message="validations_errors.description" />
-            </div>
-
-            <div class="md:col-span-3">
-                <label class="font-semibold">Body</label>
-                <Textarea v-model="formData.body" class="w-full" rows="5" autocomplete="off"
-                    @focus="validations_errors.body = ''" />
-                <LazyInputError class="text-sm mt-1" :message="validations_errors.body" />
-            </div>
-
-            <div class="md:col-span-3">
-                <label class="font-semibold">Investment Thesis</label>
-                <Textarea v-model="formData.investment_thesis" class="w-full" rows="4" autocomplete="off"
-                    @focus="validations_errors.investment_thesis = ''" />
-                <LazyInputError class="text-sm mt-1" :message="validations_errors.investment_thesis" />
-            </div>
-
-            <div class="md:col-span-3 border border-gray-200 rounded-lg p-4">
-                <h5 class="font-semibold text-gray-800 dark:text-gray-100 mb-4">Syndicate Details</h5>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <Dialog v-model:visible="visible" modal :closable="false" :maximized="true"
+        class="fullscreen-dialog-modern" maskClass="fullscreen-dialog-mask" @update:visible="$emit('close')">
+        
+        <div class="flex flex-col h-screen overflow-hidden bg-gray-50 dark:bg-gray-950 font-sans">
+            <!-- Modern Header -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 z-10 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                        <i class="pi pi-car text-xl"></i>
+                    </div>
                     <div>
-                        <label class="font-semibold">Syndicate Name</label>
-                        <LazyInputText v-model="formData.syndicate_name" class="w-full" autocomplete="off"
-                            @focus="validations_errors.syndicate_name = ''" />
-                        <LazyInputError class="text-sm mt-1" :message="validations_errors.syndicate_name" />
-                    </div>
-
-                    <div>
-                        <label class="font-semibold">Syndicate Total</label>
-                        <InputNumber v-model="formData.syndicate_total" class="w-full" :useGrouping="false"
-                            :maxFractionDigits="2" @focus="validations_errors.syndicate_total = ''" />
-                        <LazyInputError class="text-sm mt-1" :message="validations_errors.syndicate_total" />
-                    </div>
-
-                    <div>
-                        <label class="font-semibold">Allocation Cost</label>
-                        <InputNumber v-model="formData.allocation_cost" class="w-full" :useGrouping="false"
-                            :maxFractionDigits="2" @focus="validations_errors.allocation_cost = ''" />
-                        <LazyInputError class="text-sm mt-1" :message="validations_errors.allocation_cost" />
-                    </div>
-
-                    <div>
-                        <label class="font-semibold">Target Allocation</label>
-                        <InputNumber v-model="formData.target_allocation" class="w-full" :useGrouping="false"
-                            :maxFractionDigits="0" @focus="validations_errors.target_allocation = ''" />
-                        <LazyInputError class="text-sm mt-1" :message="validations_errors.target_allocation" />
+                        <h4 class="text-lg font-bold text-gray-900 dark:text-white leading-tight">
+                            {{ modalTitle }} Vehicle
+                        </h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                            Manage vehicle profiles, specifications, syndicate data, and gallery assets
+                        </p>
                     </div>
                 </div>
+                
+                <button type="button" 
+                    class="w-9 h-9 rounded-lg flex items-center justify-center border border-gray-200 dark:border-gray-800 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition duration-150" 
+                    @click="$emit('close')">
+                    <i class="pi pi-times text-sm"></i>
+                </button>
             </div>
 
-            <div class="md:col-span-3 border border-gray-200 rounded-lg p-4">
-                <h5 class="font-semibold text-gray-800 dark:text-gray-100 mb-4">Media</h5>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label class="font-semibold block mb-3">Asset Image</label>
-                        <MediaGallery :getPhoto="formData.asset_image"
-                            @set_photo="(photo) => setImage('asset_image', photo)" />
-                        <LazyInputError class="text-sm mt-1" :message="validations_errors.asset_image" />
+            <!-- Stepper Content Container -->
+            <div class="flex-1 flex overflow-hidden">
+                <!-- Left Sidebar Timeline / Steps -->
+                <div class="w-80 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 flex flex-col justify-between overflow-y-auto hidden md:flex">
+                    <div class="space-y-6">
+                        <span class="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 block">
+                            Steps & Progress
+                        </span>
+                        
+                        <div class="relative flex flex-col gap-8 pl-1">
+                            <!-- Connecting Line -->
+                            <div class="absolute left-[1.125rem] top-3 bottom-3 w-[2px] bg-gray-200 dark:bg-gray-800 z-0"></div>
+                            
+                            <div class="absolute left-[1.125rem] top-3 w-[2px] bg-emerald-500 transition-all duration-500 z-0" 
+                                :style="{ height: `${(currentTabIndex / (formTabs.length - 1)) * 90}%` }"></div>
+
+                            <!-- Steps -->
+                            <button v-for="(tab, index) in formTabs" :key="tab.key" type="button"
+                                class="relative flex items-start gap-4 text-left group focus:outline-none"
+                                @click="activeTab = tab.key">
+                                
+                                <div class="relative z-10 flex items-center justify-center rounded-full border-2 transition-all duration-300"
+                                    :class="[
+                                        activeTab === tab.key 
+                                            ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950 text-emerald-500 scale-110 shadow-lg shadow-emerald-500/20' 
+                                            : index < currentTabIndex 
+                                                ? 'border-emerald-500 bg-emerald-500 text-white' 
+                                                : 'border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-400 group-hover:border-gray-400'
+                                    ]"
+                                    style="width: 26px; height: 26px; min-width: 26px; min-height: 26px;">
+                                    <i v-if="index < currentTabIndex" class="pi pi-check text-[10px] font-bold"></i>
+                                    <span v-else class="text-[10px] font-bold">{{ index + 1 }}</span>
+                                </div>
+
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-semibold transition-colors duration-200"
+                                        :class="[
+                                            activeTab === tab.key 
+                                                ? 'text-emerald-600 dark:text-emerald-400 font-bold' 
+                                                : index < currentTabIndex 
+                                                    ? 'text-gray-900 dark:text-gray-100 font-medium' 
+                                                    : 'text-gray-500 dark:text-gray-400'
+                                        ]">
+                                        {{ tab.label }}
+                                    </span>
+                                    <span class="text-xs text-gray-400 dark:text-gray-500 mt-0.5 leading-tight">
+                                        {{ tab.desc }}
+                                    </span>
+                                </div>
+                            </button>
+                        </div>
                     </div>
 
-                    <div>
-                        <label class="font-semibold block mb-3">Hero Image</label>
-                        <MediaGallery :getPhoto="formData.hero_image"
-                            @set_photo="(photo) => setImage('hero_image', photo)" />
-                        <LazyInputError class="text-sm mt-1" :message="validations_errors.hero_image" />
-                    </div>
-
-                    <div>
-                        <label class="font-semibold block mb-3">Card Image</label>
-                        <MediaGallery :getPhoto="formData.card_image"
-                            @set_photo="(photo) => setImage('card_image', photo)" />
-                        <LazyInputError class="text-sm mt-1" :message="validations_errors.card_image" />
+                    <div class="border-t border-gray-100 dark:border-gray-800 pt-4 mt-6">
+                        <div class="flex items-center gap-2 text-xs text-gray-400">
+                            <i class="pi pi-shield"></i>
+                            <span>Validated & secure changes</span>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="md:col-span-3 border border-gray-200 rounded-lg p-4">
-                <div class="flex items-center justify-between gap-3 mb-3">
-                    <h5 class="font-semibold text-gray-800 dark:text-gray-100">Highlights</h5>
-                    <Button type="button" label="Add Highlight" class="text-xs" @click="addListItem('highlights')" />
-                </div>
-                <div class="space-y-3">
-                    <div v-for="(highlight, index) in formData.highlights" :key="`highlight-${index}`"
-                        class="flex items-center gap-3">
-                        <LazyInputText v-model="formData.highlights[index]" class="w-full" autocomplete="off" />
-                        <i @click="removeListItem('highlights', index)"
-                            class="fa-solid fa-trash text-red-500 hover:text-red-800 cursor-pointer transition duration-150 ease-in-out"></i>
-                    </div>
-                </div>
-                <LazyInputError class="text-sm mt-1" :message="validations_errors.highlights" />
-            </div>
-
-            <div class="md:col-span-3 border border-gray-200 rounded-lg p-4">
-                <div class="flex items-center justify-between gap-3 mb-3">
-                    <h5 class="font-semibold text-gray-800 dark:text-gray-100">Specs</h5>
-                    <Button type="button" label="Add Spec" class="text-xs" @click="addSpec" />
-                </div>
-                <div class="space-y-3">
-                    <div v-for="(spec, index) in formData.specs" :key="`spec-${index}`"
-                        class="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-3 items-center">
-                        <LazyInputText v-model="spec.label" class="w-full" placeholder="Label" autocomplete="off" />
-                        <LazyInputText v-model="spec.value" class="w-full" placeholder="Value" autocomplete="off" />
-                        <i @click="removeSpec(index)"
-                            class="fa-solid fa-trash text-red-500 hover:text-red-800 cursor-pointer transition duration-150 ease-in-out"></i>
-                    </div>
-                </div>
-                <LazyInputError class="text-sm mt-1" :message="validations_errors.specs" />
-            </div>
-
-            <div class="md:col-span-3 border border-gray-200 rounded-lg p-4">
-                <div class="flex items-center justify-between gap-3 mb-3">
-                    <h5 class="font-semibold text-gray-800 dark:text-gray-100">Sections</h5>
-                    <Button type="button" label="Add Section" class="text-xs" @click="addSection" />
-                </div>
-                <div class="space-y-5">
-                    <div v-for="(section, sectionIndex) in formData.sections" :key="`section-${sectionIndex}`"
-                        class="border border-gray-200 rounded-lg p-4">
-                        <div class="flex items-center justify-between gap-3 mb-3">
-                            <LazyInputText v-model="section.heading" class="w-full" placeholder="Heading"
-                                autocomplete="off" />
-                            <i @click="removeSection(sectionIndex)"
-                                class="fa-solid fa-trash text-red-500 hover:text-red-800 cursor-pointer transition duration-150 ease-in-out"></i>
+                <!-- Main Form Inputs Area -->
+                <div class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-950 p-6 md:p-10">
+                    <div class="w-full space-y-6">
+                        
+                        <div class="border-b border-gray-200 dark:border-gray-800 pb-4 mb-6">
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+                                {{ formTabs[currentTabIndex].label }}
+                            </h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                {{ formTabs[currentTabIndex].desc }}
+                            </p>
                         </div>
 
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <!-- Basic Tab Content -->
+                        <div v-show="activeTab === 'basic'" class="grid grid-cols-1 sm:grid-cols-3 gap-6 bg-white dark:bg-gray-900 p-6 rounded-2xl border border-gray-200/60 dark:border-gray-800/80 shadow-sm">
                             <div>
-                                <div class="flex items-center justify-between gap-3 mb-2">
-                                    <label class="font-semibold">Paragraphs</label>
-                                    <Button type="button" label="Add Paragraph" class="text-xs"
-                                        @click="addSectionListItem(sectionIndex, 'paragraphs')" />
+                                <label class="font-semibold">Name</label>
+                                <LazyInputText v-model="formData.name" class="w-full" placeholder="i.e. 911 Carrera"
+                                    :class="validations_errors.name ? 'border-[#f44336!important]' : ''" autocomplete="off"
+                                    @focus="validations_errors.name = ''" />
+                                <LazyInputError class="text-sm mt-1" :message="validations_errors.name" />
+                            </div>
+
+                            <div>
+                                <label class="font-semibold">Slug</label>
+                                <LazyInputText v-model="formData.slug" class="w-full" placeholder="i.e. 1967-ford-mustang-fastback"
+                                    :class="validations_errors.slug ? 'border-[#f44336!important]' : ''" autocomplete="off"
+                                    @focus="validations_errors.slug = ''" />
+                                <LazyInputError class="text-sm mt-1" :message="validations_errors.slug" />
+                            </div>
+
+                            <div>
+                                <label class="font-semibold">Retail Status</label>
+                                <LazyInputText v-model="formData.retail_status" class="w-full"
+                                    :class="validations_errors.retail_status ? 'border-[#f44336!important]' : ''" autocomplete="off"
+                                    @focus="validations_errors.retail_status = ''" />
+                                <LazyInputError class="text-sm mt-1" :message="validations_errors.retail_status" />
+                            </div>
+
+                            <div>
+                                <label class="font-semibold">Make</label>
+                                <LazyInputText v-model="formData.make" class="w-full" placeholder="i.e. Porsche"
+                                    :class="validations_errors.make ? 'border-[#f44336!important]' : ''" autocomplete="off"
+                                    @focus="validations_errors.make = ''" />
+                                <LazyInputError class="text-sm mt-1" :message="validations_errors.make" />
+                            </div>
+
+                            <div>
+                                <label class="font-semibold">Model</label>
+                                <LazyInputText v-model="formData.model" class="w-full" placeholder="i.e. Carrera"
+                                    :class="validations_errors.model ? 'border-[#f44336!important]' : ''" autocomplete="off"
+                                    @focus="validations_errors.model = ''" />
+                                <LazyInputError class="text-sm mt-1" :message="validations_errors.model" />
+                            </div>
+
+                            <div>
+                                <label class="font-semibold">Year</label>
+                                <InputNumber v-model="formData.year" class="w-full" :useGrouping="false" :maxFractionDigits="0"
+                                    placeholder="i.e. 2025" :class="validations_errors.year ? 'border-[#f44336!important]' : ''"
+                                    autocomplete="off" @focus="validations_errors.year = ''" />
+                                <LazyInputError class="text-sm mt-1" :message="validations_errors.year" />
+                            </div>
+
+                            <div class="sm:col-span-2">
+                                <label class="font-semibold">Subtitle</label>
+                                <LazyInputText v-model="formData.subtitle" class="w-full" autocomplete="off"
+                                    @focus="validations_errors.subtitle = ''" />
+                                <LazyInputError class="text-sm mt-1" :message="validations_errors.subtitle" />
+                            </div>
+
+                            <div>
+                                <label class="font-semibold">Price</label>
+                                <LazyInputText v-model="formData.price" class="w-full" autocomplete="off"
+                                    @focus="validations_errors.price = ''" />
+                                <LazyInputError class="text-sm mt-1" :message="validations_errors.price" />
+                            </div>
+
+                            <div>
+                                <label class="font-semibold">Exterior Colour</label>
+                                <LazyInputText v-model="formData.exterior_colour" class="w-full" autocomplete="off"
+                                    @focus="validations_errors.exterior_colour = ''" />
+                                <LazyInputError class="text-sm mt-1" :message="validations_errors.exterior_colour" />
+                            </div>
+
+                            <div>
+                                <label class="font-semibold">Interior Colour</label>
+                                <LazyInputText v-model="formData.interior_colour" class="w-full" autocomplete="off"
+                                    @focus="validations_errors.interior_colour = ''" />
+                                <LazyInputError class="text-sm mt-1" :message="validations_errors.interior_colour" />
+                            </div>
+
+                            <div>
+                                <label class="font-semibold">Location</label>
+                                <LazyInputText v-model="formData.location" class="w-full" autocomplete="off"
+                                    @focus="validations_errors.location = ''" />
+                                <LazyInputError class="text-sm mt-1" :message="validations_errors.location" />
+                            </div>
+
+                            <div>
+                                <label class="font-semibold">Status</label>
+                                <Select v-model="formData.status" :options="statusOptions" optionLabel="name" optionValue="value"
+                                    class="w-full" placeholder="Select Status" @focus="validations_errors.status = ''" />
+                                <LazyInputError class="text-sm mt-1" :message="validations_errors.status" />
+                            </div>
+
+                            <div class="sm:col-span-3">
+                                <label class="font-semibold">Excerpt</label>
+                                <Editor v-model="formData.excerpt" editorStyle="height: 120px" class="w-full" />
+                                <LazyInputError class="text-sm mt-1" :message="validations_errors.excerpt" />
+                            </div>
+
+                            <div class="sm:col-span-3">
+                                <label class="font-semibold">Description</label>
+                                <Editor v-model="formData.description" editorStyle="height: 180px" class="w-full" />
+                                <LazyInputError class="text-sm mt-1" :message="validations_errors.description" />
+                            </div>
+
+                            <div class="sm:col-span-3">
+                                <label class="font-semibold">Body</label>
+                                <Editor v-model="formData.body" editorStyle="height: 180px" class="w-full" />
+                                <LazyInputError class="text-sm mt-1" :message="validations_errors.body" />
+                            </div>
+
+                            <div class="sm:col-span-3">
+                                <label class="font-semibold">Investment Thesis</label>
+                                <Editor v-model="formData.investment_thesis" editorStyle="height: 180px" class="w-full" />
+                                <LazyInputError class="text-sm mt-1" :message="validations_errors.investment_thesis" />
+                            </div>
+                        </div>
+
+                        <!-- Financials Tab Content -->
+                        <div v-show="activeTab === 'financials'" class="w-full border border-gray-200 dark:border-gray-800 rounded-xl p-6 bg-white dark:bg-gray-900 shadow-sm">
+                            <h5 class="font-semibold text-gray-800 dark:text-gray-100 mb-4">Syndicate Details</h5>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <div>
+                                    <label class="font-semibold">Syndicate Name</label>
+                                    <LazyInputText v-model="formData.syndicate_name" class="w-full" autocomplete="off"
+                                        @focus="validations_errors.syndicate_name = ''" />
+                                    <LazyInputError class="text-sm mt-1" :message="validations_errors.syndicate_name" />
                                 </div>
-                                <div class="space-y-3">
-                                    <div v-for="(paragraph, paragraphIndex) in section.paragraphs"
-                                        :key="`paragraph-${sectionIndex}-${paragraphIndex}`"
-                                        class="flex items-start gap-3">
-                                        <Textarea v-model="section.paragraphs[paragraphIndex]" class="w-full" rows="2" />
-                                        <i @click="removeSectionListItem(sectionIndex, 'paragraphs', paragraphIndex)"
-                                            class="fa-solid fa-trash text-red-500 hover:text-red-800 cursor-pointer transition duration-150 ease-in-out mt-3"></i>
+
+                                <div>
+                                    <label class="font-semibold">Syndicate Total</label>
+                                    <InputNumber v-model="formData.syndicate_total" class="w-full" :useGrouping="false"
+                                        :maxFractionDigits="2" @focus="validations_errors.syndicate_total = ''" />
+                                    <LazyInputError class="text-sm mt-1" :message="validations_errors.syndicate_total" />
+                                </div>
+
+                                <div>
+                                    <label class="font-semibold">Allocation Cost</label>
+                                    <InputNumber v-model="formData.allocation_cost" class="w-full" :useGrouping="false"
+                                        :maxFractionDigits="2" @focus="validations_errors.allocation_cost = ''" />
+                                    <LazyInputError class="text-sm mt-1" :message="validations_errors.allocation_cost" />
+                                </div>
+
+                                <div>
+                                    <label class="font-semibold">Target Allocation</label>
+                                    <InputNumber v-model="formData.target_allocation" class="w-full" :useGrouping="false"
+                                        :maxFractionDigits="0" @focus="validations_errors.target_allocation = ''" />
+                                    <LazyInputError class="text-sm mt-1" :message="validations_errors.target_allocation" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Media Tab Content -->
+                        <div v-show="activeTab === 'media'" class="grid grid-cols-1 gap-6">
+                            <div class="w-full border border-gray-200 dark:border-gray-800 rounded-xl p-6 bg-white dark:bg-gray-900 shadow-sm">
+                                <h5 class="font-semibold text-gray-800 dark:text-gray-100 mb-4">Media Images</h5>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="font-semibold block mb-3">Asset Image</label>
+                                        <MediaGallery :getPhoto="formData.asset_image"
+                                            @set_photo="(photo) => setImage('asset_image', photo)" />
+                                        <LazyInputError class="text-sm mt-1" :message="validations_errors.asset_image" />
+                                    </div>
+
+                                    <div>
+                                        <label class="font-semibold block mb-3">Hero Image</label>
+                                        <MediaGallery :getPhoto="formData.hero_image"
+                                            @set_photo="(photo) => setImage('hero_image', photo)" />
+                                        <LazyInputError class="text-sm mt-1" :message="validations_errors.hero_image" />
+                                    </div>
+
+                                    <div>
+                                        <label class="font-semibold block mb-3">Card Image</label>
+                                        <MediaGallery :getPhoto="formData.card_image"
+                                            @set_photo="(photo) => setImage('card_image', photo)" />
+                                        <LazyInputError class="text-sm mt-1" :message="validations_errors.card_image" />
                                     </div>
                                 </div>
                             </div>
 
-                            <div>
-                                <div class="flex items-center justify-between gap-3 mb-2">
-                                    <label class="font-semibold">Bullets</label>
-                                    <Button type="button" label="Add Bullet" class="text-xs"
-                                        @click="addSectionListItem(sectionIndex, 'bullets')" />
+                            <div class="w-full border border-gray-200 dark:border-gray-800 rounded-xl p-6 bg-white dark:bg-gray-900 shadow-sm">
+                                <div class="flex items-center justify-between gap-3 mb-3">
+                                    <h5 class="font-semibold text-gray-800 dark:text-gray-100">Highlights</h5>
+                                    <Button type="button" icon="pi pi-plus" severity="success" @click="addListItem('highlights')" />
                                 </div>
                                 <div class="space-y-3">
-                                    <div v-for="(bullet, bulletIndex) in section.bullets"
-                                        :key="`bullet-${sectionIndex}-${bulletIndex}`"
+                                    <div v-for="(highlight, index) in formData.highlights" :key="`highlight-${index}`"
                                         class="flex items-center gap-3">
-                                        <LazyInputText v-model="section.bullets[bulletIndex]" class="w-full"
+                                        <LazyInputText v-model="formData.highlights[index]" class="w-full" autocomplete="off" />
+                                        <Button type="button" icon="pi pi-trash" severity="danger" outlined @click="removeListItem('highlights', index)" />
+                                    </div>
+                                </div>
+                                <LazyInputError class="text-sm mt-1" :message="validations_errors.highlights" />
+                            </div>
+
+                            <div class="w-full border border-gray-200 dark:border-gray-800 rounded-xl p-6 bg-white dark:bg-gray-900 shadow-sm">
+                                <div class="flex items-center justify-between gap-3 mb-3">
+                                    <h5 class="font-semibold text-gray-800 dark:text-gray-100">Specs</h5>
+                                    <Button type="button" icon="pi pi-plus" severity="success" @click="addSpec" />
+                                </div>
+                                <div class="space-y-3">
+                                    <div v-for="(spec, index) in formData.specs" :key="`spec-${index}`"
+                                        class="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-3 items-center">
+                                        <LazyInputText v-model="spec.label" class="w-full" placeholder="Label" autocomplete="off" />
+                                        <LazyInputText v-model="spec.value" class="w-full" placeholder="Value" autocomplete="off" />
+                                        <Button type="button" icon="pi pi-trash" severity="danger" outlined @click="removeSpec(index)" />
+                                    </div>
+                                </div>
+                                <LazyInputError class="text-sm mt-1" :message="validations_errors.specs" />
+                            </div>
+                        </div>
+
+                        <!-- Sections Tab Content -->
+                        <div v-show="activeTab === 'sections'" class="w-full border border-gray-200 dark:border-gray-800 rounded-xl p-6 bg-white dark:bg-gray-900 shadow-sm">
+                            <div class="flex items-center justify-between gap-3 mb-3">
+                                <h5 class="font-semibold text-gray-800 dark:text-gray-100">Sections</h5>
+                                <Button type="button" icon="pi pi-plus" severity="success" @click="addSection" />
+                            </div>
+                            <div class="space-y-5">
+                                <div v-for="(section, sectionIndex) in formData.sections" :key="`section-${sectionIndex}`"
+                                    class="border border-gray-200 dark:border-gray-850 rounded-xl p-6 bg-gray-50 dark:bg-gray-955 shadow-inner">
+                                    <div class="flex items-center justify-between gap-3 mb-3">
+                                        <LazyInputText v-model="section.heading" class="w-full" placeholder="Heading"
                                             autocomplete="off" />
-                                        <i @click="removeSectionListItem(sectionIndex, 'bullets', bulletIndex)"
-                                            class="fa-solid fa-trash text-red-500 hover:text-red-800 cursor-pointer transition duration-150 ease-in-out"></i>
+                                        <Button type="button" icon="pi pi-trash" severity="danger" outlined @click="removeSection(sectionIndex)" />
+                                    </div>
+
+                                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                        <div>
+                                            <div class="flex items-center justify-between gap-3 mb-2">
+                                                <label class="font-semibold">Paragraphs</label>
+                                                <Button type="button" icon="pi pi-plus" severity="success"
+                                                    @click="addSectionListItem(sectionIndex, 'paragraphs')" />
+                                            </div>
+                                            <div class="space-y-3">
+                                                <div v-for="(paragraph, paragraphIndex) in section.paragraphs"
+                                                    :key="`paragraph-${sectionIndex}-${paragraphIndex}`"
+                                                    class="flex items-start gap-3">
+                                                    <Editor v-model="section.paragraphs[paragraphIndex]" editorStyle="height: 100px" class="w-full" />
+                                                    <Button type="button" icon="pi pi-trash" severity="danger" outlined @click="removeSectionListItem(sectionIndex, 'paragraphs', paragraphIndex)" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <div class="flex items-center justify-between gap-3 mb-2">
+                                                <label class="font-semibold">Bullets</label>
+                                                <Button type="button" icon="pi pi-plus" severity="success"
+                                                    @click="addSectionListItem(sectionIndex, 'bullets')" />
+                                            </div>
+                                            <div class="space-y-3">
+                                                <div v-for="(bullet, bulletIndex) in section.bullets"
+                                                    :key="`bullet-${sectionIndex}-${bulletIndex}`"
+                                                    class="flex items-center gap-3">
+                                                    <LazyInputText v-model="section.bullets[bulletIndex]" class="w-full"
+                                                        autocomplete="off" />
+                                                    <Button type="button" icon="pi pi-trash" severity="danger" outlined @click="removeSectionListItem(sectionIndex, 'bullets', bulletIndex)" />
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+                            <LazyInputError class="text-sm mt-1" :message="validations_errors.sections" />
                         </div>
+
+                        <!-- Technical Details Tab Content -->
+                        <div v-show="activeTab === 'technical'" class="w-full border border-gray-200 dark:border-gray-800 rounded-xl p-6 bg-white dark:bg-gray-900 shadow-sm">
+                            <h5 class="font-semibold text-gray-800 dark:text-gray-100 mb-4">Detail</h5>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="font-semibold">Name</label>
+                                    <LazyInputText v-model="formData.detail.name" class="w-full" autocomplete="off" />
+                                </div>
+
+                                <div>
+                                    <label class="font-semibold">VIN</label>
+                                    <LazyInputText v-model="formData.detail.vin" class="w-full" autocomplete="off" />
+                                </div>
+
+                                <div>
+                                    <label class="font-semibold">Mileage</label>
+                                    <InputNumber v-model="formData.detail.mileage" class="w-full" :useGrouping="false"
+                                        :maxFractionDigits="0" />
+                                </div>
+
+                                <div>
+                                    <label class="font-semibold">Condition Grade</label>
+                                    <LazyInputText v-model="formData.detail.condition_grade" class="w-full" autocomplete="off" />
+                                </div>
+
+                                <div>
+                                    <label class="font-semibold">Engine</label>
+                                    <LazyInputText v-model="formData.detail.engine" class="w-full" autocomplete="off" />
+                                </div>
+
+                                <div>
+                                    <label class="font-semibold">Power</label>
+                                    <InputNumber v-model="formData.detail.power" class="w-full" :useGrouping="false" />
+                                </div>
+
+                                <div>
+                                    <label class="font-semibold">Torque</label>
+                                    <InputNumber v-model="formData.detail.torque" class="w-full" :useGrouping="false" />
+                                </div>
+
+                                <div>
+                                    <label class="font-semibold">Seating Capacity</label>
+                                    <InputNumber v-model="formData.detail.seating_capacity" class="w-full" :useGrouping="false"
+                                        :maxFractionDigits="0" />
+                                </div>
+
+                                <div>
+                                    <label class="font-semibold">Drive Type</label>
+                                    <LazyInputText v-model="formData.detail.drive_type" class="w-full" autocomplete="off" />
+                                </div>
+
+                                <div>
+                                    <label class="font-semibold">Transmission</label>
+                                    <LazyInputText v-model="formData.detail.transmission" class="w-full" autocomplete="off" />
+                                </div>
+
+                                <div>
+                                    <label class="font-semibold">Year From</label>
+                                    <InputNumber v-model="formData.detail.year_from" class="w-full" :useGrouping="false"
+                                        :maxFractionDigits="0" />
+                                </div>
+
+                                <div>
+                                    <label class="font-semibold">3D Image URL</label>
+                                    <LazyInputText v-model="formData.detail.three_d_image_url" class="w-full"
+                                        placeholder="https://example.com" autocomplete="off" />
+                                </div>
+
+                                <div>
+                                    <label class="font-semibold">Video Path</label>
+                                    <div class="w-full mt-2">
+                                        <MediaGallery :getPhoto="formData.detail.video_path" @set_photo="setDetailVideo" />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="font-semibold">Status</label>
+                                    <Select v-model="formData.detail.status" :options="statusOptions" optionLabel="name" optionValue="value"
+                                        class="w-full" placeholder="Select Status" />
+                                </div>
+
+                                <div class="md:col-span-3">
+                                    <label class="font-semibold block mb-3">Gallery</label>
+                                    <MediaGallery :getPhoto="formData.detail.gallery" :multiple="true"
+                                        @set_photo="setDetailGallery" />
+                                    <LazyInputError class="text-sm mt-1" :message="validations_errors['detail.gallery']" />
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
-                <LazyInputError class="text-sm mt-1" :message="validations_errors.sections" />
             </div>
 
-            <div class="md:col-span-3 border border-gray-200 rounded-lg p-4">
-                <h5 class="font-semibold text-gray-800 dark:text-gray-100 mb-4">Detail</h5>
+            <!-- Footer area with buttons -->
+            <div class="flex justify-between items-center px-8 py-4 border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 z-10 shadow-md">
+                <!-- Left side: Cancel -->
+                <Button type="button" label="Cancel" severity="danger" outlined
+                    class="transition-all duration-300 hover:scale-105 border border-red-500/30 hover:bg-red-55 dark:hover:bg-red-950/20" 
+                    @click="$emit('close')">
+                    <template #icon="{ class: iconClass }">
+                        <i class="pi pi-times-circle mr-2" :class="iconClass"></i>
+                    </template>
+                </Button>
+                
+                <!-- Right side: Prev, Next, Submit -->
+                <div class="flex items-center gap-3">
+                    <Button v-if="isLoading" severity="secondary" style="cursor: not-allowed; width: 80px;">
+                        <ProgressSpinner style="width: 25px; height: 25px" strokeWidth="8" animationDuration=".5s" />
+                    </Button>
+                    <template v-else>
+                        <Button v-if="!isFirstTab" type="button" label="Previous" severity="secondary" outlined
+                            class="border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+                            @click="prevTab">
+                            <template #icon="{ class: iconClass }">
+                                <i class="pi pi-arrow-left mr-2" :class="iconClass"></i>
+                            </template>
+                        </Button>
+                        
+                        <Button v-if="!isLastTab" type="button" label="Next" severity="success"
+                            class="bg-emerald-500 hover:bg-emerald-600 border-none transition text-white font-semibold"
+                            @click="nextTab">
+                            <template #icon="{ class: iconClass }">
+                                <i class="pi pi-arrow-right ml-2" :class="iconClass"></i>
+                            </template>
+                        </Button>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label class="font-semibold">Name</label>
-                        <LazyInputText v-model="formData.detail.name" class="w-full" autocomplete="off" />
-                    </div>
-
-                    <div>
-                        <label class="font-semibold">VIN</label>
-                        <LazyInputText v-model="formData.detail.vin" class="w-full" autocomplete="off" />
-                    </div>
-
-                    <div>
-                        <label class="font-semibold">Mileage</label>
-                        <InputNumber v-model="formData.detail.mileage" class="w-full" :useGrouping="false"
-                            :maxFractionDigits="0" />
-                    </div>
-
-                    <div>
-                        <label class="font-semibold">Condition Grade</label>
-                        <LazyInputText v-model="formData.detail.condition_grade" class="w-full" autocomplete="off" />
-                    </div>
-
-                    <div>
-                        <label class="font-semibold">Engine</label>
-                        <LazyInputText v-model="formData.detail.engine" class="w-full" autocomplete="off" />
-                    </div>
-
-                    <div>
-                        <label class="font-semibold">Power</label>
-                        <InputNumber v-model="formData.detail.power" class="w-full" :useGrouping="false" />
-                    </div>
-
-                    <div>
-                        <label class="font-semibold">Torque</label>
-                        <InputNumber v-model="formData.detail.torque" class="w-full" :useGrouping="false" />
-                    </div>
-
-                    <div>
-                        <label class="font-semibold">Seating Capacity</label>
-                        <InputNumber v-model="formData.detail.seating_capacity" class="w-full" :useGrouping="false"
-                            :maxFractionDigits="0" />
-                    </div>
-
-                    <div>
-                        <label class="font-semibold">Drive Type</label>
-                        <LazyInputText v-model="formData.detail.drive_type" class="w-full" autocomplete="off" />
-                    </div>
-
-                    <div>
-                        <label class="font-semibold">Transmission</label>
-                        <LazyInputText v-model="formData.detail.transmission" class="w-full" autocomplete="off" />
-                    </div>
-
-                    <div>
-                        <label class="font-semibold">Year From</label>
-                        <InputNumber v-model="formData.detail.year_from" class="w-full" :useGrouping="false"
-                            :maxFractionDigits="0" />
-                    </div>
-
-                    <div>
-                        <label class="font-semibold">3D Image URL</label>
-                        <LazyInputText v-model="formData.detail.three_d_image_url" class="w-full"
-                            placeholder="https://example.com" autocomplete="off" />
-                    </div>
-
-                    <div>
-                        <label class="font-semibold">Video Path</label>
-                        <LazyInputText v-model="formData.detail.video_path" class="w-full" autocomplete="off" />
-                    </div>
-
-                    <div class="flex items-center gap-4">
-                        <label class="font-semibold">Status</label>
-                        <div class="flex-auto">
-                            <ToggleSwitch v-model="formData.detail.status" />
-                        </div>
-                    </div>
-
-                    <div class="md:col-span-3">
-                        <label class="font-semibold block mb-3">Gallery</label>
-                        <MediaGallery :getPhoto="formData.detail.gallery" :multiple="true"
-                            @set_photo="setDetailGallery" />
-                        <LazyInputError class="text-sm mt-1" :message="validations_errors['detail.gallery']" />
-                    </div>
+                        <Button type="button" :label="modalTitle === 'Create' ? 'Create Vehicle' : 'Update Vehicle'" 
+                            :severity="isLastTab ? 'success' : 'secondary'"
+                            :outlined="!isLastTab"
+                            raised class="transition duration-150 hover:shadow-lg font-semibold"
+                            @click="modalTitle === 'Create' ? createHandler() : updateHandler()">
+                            <template #icon="{ class: iconClass }">
+                                <i :class="modalTitle === 'Create' ? 'pi pi-plus-circle mr-2' : 'pi pi-refresh mr-2'"></i>
+                            </template>
+                        </Button>
+                    </template>
                 </div>
             </div>
         </div>
-
-        <template #footer class="flex justify-end gap-2 border-gray-200">
-            <div class="flex justify-end items-center gap-3 border-gray-200">
-                <Button v-if="isLoading" severity="secondary" style="cursor: not-allowed; width: 80px;">
-                    <ProgressSpinner style="width: 25px; height: 25px" strokeWidth="8" animationDuration=".5s" />
-                </Button>
-                <template v-else>
-                    <Button type="button" label="Cancel" severity="danger" outlined
-                        class="transition-all duration-300 hover:scale-105" @click="$emit('close')">
-                        <template #icon="{ class: iconClass }">
-                            <i class="pi pi-times-circle mr-2" :class="iconClass"></i>
-                        </template>
-                    </Button>
-                    <Button type="button" :label="modalTitle === 'Create' ? 'Create' : 'Update'" severity="success"
-                        raised class="transition-all duration-300 hover:scale-105 hover:shadow-lg"
-                        @click="modalTitle === 'Create' ? createHandler() : updateHandler()">
-                        <template #icon="{ class: iconClass }">
-                            <i :class="modalTitle === 'Create' ? 'pi pi-plus-circle mr-2' : 'pi pi-refresh mr-2'"></i>
-                        </template>
-                    </Button>
-                </template>
-            </div>
-        </template>
     </Dialog>
     <LazyResponseModal :response_modal="response_modal" />
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss">
+.fullscreen-dialog-mask {
+    padding: 0 !important;
+}
+
+.fullscreen-dialog-modern {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    margin: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+
+    .p-dialog-content {
+        padding: 0 !important;
+        overflow: hidden !important;
+        background: transparent !important;
+        height: 100% !important;
+        max-height: 100% !important;
+    }
+    
+    .p-dialog-header, .p-dialog-footer {
+        display: none !important;
+    }
+
+    // Force full-width block layout for input components and labels inside the dialog
+    .p-inputnumber, .p-inputnumber input, .p-colorpicker, .p-editor-container {
+        width: 100% !important;
+    }
+
+    label {
+        display: block !important;
+        margin-bottom: 0.5rem !important;
+    }
+}
+</style>

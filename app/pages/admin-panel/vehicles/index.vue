@@ -261,9 +261,19 @@ const onChangeHandler = () => {
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="flex justify-center items-center" :title="getVehicleStatusName(item.status)">
-                                                <i v-if="isActiveStatus(item.status)" class="fa-solid fa-circle-check text-green-500 text-xl" />
-                                                <i v-else class="fa-solid fa-circle-check text-gray-300 dark:text-gray-600 text-xl" />
+                                            <div class="flex justify-center items-center">
+                                                <span class="px-2.5 py-1 text-xs rounded-full font-semibold border"
+                                                    :class="{
+                                                        'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700': Number(item.status) === 0 || !item.status,
+                                                        'bg-green-100 text-green-800 border-green-200 dark:bg-green-950 dark:text-green-200 dark:border-green-850': Number(item.status) === 1,
+                                                        'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-950 dark:text-blue-200 dark:border-blue-850': Number(item.status) === 2,
+                                                        'bg-indigo-100 text-indigo-800 border-indigo-200 dark:bg-indigo-950 dark:text-indigo-200 dark:border-indigo-850': Number(item.status) === 3,
+                                                        'bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-950 dark:text-orange-200 dark:border-orange-850': Number(item.status) === 4,
+                                                        'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-950 dark:text-yellow-200 dark:border-yellow-850': Number(item.status) === 5,
+                                                        'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-200 dark:border-emerald-850': Number(item.status) === 6
+                                                    }">
+                                                    {{ getVehicleStatusName(item.status) }}
+                                                </span>
                                             </div>
                                         </td>
                                         <td v-if="permissions.edit || permissions.delete">

@@ -2,6 +2,12 @@
 const AddEdit = defineAsyncComponent(() => import('./components/AddEdit.vue'));
 definePageMeta({ middleware: ['auth-admin'], layout: 'admin' });
 
+const STATUS_DRAFT = 0;
+const STATUS_UPCOMING = 1;
+const STATUS_LIVE = 2;
+const STATUS_SOLD = 3;
+const STATUS_INACTIVE = 4;
+
 const { $optionsList } = useNuxtApp();
 
 const optionsList = $optionsList();
@@ -253,7 +259,7 @@ const formatNumber = (value) => {
                                                 </div>
                                                 <div class="flex flex-col">
                                                     <div class="flex items-center gap-2">
-                                                        <span class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ row.headline || row.item_name || 'Unknown Item' }}</span>
+                                                        <span class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ row.assetable?.name || row.item_name || row.headline || 'Unknown Item' }}</span>
                                                         <span v-if="row.is_fractional" class="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-700">Fractional</span>
                                                         <span v-if="row.is_exclusive" class="text-[10px] px-1.5 py-0.5 rounded bg-purple-100 text-purple-700">Exclusive</span>
                                                     </div>
@@ -265,8 +271,16 @@ const formatNumber = (value) => {
                                         </td>
                                         <td>
                                             <div class="flex justify-center items-center">
-                                                <i v-if="row.status > 0" class="fa-solid fa-circle-check text-green-500 text-xl" />
-                                                <i v-else class="fa-solid fa-circle-check text-gray-300 dark:text-gray-600 text-xl" />
+                                                <span class="px-2 py-1 text-xs rounded-full font-medium" 
+                                                    :class="{
+                                                        'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300': row.status === STATUS_DRAFT,
+                                                        'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300': row.status === STATUS_UPCOMING,
+                                                        'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300': row.status === STATUS_LIVE,
+                                                        'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300': row.status === STATUS_SOLD,
+                                                        'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300': row.status === STATUS_INACTIVE
+                                                    }">
+                                                    {{ row.live_status || 'Unknown' }}
+                                                </span>
                                             </div>
                                         </td>
                                         <td v-if="permissions.edit || permissions.delete">
