@@ -103,12 +103,26 @@ const submitSlots = async (item) => {
     <div class="h-full mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
         <div class="w-full max-w-7xl mx-auto overflow-auto">
             
-            <div class="w-full flex flex-wrap md:flex-nowrap items-center gap-4 mb-8 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                <div class="flex items-center gap-2 w-full md:w-auto">
-                    <label for="search" class="font-medium text-gray-800 dark:text-gray-200 whitespace-nowrap">Search Items</label>
-                    <LazyInputText type="text" v-model="search" @keyup.enter="loadData(1)" class="w-full md:w-64" placeholder="Search by name or slug..." />
+            <div class="w-full flex flex-wrap md:flex-nowrap items-center justify-between gap-4 mb-8 bg-white dark:bg-[#1a2332] p-5 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+                <div class="flex flex-col md:flex-row items-start md:items-center gap-4 w-full md:w-auto">
+                    <div class="text-lg font-semibold text-gray-900 dark:text-white">
+                        Allocation Management
+                    </div>
+                    <div class="hidden md:block h-6 w-px bg-gray-200 dark:bg-gray-700"></div>
+                    <div class="flex items-center gap-3 w-full md:w-auto">
+                        <div class="relative w-full md:w-80">
+                            <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                            <LazyInputText 
+                                type="text" 
+                                v-model="search" 
+                                @keyup.enter="loadData(1)" 
+                                class="w-full pl-10 !bg-gray-50 dark:!bg-[#131b26] dark:text-white" 
+                                placeholder="Search items by name..." 
+                            />
+                        </div>
+                        <Button label="Search" @click="loadData(1)" class="whitespace-nowrap" />
+                    </div>
                 </div>
-                <Button label="Search" @click="loadData(1)" />
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-8 w-full">
@@ -125,33 +139,50 @@ const submitSlots = async (item) => {
                         No fractional items found.
                     </div>
                     
-                    <div v-for="item in data" :key="item.id" class="border-b border-gray-200 dark:border-gray-700 pb-6 relative flex flex-col justify-between">
+                    <div v-for="item in data" :key="item.id" class="bg-white dark:bg-[#1a2332] border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-blue-500/50 transition-all duration-200 relative flex flex-col justify-between shadow-sm hover:shadow-md">
                         
-                        <h3 class="text-[15px] font-bold text-gray-900 dark:text-white mb-4">
-                            Total Allocations for {{ item.item_name || item.assetable?.asset_name || `Item #${item.id}` }}
-                        </h3>
-                        
-                        <div class="flex items-center mb-5 w-full">
-                            <input 
-                                type="number" 
-                                v-model="item.input_slots" 
-                                placeholder="Enter slots to add" 
-                                class="flex-grow border border-gray-300 dark:border-gray-600 rounded-l-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-transparent text-gray-900 dark:text-white"
-                                @keyup.enter="submitSlots(item)"
-                            />
-                            <button 
-                                class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 text-sm font-medium rounded-r-md transition-colors whitespace-nowrap disabled:opacity-70 flex items-center justify-center min-w-[80px]"
-                                @click="submitSlots(item)"
-                                :disabled="isSubmittingId === item.id"
-                            >
-                                <span v-if="isSubmittingId === item.id" class="inline-block animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-1"></span>
-                                Submit
-                            </button>
+                        <div class="mb-5">
+                            <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-1 line-clamp-2" :title="item.item_name || item.assetable?.asset_name || `Item #${item.id}`">
+                                {{ item.item_name || item.assetable?.asset_name || `Item #${item.id}` }}
+                            </h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Manage allocations</p>
                         </div>
                         
-                        <div class="text-gray-500 dark:text-gray-400 text-sm space-y-1.5">
-                            <div>Total Allocations = {{ item.shares_total || item.total_shares || 0 }}</div>
-                            <div class="font-bold text-gray-900 dark:text-gray-200">Remaining Allocations = {{ item.shares_available || item.available_shares || 0 }}</div>
+                        <div class="flex flex-col gap-4 mt-auto">
+                            <!-- Stats Grid -->
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="bg-gray-50 dark:bg-[#131b26] rounded-lg p-3 border border-gray-100 dark:border-gray-800">
+                                    <div class="text-[11px] uppercase tracking-wider font-semibold text-gray-500 dark:text-gray-400 mb-1">Total Allocations</div>
+                                    <div class="text-lg font-bold text-gray-900 dark:text-white">
+                                        {{ item.shares_total || item.total_shares || 0 }}
+                                    </div>
+                                </div>
+                                <div class="bg-blue-50/50 dark:bg-blue-900/10 rounded-lg p-3 border border-blue-100 dark:border-blue-800/30">
+                                    <div class="text-[11px] uppercase tracking-wider font-semibold text-blue-600 dark:text-blue-400 mb-1">Remaining</div>
+                                    <div class="text-lg font-bold text-blue-700 dark:text-blue-300">
+                                        {{ item.shares_available || item.available_shares || 0 }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Input Group -->
+                            <div class="flex items-stretch w-full mt-2">
+                                <input 
+                                    type="number" 
+                                    v-model="item.input_slots" 
+                                    placeholder="Enter slots to add" 
+                                    class="flex-grow w-full min-w-0 border border-gray-300 dark:border-gray-600 rounded-l-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 bg-white dark:bg-[#131b26] text-gray-900 dark:text-white transition-all shadow-sm"
+                                    @keyup.enter="submitSlots(item)"
+                                />
+                                <button 
+                                    class="flex-shrink-0 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 text-sm font-medium rounded-r-lg transition-colors whitespace-nowrap disabled:opacity-70 flex items-center justify-center min-w-[90px] shadow-sm"
+                                    @click="submitSlots(item)"
+                                    :disabled="isSubmittingId === item.id"
+                                >
+                                    <span v-if="isSubmittingId === item.id" class="inline-block animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></span>
+                                    <span>Submit</span>
+                                </button>
+                            </div>
                         </div>
                         
                     </div>
