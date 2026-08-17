@@ -8,7 +8,7 @@ defineProps<{
   <aside
     class="relative flex min-h-[520px] flex-col justify-between overflow-hidden bg-tccDeepBlack p-8 text-white sm:p-12 lg:col-span-5 lg:min-h-screen">
     <div class="absolute inset-0 bg-cover bg-center opacity-70"
-      style="background-image: url('/generated/restoration-workshop.png');" />
+      style="background-image: url('/frontend/assets/images/login_image.png');" />
     <div class="absolute inset-0 bg-gradient-to-b from-tccDeepBlack/80 via-tccDeepBlack/60 to-tccDeepBlack" />
 
     <!-- <div class="relative z-10">
@@ -23,14 +23,17 @@ defineProps<{
       <div class="space-y-2">
         <span class="restomod-eyebrow">Member Access</span>
         <h1 class="font-poppins text-4xl font-black leading-[0.95] text-white sm:text-5xl">
-          Built In The <span class="text-tccGold">Open</span>
+          Built to be <span class="text-tccGold">Experienced</span>
         </h1>
         <p class="max-w-sm text-sm font-light leading-relaxed text-white/70">{{ description }}</p>
       </div>
     </div>
 
-    <p class="relative z-10 text-[10px] font-light uppercase tracking-[0.18em] text-white/40">
-      &copy; 2026 Vision148. Security-focused investment platform.
-    </p>
+    <div class="relative z-10 flex items-center gap-4">
+      <img src="/TCC-Logo.jpeg" alt="TCC Logo" class="h-8 w-auto">
+      <p class="text-[10px] font-light uppercase tracking-[0.18em] text-white/40">
+        &copy; 2026 Syndincated Restomod. Security-focused investment platform.
+      </p>
+    </div>
   </aside>
 </template>

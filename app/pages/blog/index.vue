@@ -387,7 +387,7 @@ watch(totalPages, (newTotalPages) => {
     <div class="bg-tccDeepBlack text-white">
         <section class="relative min-h-[520px] overflow-hidden bg-tccDeepBlack text-white md:min-h-[620px]">
             <div class="absolute inset-0">
-                <img src="/generated/restoration-workshop.png" alt="Classic car restoration workshop"
+                <img src="/frontend/assets/images/fabrication.jpg" alt="Classic car restoration workshop"
                     class="h-full w-full object-cover opacity-70">
                 <div
                     class="absolute inset-0 bg-gradient-to-b from-tccDeepBlack/35 via-tccDeepBlack/45 to-tccDeepBlack" />
@@ -404,8 +404,8 @@ watch(totalPages, (newTotalPages) => {
                         Vision148 Journal
                     </h1>
                     <p class="mt-6 max-w-2xl text-base leading-relaxed text-white/70 sm:text-lg">
-                        Market notes, build-room updates, ownership education, and member stories from the world of
-                        collectible cars.
+                        Showcasing each aspect of the RS500 Genesis build with intimate access to the technology, skills
+                        and people that are integral to the execution of this unique car.
                     </p>
                     <div class="mt-9 grid max-w-3xl grid-cols-1 gap-3 sm:grid-cols-3">
                         <div class="border-l border-tccGold/50 pl-4">
@@ -414,7 +414,7 @@ watch(totalPages, (newTotalPages) => {
                             <span v-if="shouldShowBlogPostsSkeleton"
                                 class="mt-2 block h-7 w-10 animate-pulse rounded-full bg-tccGold/20" />
                             <strong v-else class="mt-1 block text-2xl font-black text-tccGold">{{ allPosts.length
-                            }}</strong>
+                                }}</strong>
                         </div>
                         <div class="border-l border-tccGold/50 pl-4">
                             <span
@@ -422,7 +422,7 @@ watch(totalPages, (newTotalPages) => {
                             <span v-if="shouldShowCategoriesSkeleton"
                                 class="mt-2 block h-7 w-10 animate-pulse rounded-full bg-tccGold/20" />
                             <strong v-else class="mt-1 block text-2xl font-black text-tccGold">{{ categories.length - 1
-                                }}</strong>
+                            }}</strong>
                         </div>
                         <div class="border-l border-tccGold/50 pl-4">
                             <span
@@ -516,7 +516,8 @@ watch(totalPages, (newTotalPages) => {
                         Notes</span>
                     <h2 class="mt-4 font-poppins text-2xl font-black leading-tight text-white">This month in the garage
                     </h2>
-                    <div class="mt-7 h-[320px] space-y-5 overflow-y-auto pr-3 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/10 hover:[&::-webkit-scrollbar-thumb]:bg-white/20 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-1.5">
+                    <div
+                        class="mt-7 h-[320px] space-y-5 overflow-y-auto pr-3 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/10 hover:[&::-webkit-scrollbar-thumb]:bg-white/20 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-1.5">
                         <template v-if="shouldShowIssueNotesSkeleton">
                             <div v-for="(noteSkeleton, skeletonIndex) in issueNoteSkeletonRows"
                                 :key="`issue-note-skeleton-${skeletonIndex}`"
