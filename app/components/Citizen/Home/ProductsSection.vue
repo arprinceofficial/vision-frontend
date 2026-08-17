@@ -23,13 +23,13 @@ const products = [
         disabled: false
     },
     {
-        image: '/generated/experiential.jpeg',
+        image: '/frontend/assets/images/pillars.png',
         alt: 'Syndicated Drive',
         badge: 'Pillar 03',
         title: 'Member Experience',
         description:
             'Build updates, private previews, driving access, member votes, and document vaults make ownership feel tangible.',
-        action: 'Coming Soon',
+        action: 'Learn More',
         to: '',
         disabled: true
     }
