@@ -286,7 +286,8 @@ onMounted(() => {
     loadVehicles();
 });
 
-const onVehicleChange = (selectedId) => {
+const onVehicleChange = () => {
+    const selectedId = formData.value.assetable_id;
     if (!selectedId) return;
     const vehicle = vehicles.value.find(v => v.id === selectedId);
 
