@@ -13,7 +13,7 @@ const activeTab = ref('basic');
 
 const formTabs = [
     { key: 'basic', label: 'Basic Info', desc: 'Core vehicle info & description', icon: 'pi pi-info-circle' },
-    { key: 'financials', label: 'Syndicate', desc: 'Syndicate total & allocation cost', icon: 'pi pi-dollar' },
+    // { key: 'financials', label: 'Syndicate', desc: 'Syndicate total & allocation cost', icon: 'pi pi-dollar' },
     { key: 'media', label: 'Media & Gallery', desc: 'Asset images & highlights list', icon: 'pi pi-images' },
     { key: 'sections', label: 'Page Sections', desc: 'Custom content headers & bullets', icon: 'pi pi-file-edit' },
     { key: 'technical', label: 'Tech Details', desc: 'Engine specs, mileage, and gallery', icon: 'pi pi-cog' },
@@ -558,6 +558,7 @@ const removeSectionListItem = (sectionIndex, field, itemIndex) => {
                                 <LazyInputText v-model="formData.name" class="w-full" placeholder="i.e. 911 Carrera"
                                     :class="validations_errors.name ? 'border-[#f44336!important]' : ''" autocomplete="off"
                                     @focus="validations_errors.name = ''" />
+                                <small class="text-xs text-gray-500 mt-1 block">Used in: Main title on Retail detail page</small>
                                 <LazyInputError class="text-sm mt-1" :message="validations_errors.name" />
                             </div>
 
@@ -566,10 +567,11 @@ const removeSectionListItem = (sectionIndex, field, itemIndex) => {
                                 <LazyInputText v-model="formData.slug" class="w-full" placeholder="i.e. 1967-ford-mustang-fastback"
                                     :class="validations_errors.slug ? 'border-[#f44336!important]' : ''" autocomplete="off"
                                     @focus="validations_errors.slug = ''" />
+                                <small class="text-xs text-gray-500 mt-1 block">Used in: URL path (/retail/[slug])</small>
                                 <LazyInputError class="text-sm mt-1" :message="validations_errors.slug" />
                             </div>
 
-                            <div>
+                            <div v-show="false">
                                 <label class="font-semibold">Retail Status</label>
                                 <LazyInputText v-model="formData.retail_status" class="w-full"
                                     :class="validations_errors.retail_status ? 'border-[#f44336!important]' : ''" autocomplete="off"
@@ -582,6 +584,7 @@ const removeSectionListItem = (sectionIndex, field, itemIndex) => {
                                 <LazyInputText v-model="formData.make" class="w-full" placeholder="i.e. Porsche"
                                     :class="validations_errors.make ? 'border-[#f44336!important]' : ''" autocomplete="off"
                                     @focus="validations_errors.make = ''" />
+                                <small class="text-xs text-gray-500 mt-1 block">Used in: Technical Data grid</small>
                                 <LazyInputError class="text-sm mt-1" :message="validations_errors.make" />
                             </div>
 
@@ -590,6 +593,7 @@ const removeSectionListItem = (sectionIndex, field, itemIndex) => {
                                 <LazyInputText v-model="formData.model" class="w-full" placeholder="i.e. Carrera"
                                     :class="validations_errors.model ? 'border-[#f44336!important]' : ''" autocomplete="off"
                                     @focus="validations_errors.model = ''" />
+                                <small class="text-xs text-gray-500 mt-1 block">Used in: Technical Data grid</small>
                                 <LazyInputError class="text-sm mt-1" :message="validations_errors.model" />
                             </div>
 
@@ -598,41 +602,52 @@ const removeSectionListItem = (sectionIndex, field, itemIndex) => {
                                 <InputNumber v-model="formData.year" class="w-full" :useGrouping="false" :maxFractionDigits="0"
                                     placeholder="i.e. 2025" :class="validations_errors.year ? 'border-[#f44336!important]' : ''"
                                     autocomplete="off" @focus="validations_errors.year = ''" />
+                                <small class="text-xs text-gray-500 mt-1 block">Used in: Technical Data grid</small>
                                 <LazyInputError class="text-sm mt-1" :message="validations_errors.year" />
                             </div>
 
                             <div class="sm:col-span-2">
                                 <label class="font-semibold">Subtitle</label>
                                 <LazyInputText v-model="formData.subtitle" class="w-full" autocomplete="off"
+                                    placeholder="e.g. The ultimate track toy."
                                     @focus="validations_errors.subtitle = ''" />
+                                <small class="text-xs text-gray-500 mt-1 block">Used in: Subtitle on Retail detail page</small>
                                 <LazyInputError class="text-sm mt-1" :message="validations_errors.subtitle" />
                             </div>
 
                             <div>
                                 <label class="font-semibold">Price</label>
                                 <LazyInputText v-model="formData.price" class="w-full" autocomplete="off"
+                                    placeholder="e.g. 150000"
                                     @focus="validations_errors.price = ''" />
+                                <small class="text-xs text-gray-500 mt-1 block">Used in: Pricing block on Retail detail page</small>
                                 <LazyInputError class="text-sm mt-1" :message="validations_errors.price" />
                             </div>
 
                             <div>
                                 <label class="font-semibold">Exterior Colour</label>
                                 <LazyInputText v-model="formData.exterior_colour" class="w-full" autocomplete="off"
+                                    placeholder="e.g. Guards Red"
                                     @focus="validations_errors.exterior_colour = ''" />
+                                <small class="text-xs text-gray-500 mt-1 block">Used in: Key Specs section</small>
                                 <LazyInputError class="text-sm mt-1" :message="validations_errors.exterior_colour" />
                             </div>
 
                             <div>
                                 <label class="font-semibold">Interior Colour</label>
                                 <LazyInputText v-model="formData.interior_colour" class="w-full" autocomplete="off"
+                                    placeholder="e.g. Black Leather"
                                     @focus="validations_errors.interior_colour = ''" />
+                                <small class="text-xs text-gray-500 mt-1 block">Used in: Key Specs section</small>
                                 <LazyInputError class="text-sm mt-1" :message="validations_errors.interior_colour" />
                             </div>
 
                             <div>
                                 <label class="font-semibold">Location</label>
                                 <LazyInputText v-model="formData.location" class="w-full" autocomplete="off"
+                                    placeholder="e.g. London, UK"
                                     @focus="validations_errors.location = ''" />
+                                <small class="text-xs text-gray-500 mt-1 block">Used in: Key Specs section</small>
                                 <LazyInputError class="text-sm mt-1" :message="validations_errors.location" />
                             </div>
 
@@ -645,7 +660,8 @@ const removeSectionListItem = (sectionIndex, field, itemIndex) => {
 
                             <div class="sm:col-span-3">
                                 <label class="font-semibold">Excerpt</label>
-                                <Editor v-model="formData.excerpt" editorStyle="height: 120px" class="w-full" />
+                                <Editor v-model="formData.excerpt" editorStyle="height: 120px" class="w-full" placeholder="e.g. A pristine example of..." />
+                                <small class="text-xs text-gray-500 mt-1 block">Used in: Short summary on Retail list page</small>
                                 <LazyInputError class="text-sm mt-1" :message="validations_errors.excerpt" />
                             </div>
 
@@ -661,7 +677,7 @@ const removeSectionListItem = (sectionIndex, field, itemIndex) => {
                                 <LazyInputError class="text-sm mt-1" :message="validations_errors.body" />
                             </div>
 
-                            <div class="sm:col-span-3">
+                            <div v-show="false" class="sm:col-span-3">
                                 <label class="font-semibold">Investment Thesis</label>
                                 <Editor v-model="formData.investment_thesis" editorStyle="height: 180px" class="w-full" />
                                 <LazyInputError class="text-sm mt-1" :message="validations_errors.investment_thesis" />
@@ -672,14 +688,14 @@ const removeSectionListItem = (sectionIndex, field, itemIndex) => {
                         <div v-show="activeTab === 'financials'" class="w-full border border-gray-200 dark:border-gray-800 rounded-xl p-6 bg-white dark:bg-gray-900 shadow-sm">
                             <h5 class="font-semibold text-gray-800 dark:text-gray-100 mb-4">Syndicate Details</h5>
                             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                <div>
+                                <div v-show="false">
                                     <label class="font-semibold">Syndicate Name</label>
                                     <LazyInputText v-model="formData.syndicate_name" class="w-full" autocomplete="off"
                                         @focus="validations_errors.syndicate_name = ''" />
                                     <LazyInputError class="text-sm mt-1" :message="validations_errors.syndicate_name" />
                                 </div>
 
-                                <div>
+                                <div v-show="false">
                                     <label class="font-semibold">Syndicate Total</label>
                                     <InputNumber v-model="formData.syndicate_total" class="w-full" :useGrouping="false"
                                         :maxFractionDigits="2" @focus="validations_errors.syndicate_total = ''" />
@@ -693,7 +709,7 @@ const removeSectionListItem = (sectionIndex, field, itemIndex) => {
                                     <LazyInputError class="text-sm mt-1" :message="validations_errors.allocation_cost" />
                                 </div>
 
-                                <div>
+                                <div v-show="false">
                                     <label class="font-semibold">Target Allocation</label>
                                     <InputNumber v-model="formData.target_allocation" class="w-full" :useGrouping="false"
                                         :maxFractionDigits="0" @focus="validations_errors.target_allocation = ''" />
@@ -707,7 +723,7 @@ const removeSectionListItem = (sectionIndex, field, itemIndex) => {
                             <div class="w-full border border-gray-200 dark:border-gray-800 rounded-xl p-6 bg-white dark:bg-gray-900 shadow-sm">
                                 <h5 class="font-semibold text-gray-800 dark:text-gray-100 mb-4">Media Images</h5>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div>
+                                    <div v-show="false">
                                         <label class="font-semibold block mb-3">Asset Image</label>
                                         <MediaGallery :getPhoto="formData.asset_image"
                                             @set_photo="(photo) => setImage('asset_image', photo)" />
@@ -738,7 +754,7 @@ const removeSectionListItem = (sectionIndex, field, itemIndex) => {
                                 <div class="space-y-3">
                                     <div v-for="(highlight, index) in formData.highlights" :key="`highlight-${index}`"
                                         class="flex items-center gap-3">
-                                        <LazyInputText v-model="formData.highlights[index]" class="w-full" autocomplete="off" />
+                                        <LazyInputText v-model="formData.highlights[index]" class="w-full" autocomplete="off" placeholder="e.g. Original matching numbers engine" />
                                         <Button type="button" icon="pi pi-trash" severity="danger" outlined @click="removeListItem('highlights', index)" />
                                     </div>
                                 </div>
@@ -753,8 +769,8 @@ const removeSectionListItem = (sectionIndex, field, itemIndex) => {
                                 <div class="space-y-3">
                                     <div v-for="(spec, index) in formData.specs" :key="`spec-${index}`"
                                         class="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-3 items-center">
-                                        <LazyInputText v-model="spec.label" class="w-full" placeholder="Label" autocomplete="off" />
-                                        <LazyInputText v-model="spec.value" class="w-full" placeholder="Value" autocomplete="off" />
+                                        <LazyInputText v-model="spec.label" class="w-full" placeholder="e.g. 0-60 mph" autocomplete="off" />
+                                        <LazyInputText v-model="spec.value" class="w-full" placeholder="e.g. 3.2 seconds" autocomplete="off" />
                                         <Button type="button" icon="pi pi-trash" severity="danger" outlined @click="removeSpec(index)" />
                                     </div>
                                 </div>
@@ -772,7 +788,7 @@ const removeSectionListItem = (sectionIndex, field, itemIndex) => {
                                 <div v-for="(section, sectionIndex) in formData.sections" :key="`section-${sectionIndex}`"
                                     class="border border-gray-200 dark:border-gray-850 rounded-xl p-6 bg-gray-50 dark:bg-gray-955 shadow-inner">
                                     <div class="flex items-center justify-between gap-3 mb-3">
-                                        <LazyInputText v-model="section.heading" class="w-full" placeholder="Heading"
+                                        <LazyInputText v-model="section.heading" class="w-full" placeholder="e.g. The History"
                                             autocomplete="off" />
                                         <Button type="button" icon="pi pi-trash" severity="danger" outlined @click="removeSection(sectionIndex)" />
                                     </div>
@@ -823,41 +839,48 @@ const removeSectionListItem = (sectionIndex, field, itemIndex) => {
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
                                     <label class="font-semibold">Name</label>
-                                    <LazyInputText v-model="formData.detail.name" class="w-full" autocomplete="off" />
+                                    <LazyInputText v-model="formData.detail.name" class="w-full" autocomplete="off"
+                                        placeholder="e.g. 911 Carrera (992)" />
+                                    <small class="text-xs text-gray-500 mt-1 block">Used in: Tech data specification name</small>
                                 </div>
 
                                 <div>
                                     <label class="font-semibold">VIN</label>
-                                    <LazyInputText v-model="formData.detail.vin" class="w-full" autocomplete="off" />
+                                    <LazyInputText v-model="formData.detail.vin" class="w-full" autocomplete="off"
+                                        placeholder="e.g. WP0AB299..." />
+                                    <small class="text-xs text-gray-500 mt-1 block">Used in: Vehicle verification records</small>
                                 </div>
 
                                 <div>
                                     <label class="font-semibold">Mileage</label>
                                     <InputNumber v-model="formData.detail.mileage" class="w-full" :useGrouping="false"
-                                        :maxFractionDigits="0" />
+                                        :maxFractionDigits="0" placeholder="e.g. 12000" />
+                                    <small class="text-xs text-gray-500 mt-1 block">Used in: Technical Data grid</small>
                                 </div>
 
-                                <div>
+                                <div v-show="false">
                                     <label class="font-semibold">Condition Grade</label>
                                     <LazyInputText v-model="formData.detail.condition_grade" class="w-full" autocomplete="off" />
                                 </div>
 
                                 <div>
                                     <label class="font-semibold">Engine</label>
-                                    <LazyInputText v-model="formData.detail.engine" class="w-full" autocomplete="off" />
+                                    <LazyInputText v-model="formData.detail.engine" class="w-full" autocomplete="off"
+                                        placeholder="e.g. 3.0L Twin-Turbo Flat-6" />
+                                    <small class="text-xs text-gray-500 mt-1 block">Used in: Technical Data grid</small>
                                 </div>
 
-                                <div>
+                                <div v-show="false">
                                     <label class="font-semibold">Power</label>
                                     <InputNumber v-model="formData.detail.power" class="w-full" :useGrouping="false" />
                                 </div>
 
-                                <div>
+                                <div v-show="false">
                                     <label class="font-semibold">Torque</label>
                                     <InputNumber v-model="formData.detail.torque" class="w-full" :useGrouping="false" />
                                 </div>
 
-                                <div>
+                                <div v-show="false">
                                     <label class="font-semibold">Seating Capacity</label>
                                     <InputNumber v-model="formData.detail.seating_capacity" class="w-full" :useGrouping="false"
                                         :maxFractionDigits="0" />
@@ -865,27 +888,31 @@ const removeSectionListItem = (sectionIndex, field, itemIndex) => {
 
                                 <div>
                                     <label class="font-semibold">Drive Type</label>
-                                    <LazyInputText v-model="formData.detail.drive_type" class="w-full" autocomplete="off" />
+                                    <LazyInputText v-model="formData.detail.drive_type" class="w-full" autocomplete="off"
+                                        placeholder="e.g. RWD" />
+                                    <small class="text-xs text-gray-500 mt-1 block">Used in: Technical Data grid</small>
                                 </div>
 
                                 <div>
                                     <label class="font-semibold">Transmission</label>
-                                    <LazyInputText v-model="formData.detail.transmission" class="w-full" autocomplete="off" />
+                                    <LazyInputText v-model="formData.detail.transmission" class="w-full" autocomplete="off"
+                                        placeholder="e.g. 8-Speed PDK" />
+                                    <small class="text-xs text-gray-500 mt-1 block">Used in: Technical Data grid</small>
                                 </div>
 
-                                <div>
+                                <div v-show="false">
                                     <label class="font-semibold">Year From</label>
                                     <InputNumber v-model="formData.detail.year_from" class="w-full" :useGrouping="false"
                                         :maxFractionDigits="0" />
                                 </div>
 
-                                <div>
+                                <div v-show="false">
                                     <label class="font-semibold">3D Image URL</label>
                                     <LazyInputText v-model="formData.detail.three_d_image_url" class="w-full"
                                         placeholder="https://example.com" autocomplete="off" />
                                 </div>
 
-                                <div>
+                                <div v-show="false">
                                     <label class="font-semibold">Video Path</label>
                                     <div class="w-full mt-2">
                                         <MediaGallery :getPhoto="formData.detail.video_path" @set_photo="setDetailVideo" />

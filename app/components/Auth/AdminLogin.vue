@@ -50,7 +50,7 @@ const admin_user = adminUser();
             <!-- Header Section -->
             <div class="flex flex-col items-center mb-8">
                 <NuxtLink to="/" class="mb-6 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-lg">
-                    <ApplicationLogo :width="'160px'" :height="'55px'" />
+                    <ApplicationLogo :width="'260px'" :height="'auto'" />
                 </NuxtLink>
                 <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
                     Admin Portal

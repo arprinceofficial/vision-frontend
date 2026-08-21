@@ -12,7 +12,7 @@ const props = defineProps({
 </script>
 <template>
 	<div>
-		<NuxtImg src="/TCC-Logo.jpeg" alt=""
+		<NuxtImg src="/svg/logo-transparent.svg" alt="Vision148"
             :width="width"
             :height="height"
             class="fill-current" />

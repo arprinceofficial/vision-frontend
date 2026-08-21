@@ -47,7 +47,7 @@ const isMobile = useState('isMobile');
                     <!-- Profile dropdown -->
                     <div class="flex items-center justify-center">
                         <div class="relative flex items-center gap-3" ref="dropdownRef">
-                            <!-- <ColorMode class="mt-1.5" /> -->
+                            <ColorMode class="mt-1.5" />
                             <button
                                 @click.stop="showingNavigationDropdown = !showingNavigationDropdown"
                                 class="flex items-center transition-transform duration-200 hover:scale-105"
