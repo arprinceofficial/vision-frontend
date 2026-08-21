@@ -13,7 +13,7 @@ const activeTab = ref('basic');
 
 const formTabs = [
     { key: 'basic', label: 'Basic Info', desc: 'Core vehicle info & description', icon: 'pi pi-info-circle' },
-    { key: 'financials', label: 'Syndicate', desc: 'Syndicate total & allocation cost', icon: 'pi pi-dollar' },
+    // { key: 'financials', label: 'Syndicate', desc: 'Syndicate total & allocation cost', icon: 'pi pi-dollar' },
     { key: 'media', label: 'Media & Gallery', desc: 'Asset images & highlights list', icon: 'pi pi-images' },
     { key: 'sections', label: 'Page Sections', desc: 'Custom content headers & bullets', icon: 'pi pi-file-edit' },
     { key: 'technical', label: 'Tech Details', desc: 'Engine specs, mileage, and gallery', icon: 'pi pi-cog' },
@@ -569,7 +569,7 @@ const removeSectionListItem = (sectionIndex, field, itemIndex) => {
                                 <LazyInputError class="text-sm mt-1" :message="validations_errors.slug" />
                             </div>
 
-                            <div>
+                            <div v-show="false">
                                 <label class="font-semibold">Retail Status</label>
                                 <LazyInputText v-model="formData.retail_status" class="w-full"
                                     :class="validations_errors.retail_status ? 'border-[#f44336!important]' : ''" autocomplete="off"
@@ -661,7 +661,7 @@ const removeSectionListItem = (sectionIndex, field, itemIndex) => {
                                 <LazyInputError class="text-sm mt-1" :message="validations_errors.body" />
                             </div>
 
-                            <div class="sm:col-span-3">
+                            <div v-show="false" class="sm:col-span-3">
                                 <label class="font-semibold">Investment Thesis</label>
                                 <Editor v-model="formData.investment_thesis" editorStyle="height: 180px" class="w-full" />
                                 <LazyInputError class="text-sm mt-1" :message="validations_errors.investment_thesis" />
@@ -672,14 +672,14 @@ const removeSectionListItem = (sectionIndex, field, itemIndex) => {
                         <div v-show="activeTab === 'financials'" class="w-full border border-gray-200 dark:border-gray-800 rounded-xl p-6 bg-white dark:bg-gray-900 shadow-sm">
                             <h5 class="font-semibold text-gray-800 dark:text-gray-100 mb-4">Syndicate Details</h5>
                             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                <div>
+                                <div v-show="false">
                                     <label class="font-semibold">Syndicate Name</label>
                                     <LazyInputText v-model="formData.syndicate_name" class="w-full" autocomplete="off"
                                         @focus="validations_errors.syndicate_name = ''" />
                                     <LazyInputError class="text-sm mt-1" :message="validations_errors.syndicate_name" />
                                 </div>
 
-                                <div>
+                                <div v-show="false">
                                     <label class="font-semibold">Syndicate Total</label>
                                     <InputNumber v-model="formData.syndicate_total" class="w-full" :useGrouping="false"
                                         :maxFractionDigits="2" @focus="validations_errors.syndicate_total = ''" />
@@ -693,7 +693,7 @@ const removeSectionListItem = (sectionIndex, field, itemIndex) => {
                                     <LazyInputError class="text-sm mt-1" :message="validations_errors.allocation_cost" />
                                 </div>
 
-                                <div>
+                                <div v-show="false">
                                     <label class="font-semibold">Target Allocation</label>
                                     <InputNumber v-model="formData.target_allocation" class="w-full" :useGrouping="false"
                                         :maxFractionDigits="0" @focus="validations_errors.target_allocation = ''" />
@@ -707,7 +707,7 @@ const removeSectionListItem = (sectionIndex, field, itemIndex) => {
                             <div class="w-full border border-gray-200 dark:border-gray-800 rounded-xl p-6 bg-white dark:bg-gray-900 shadow-sm">
                                 <h5 class="font-semibold text-gray-800 dark:text-gray-100 mb-4">Media Images</h5>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div>
+                                    <div v-show="false">
                                         <label class="font-semibold block mb-3">Asset Image</label>
                                         <MediaGallery :getPhoto="formData.asset_image"
                                             @set_photo="(photo) => setImage('asset_image', photo)" />
@@ -837,7 +837,7 @@ const removeSectionListItem = (sectionIndex, field, itemIndex) => {
                                         :maxFractionDigits="0" />
                                 </div>
 
-                                <div>
+                                <div v-show="false">
                                     <label class="font-semibold">Condition Grade</label>
                                     <LazyInputText v-model="formData.detail.condition_grade" class="w-full" autocomplete="off" />
                                 </div>
@@ -847,17 +847,17 @@ const removeSectionListItem = (sectionIndex, field, itemIndex) => {
                                     <LazyInputText v-model="formData.detail.engine" class="w-full" autocomplete="off" />
                                 </div>
 
-                                <div>
+                                <div v-show="false">
                                     <label class="font-semibold">Power</label>
                                     <InputNumber v-model="formData.detail.power" class="w-full" :useGrouping="false" />
                                 </div>
 
-                                <div>
+                                <div v-show="false">
                                     <label class="font-semibold">Torque</label>
                                     <InputNumber v-model="formData.detail.torque" class="w-full" :useGrouping="false" />
                                 </div>
 
-                                <div>
+                                <div v-show="false">
                                     <label class="font-semibold">Seating Capacity</label>
                                     <InputNumber v-model="formData.detail.seating_capacity" class="w-full" :useGrouping="false"
                                         :maxFractionDigits="0" />
@@ -873,19 +873,19 @@ const removeSectionListItem = (sectionIndex, field, itemIndex) => {
                                     <LazyInputText v-model="formData.detail.transmission" class="w-full" autocomplete="off" />
                                 </div>
 
-                                <div>
+                                <div v-show="false">
                                     <label class="font-semibold">Year From</label>
                                     <InputNumber v-model="formData.detail.year_from" class="w-full" :useGrouping="false"
                                         :maxFractionDigits="0" />
                                 </div>
 
-                                <div>
+                                <div v-show="false">
                                     <label class="font-semibold">3D Image URL</label>
                                     <LazyInputText v-model="formData.detail.three_d_image_url" class="w-full"
                                         placeholder="https://example.com" autocomplete="off" />
                                 </div>
 
-                                <div>
+                                <div v-show="false">
                                     <label class="font-semibold">Video Path</label>
                                     <div class="w-full mt-2">
                                         <MediaGallery :getPhoto="formData.detail.video_path" @set_photo="setDetailVideo" />
