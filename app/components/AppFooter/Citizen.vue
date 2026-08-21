@@ -10,10 +10,8 @@
     <div class="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.2fr_0.8fr_0.8fr] lg:px-8">
       <div class="space-y-5">
         <div class="flex items-center gap-2">
-          <img src="/logo-4-BrrnFFbn.jpeg" alt="Vision148"
-            class="h-auto w-[100px] transition-transform duration-300 hover:scale-[1.02] sm:w-[40px]">
-          <span
-            class="font-mono text-[10px] tracking-[0.25em] uppercase text-bone/80 leading-tight hidden sm:block pl-4">Syndicated<br>Restomod</span>
+          <img src="/svg/logo-transparent.svg" alt="Vision148"
+            class="h-10 w-auto opacity-70 transition-opacity duration-300 hover:opacity-100">
         </div>
         <p class="max-w-xl text-sm leading-relaxed text-white/60">
           Collective ownership for rare automotive assets, combining transparent syndicate structures, specialist
