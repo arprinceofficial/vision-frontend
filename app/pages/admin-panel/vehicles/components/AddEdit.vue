@@ -754,7 +754,7 @@ const removeSectionListItem = (sectionIndex, field, itemIndex) => {
                                 <div class="space-y-3">
                                     <div v-for="(highlight, index) in formData.highlights" :key="`highlight-${index}`"
                                         class="flex items-center gap-3">
-                                        <LazyInputText v-model="formData.highlights[index]" class="w-full" autocomplete="off" />
+                                        <LazyInputText v-model="formData.highlights[index]" class="w-full" autocomplete="off" placeholder="e.g. Original matching numbers engine" />
                                         <Button type="button" icon="pi pi-trash" severity="danger" outlined @click="removeListItem('highlights', index)" />
                                     </div>
                                 </div>
@@ -769,8 +769,8 @@ const removeSectionListItem = (sectionIndex, field, itemIndex) => {
                                 <div class="space-y-3">
                                     <div v-for="(spec, index) in formData.specs" :key="`spec-${index}`"
                                         class="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-3 items-center">
-                                        <LazyInputText v-model="spec.label" class="w-full" placeholder="Label" autocomplete="off" />
-                                        <LazyInputText v-model="spec.value" class="w-full" placeholder="Value" autocomplete="off" />
+                                        <LazyInputText v-model="spec.label" class="w-full" placeholder="e.g. 0-60 mph" autocomplete="off" />
+                                        <LazyInputText v-model="spec.value" class="w-full" placeholder="e.g. 3.2 seconds" autocomplete="off" />
                                         <Button type="button" icon="pi pi-trash" severity="danger" outlined @click="removeSpec(index)" />
                                     </div>
                                 </div>
@@ -788,7 +788,7 @@ const removeSectionListItem = (sectionIndex, field, itemIndex) => {
                                 <div v-for="(section, sectionIndex) in formData.sections" :key="`section-${sectionIndex}`"
                                     class="border border-gray-200 dark:border-gray-850 rounded-xl p-6 bg-gray-50 dark:bg-gray-955 shadow-inner">
                                     <div class="flex items-center justify-between gap-3 mb-3">
-                                        <LazyInputText v-model="section.heading" class="w-full" placeholder="Heading"
+                                        <LazyInputText v-model="section.heading" class="w-full" placeholder="e.g. The History"
                                             autocomplete="off" />
                                         <Button type="button" icon="pi pi-trash" severity="danger" outlined @click="removeSection(sectionIndex)" />
                                     </div>

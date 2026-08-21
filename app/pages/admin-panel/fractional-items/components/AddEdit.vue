@@ -286,20 +286,26 @@ onMounted(() => {
     loadVehicles();
 });
 
-const onVehicleChange = () => {
-    const selectedId = formData.value.assetable_id;
+const onVehicleChange = (selectedId) => {
+    if (!selectedId) return;
     const vehicle = vehicles.value.find(v => v.id === selectedId);
-    
+
     if (vehicle) {
         if (!formData.value.slug && vehicle.slug) formData.value.slug = vehicle.slug;
         if (!formData.value.headline && vehicle.subtitle) formData.value.headline = vehicle.subtitle;
+        if (!formData.value.subhead_line && vehicle.subtitle) formData.value.subhead_line = vehicle.subtitle;
         if (!formData.value.item_name && vehicle.name) formData.value.item_name = vehicle.name;
+        if (!formData.value.item_second_name && vehicle.make && vehicle.model) formData.value.item_second_name = `${vehicle.make} ${vehicle.model}`;
         if (!formData.value.item_details && vehicle.description) formData.value.item_details = vehicle.description;
         if (!formData.value.bg_image && vehicle.hero_image) formData.value.bg_image = vehicle.hero_image;
         if (!formData.value.summary_image && vehicle.card_image) formData.value.summary_image = vehicle.card_image;
         if (!formData.value.item_3d_image && vehicle.three_d_image_url) formData.value.item_3d_image = vehicle.three_d_image_url;
         if (!formData.value.portfolio_video && vehicle.video_path) formData.value.portfolio_video = vehicle.video_path;
         if (!formData.value.asset_name && vehicle.name) formData.value.asset_name = vehicle.name;
+        if (!formData.value.total_value && vehicle.syndicate_total) formData.value.total_value = vehicle.syndicate_total;
+        if (!formData.value.share_price && vehicle.allocation_cost) formData.value.share_price = vehicle.allocation_cost;
+        if (!formData.value.total_shares && vehicle.target_allocation) formData.value.total_shares = vehicle.target_allocation;
+        if (!formData.value.trust_name && vehicle.syndicate_name) formData.value.trust_name = vehicle.syndicate_name;
     }
 };
 
@@ -1187,15 +1193,19 @@ const createHandler = async () => {
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <div>
                                 <label class="font-semibold text-sm">Eyebrow</label>
-                                <LazyInputText v-model="formData.this_car_eyebrow" class="w-full" autocomplete="off" />
+                                <LazyInputText v-model="formData.this_car_eyebrow" class="w-full" autocomplete="off"
+                                    placeholder="e.g. Unique Features" />
+                                <small class="text-xs text-gray-500 mt-1 block">Used in: Analysis section small heading</small>
                             </div>
                             <div class="sm:col-span-2">
                                 <label class="font-semibold text-sm">Lead</label>
-                                <Editor v-model="formData.this_car_lead" editorStyle="height: 120px" class="w-full" />
+                                <Editor v-model="formData.this_car_lead" editorStyle="height: 120px" class="w-full" placeholder="e.g. This exceptional model represents..." />
+                                <small class="text-xs text-gray-500 mt-1 block">Used in: Analysis section introductory text</small>
                             </div>
                             <div class="sm:col-span-3">
                                 <label class="font-semibold text-sm">Conclusion</label>
-                                <Editor v-model="formData.this_car_conclusion" editorStyle="height: 140px" class="w-full" />
+                                <Editor v-model="formData.this_car_conclusion" editorStyle="height: 140px" class="w-full" placeholder="e.g. In conclusion, the value proposition is..." />
+                                <small class="text-xs text-gray-500 mt-1 block">Used in: Analysis section concluding remarks</small>
                             </div>
                         </div>
 
@@ -1243,15 +1253,18 @@ const createHandler = async () => {
                             <div>
                                 <label class="font-semibold text-sm">Eyebrow</label>
                                 <LazyInputText v-model="formData.wider_market_eyebrow" class="w-full"
-                                    autocomplete="off" />
+                                    autocomplete="off" placeholder="e.g. Market Trends" />
+                                <small class="text-xs text-gray-500 mt-1 block">Used in: Analysis section small heading</small>
                             </div>
                             <div class="sm:col-span-2">
                                 <label class="font-semibold text-sm">Lead</label>
-                                <Editor v-model="formData.wider_market_lead" editorStyle="height: 120px" class="w-full" />
+                                <Editor v-model="formData.wider_market_lead" editorStyle="height: 120px" class="w-full" placeholder="e.g. The broader market shows..." />
+                                <small class="text-xs text-gray-500 mt-1 block">Used in: Wider Market Analysis introductory text</small>
                             </div>
                             <div class="sm:col-span-3">
                                 <label class="font-semibold text-sm">Conclusion</label>
-                                <Editor v-model="formData.wider_market_conclusion" editorStyle="height: 140px" class="w-full" />
+                                <Editor v-model="formData.wider_market_conclusion" editorStyle="height: 140px" class="w-full" placeholder="e.g. With current trends..." />
+                                <small class="text-xs text-gray-500 mt-1 block">Used in: Wider Market Analysis concluding remarks</small>
                             </div>
                         </div>
 
@@ -1299,15 +1312,18 @@ const createHandler = async () => {
                             <div>
                                 <label class="font-semibold text-sm">Eyebrow</label>
                                 <LazyInputText v-model="formData.net_returns_eyebrow" class="w-full"
-                                    autocomplete="off" />
+                                    autocomplete="off" placeholder="e.g. Return Projections" />
+                                <small class="text-xs text-gray-500 mt-1 block">Used in: Analysis section small heading</small>
                             </div>
                             <div class="sm:col-span-2">
                                 <label class="font-semibold text-sm">Lead</label>
-                                <Editor v-model="formData.net_returns_lead" editorStyle="height: 120px" class="w-full" />
+                                <Editor v-model="formData.net_returns_lead" editorStyle="height: 120px" class="w-full" placeholder="e.g. Expected net returns are calculated..." />
+                                <small class="text-xs text-gray-500 mt-1 block">Used in: Net Returns Analysis introductory text</small>
                             </div>
                             <div class="sm:col-span-3">
                                 <label class="font-semibold text-sm">Conclusion</label>
-                                <Editor v-model="formData.net_returns_conclusion" editorStyle="height: 140px" class="w-full" />
+                                <Editor v-model="formData.net_returns_conclusion" editorStyle="height: 140px" class="w-full" placeholder="e.g. The projected yield stands at..." />
+                                <small class="text-xs text-gray-500 mt-1 block">Used in: Net Returns Analysis concluding remarks</small>
                             </div>
                         </div>
 
