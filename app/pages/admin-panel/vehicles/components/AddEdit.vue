@@ -617,7 +617,7 @@ const removeSectionListItem = (sectionIndex, field, itemIndex) => {
 
                             <div>
                                 <label class="font-semibold">Price</label>
-                                <LazyInputText v-model="formData.price" class="w-full" autocomplete="off"
+                                <InputNumber v-model="formData.price" class="w-full" :useGrouping="false" :maxFractionDigits="2" autocomplete="off"
                                     placeholder="e.g. 150000"
                                     @focus="validations_errors.price = ''" />
                                 <small class="text-xs text-gray-500 mt-1 block">Used in: Pricing block on Retail detail page</small>

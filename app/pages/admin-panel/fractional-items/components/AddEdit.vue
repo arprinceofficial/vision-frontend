@@ -963,7 +963,7 @@ const createHandler = async () => {
 
                     <div>
                         <label class="font-semibold">Total Shares <span class="text-red-500">*</span></label>
-                        <LazyInputText v-model="formData.total_shares" type="number" class="w-full"
+                        <InputNumber v-model="formData.total_shares" :useGrouping="false" class="w-full"
                             placeholder="e.g. 10000"
                             :class="validations_errors.total_shares ? 'border-[#f44336!important]' : ''"
                             autocomplete="off" @focus="validations_errors.total_shares = ''" />
@@ -973,7 +973,7 @@ const createHandler = async () => {
 
                     <div>
                         <label class="font-semibold">Available Shares <span class="text-red-500">*</span></label>
-                        <LazyInputText v-model="formData.available_shares" type="number" class="w-full"
+                        <InputNumber v-model="formData.available_shares" :useGrouping="false" class="w-full"
                             placeholder="e.g. 2500"
                             :class="validations_errors.available_shares ? 'border-[#f44336!important]' : ''"
                             autocomplete="off" @focus="validations_errors.available_shares = ''" />
@@ -983,7 +983,7 @@ const createHandler = async () => {
 
                     <div>
                         <label class="font-semibold">Share Price <span class="text-red-500">*</span></label>
-                        <LazyInputText v-model="formData.share_price" type="number" step="0.01" class="w-full"
+                        <InputNumber v-model="formData.share_price" :useGrouping="false" :maxFractionDigits="2" class="w-full"
                             placeholder="e.g. 150.00"
                             :class="validations_errors.share_price ? 'border-[#f44336!important]' : ''"
                             autocomplete="off" @focus="validations_errors.share_price = ''" />
@@ -993,7 +993,7 @@ const createHandler = async () => {
 
                     <div>
                         <label class="font-semibold">Total Value <span class="text-red-500">*</span></label>
-                        <LazyInputText v-model="formData.total_value" type="number" step="0.01" class="w-full"
+                        <InputNumber v-model="formData.total_value" :useGrouping="false" :maxFractionDigits="2" class="w-full"
                             placeholder="e.g. 1500000"
                             :class="validations_errors.total_value ? 'border-[#f44336!important]' : ''"
                             autocomplete="off" @focus="validations_errors.total_value = ''" />
@@ -1003,7 +1003,7 @@ const createHandler = async () => {
 
                     <div>
                         <label class="font-semibold">Historical Value</label>
-                        <LazyInputText v-model="formData.historical_value" type="number" step="0.01" class="w-full"
+                        <InputNumber v-model="formData.historical_value" :useGrouping="false" :maxFractionDigits="2" class="w-full"
                             placeholder="e.g. 1200000"
                             :class="validations_errors.historical_value ? 'border-[#f44336!important]' : ''"
                             autocomplete="off" @focus="validations_errors.historical_value = ''" />
@@ -1013,7 +1013,7 @@ const createHandler = async () => {
 
                     <div>
                         <label class="font-semibold">Annual Fees</label>
-                        <LazyInputText v-model="formData.annual_fees" type="number" step="0.01" class="w-full"
+                        <InputNumber v-model="formData.annual_fees" :useGrouping="false" :maxFractionDigits="2" class="w-full"
                             placeholder="e.g. 1.5"
                             :class="validations_errors.annual_fees ? 'border-[#f44336!important]' : ''"
                             autocomplete="off" @focus="validations_errors.annual_fees = ''" />
@@ -1023,7 +1023,7 @@ const createHandler = async () => {
 
                     <div>
                         <label class="font-semibold">AUM Trust Fee</label>
-                        <LazyInputText v-model="formData.aum_trust_fee" type="number" step="0.01" class="w-full"
+                        <InputNumber v-model="formData.aum_trust_fee" :useGrouping="false" :maxFractionDigits="2" class="w-full"
                             placeholder="e.g. 1.0"
                             :class="validations_errors.aum_trust_fee ? 'border-[#f44336!important]' : ''"
                             autocomplete="off" @focus="validations_errors.aum_trust_fee = ''" />
@@ -1040,14 +1040,14 @@ const createHandler = async () => {
 
                     <div v-show="false">
                         <label class="font-semibold">Funded Current Price</label>
-                        <LazyInputText v-model="formData.funded_current_price" type="number" step="0.01" class="w-full"
+                        <InputNumber v-model="formData.funded_current_price" :useGrouping="false" :maxFractionDigits="2" class="w-full"
                             autocomplete="off" @focus="validations_errors.funded_current_price = ''" />
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.funded_current_price" />
                     </div>
 
                     <div v-show="false">
                         <label class="font-semibold">Exit Value</label>
-                        <LazyInputText v-model="formData.exit_value" type="number" step="0.01" class="w-full"
+                        <InputNumber v-model="formData.exit_value" :useGrouping="false" :maxFractionDigits="2" class="w-full"
                             autocomplete="off" @focus="validations_errors.exit_value = ''" />
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.exit_value" />
                     </div>
@@ -1086,21 +1086,21 @@ const createHandler = async () => {
 
                     <div v-show="false">
                         <label class="font-semibold">Asset Cost</label>
-                        <LazyInputText v-model="formData.asset_cost" type="number" step="0.01" class="w-full"
+                        <InputNumber v-model="formData.asset_cost" :useGrouping="false" :maxFractionDigits="2" class="w-full"
                             autocomplete="off" @focus="validations_errors.asset_cost = ''" />
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.asset_cost" />
                     </div>
 
                     <div v-show="false">
                         <label class="font-semibold">Asset Curation Fee</label>
-                        <LazyInputText v-model="formData.asset_curation_fee" type="number" step="0.01" class="w-full"
+                        <InputNumber v-model="formData.asset_curation_fee" :useGrouping="false" :maxFractionDigits="2" class="w-full"
                             autocomplete="off" @focus="validations_errors.asset_curation_fee = ''" />
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.asset_curation_fee" />
                     </div>
 
                     <div v-show="false">
                         <label class="font-semibold">Home Syndicate Total</label>
-                        <LazyInputText v-model="formData.home_syndicate_total" type="number" step="0.01" class="w-full"
+                        <InputNumber v-model="formData.home_syndicate_total" :useGrouping="false" :maxFractionDigits="2" class="w-full"
                             autocomplete="off" @focus="validations_errors.home_syndicate_total = ''" />
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.home_syndicate_total" />
                     </div>
@@ -1553,12 +1553,12 @@ const createHandler = async () => {
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label class="font-semibold text-sm">Year</label>
-                                    <LazyInputText v-model="point.year" type="number" class="w-full"
+                                    <InputNumber v-model="point.year" :useGrouping="false" class="w-full"
                                         autocomplete="off" />
                                 </div>
                                 <div>
                                     <label class="font-semibold text-sm">Value</label>
-                                    <LazyInputText v-model="point.value" type="number" class="w-full"
+                                    <InputNumber v-model="point.value" :useGrouping="false" class="w-full"
                                         autocomplete="off" />
                                 </div>
                             </div>
@@ -1838,7 +1838,7 @@ const createHandler = async () => {
                                 </div>
                                 <div v-for="(year, index) in formData.chart_years" :key="index"
                                     class="flex items-center gap-2 mb-3">
-                                    <LazyInputText v-model="formData.chart_years[index]" type="number" class="w-full"
+                                    <InputNumber v-model="formData.chart_years[index]" :useGrouping="false" class="w-full"
                                         autocomplete="off" />
                                     <Button type="button" icon="pi pi-trash" severity="danger" outlined
                                         @click="removeListItem('chart_years', index)" />
@@ -1853,7 +1853,7 @@ const createHandler = async () => {
                                 </div>
                                 <div v-for="(value, index) in formData.chart_values" :key="index"
                                     class="flex items-center gap-2 mb-3">
-                                    <LazyInputText v-model="formData.chart_values[index]" type="number" step="0.01"
+                                    <InputNumber v-model="formData.chart_values[index]" :useGrouping="false" :maxFractionDigits="2"
                                         class="w-full" autocomplete="off" />
                                     <Button type="button" icon="pi pi-trash" severity="danger" outlined
                                         @click="removeListItem('chart_values', index)" />
