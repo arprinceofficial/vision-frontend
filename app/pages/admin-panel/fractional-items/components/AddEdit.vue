@@ -965,7 +965,7 @@ const createHandler = async () => {
                         <label class="font-semibold">Total Shares <span class="text-red-500">*</span></label>
                         <InputNumber v-model="formData.total_shares" :useGrouping="false" class="w-full"
                             placeholder="e.g. 10000"
-                            :class="validations_errors.total_shares ? 'border-[#f44336!important]' : ''"
+                            :invalid="!!validations_errors.total_shares"
                             autocomplete="off" @focus="validations_errors.total_shares = ''" />
                         <small class="text-xs text-gray-500 mt-1 block">Used in: Investment metrics block on Syndicate detail page</small>
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.total_shares" />
@@ -975,7 +975,7 @@ const createHandler = async () => {
                         <label class="font-semibold">Available Shares <span class="text-red-500">*</span></label>
                         <InputNumber v-model="formData.available_shares" :useGrouping="false" class="w-full"
                             placeholder="e.g. 2500"
-                            :class="validations_errors.available_shares ? 'border-[#f44336!important]' : ''"
+                            :invalid="!!validations_errors.available_shares"
                             autocomplete="off" @focus="validations_errors.available_shares = ''" />
                         <small class="text-xs text-gray-500 mt-1 block">Used in: Investment metrics block</small>
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.available_shares" />
@@ -985,7 +985,7 @@ const createHandler = async () => {
                         <label class="font-semibold">Share Price <span class="text-red-500">*</span></label>
                         <InputNumber v-model="formData.share_price" :useGrouping="false" :maxFractionDigits="2" class="w-full"
                             placeholder="e.g. 150.00"
-                            :class="validations_errors.share_price ? 'border-[#f44336!important]' : ''"
+                            :invalid="!!validations_errors.share_price"
                             autocomplete="off" @focus="validations_errors.share_price = ''" />
                         <small class="text-xs text-gray-500 mt-1 block">Used in: Investment metrics block</small>
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.share_price" />
@@ -995,7 +995,7 @@ const createHandler = async () => {
                         <label class="font-semibold">Total Value <span class="text-red-500">*</span></label>
                         <InputNumber v-model="formData.total_value" :useGrouping="false" :maxFractionDigits="2" class="w-full"
                             placeholder="e.g. 1500000"
-                            :class="validations_errors.total_value ? 'border-[#f44336!important]' : ''"
+                            :invalid="!!validations_errors.total_value"
                             autocomplete="off" @focus="validations_errors.total_value = ''" />
                         <small class="text-xs text-gray-500 mt-1 block">Used in: Investment metrics block</small>
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.total_value" />
@@ -1005,7 +1005,7 @@ const createHandler = async () => {
                         <label class="font-semibold">Historical Value</label>
                         <InputNumber v-model="formData.historical_value" :useGrouping="false" :maxFractionDigits="2" class="w-full"
                             placeholder="e.g. 1200000"
-                            :class="validations_errors.historical_value ? 'border-[#f44336!important]' : ''"
+                            :invalid="!!validations_errors.historical_value"
                             autocomplete="off" @focus="validations_errors.historical_value = ''" />
                         <small class="text-xs text-gray-500 mt-1 block">Used in: Investment metrics block</small>
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.historical_value" />
@@ -1015,7 +1015,7 @@ const createHandler = async () => {
                         <label class="font-semibold">Annual Fees</label>
                         <InputNumber v-model="formData.annual_fees" :useGrouping="false" :maxFractionDigits="2" class="w-full"
                             placeholder="e.g. 1.5"
-                            :class="validations_errors.annual_fees ? 'border-[#f44336!important]' : ''"
+                            :invalid="!!validations_errors.annual_fees"
                             autocomplete="off" @focus="validations_errors.annual_fees = ''" />
                         <small class="text-xs text-gray-500 mt-1 block">Used in: Financials block (Annual Fees %)</small>
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.annual_fees" />
@@ -1025,7 +1025,7 @@ const createHandler = async () => {
                         <label class="font-semibold">AUM Trust Fee</label>
                         <InputNumber v-model="formData.aum_trust_fee" :useGrouping="false" :maxFractionDigits="2" class="w-full"
                             placeholder="e.g. 1.0"
-                            :class="validations_errors.aum_trust_fee ? 'border-[#f44336!important]' : ''"
+                            :invalid="!!validations_errors.aum_trust_fee"
                             autocomplete="off" @focus="validations_errors.aum_trust_fee = ''" />
                         <small class="text-xs text-gray-500 mt-1 block">Used in: Financials block (Trust Fee %)</small>
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.aum_trust_fee" />

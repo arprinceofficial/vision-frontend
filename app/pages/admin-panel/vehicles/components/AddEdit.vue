@@ -573,8 +573,8 @@ const removeSectionListItem = (sectionIndex, field, itemIndex) => {
 
                             <div v-show="false">
                                 <label class="font-semibold">Retail Status</label>
-                                <LazyInputText v-model="formData.retail_status" class="w-full"
-                                    :class="validations_errors.retail_status ? 'border-[#f44336!important]' : ''" autocomplete="off"
+                                <InputNumber v-model="formData.retail_status" class="w-full" :useGrouping="false"
+                                    :invalid="!!validations_errors.retail_status" autocomplete="off"
                                     @focus="validations_errors.retail_status = ''" />
                                 <LazyInputError class="text-sm mt-1" :message="validations_errors.retail_status" />
                             </div>
@@ -600,7 +600,7 @@ const removeSectionListItem = (sectionIndex, field, itemIndex) => {
                             <div>
                                 <label class="font-semibold">Year</label>
                                 <InputNumber v-model="formData.year" class="w-full" :useGrouping="false" :maxFractionDigits="0"
-                                    placeholder="i.e. 2025" :class="validations_errors.year ? 'border-[#f44336!important]' : ''"
+                                    placeholder="i.e. 2025" :invalid="!!validations_errors.year"
                                     autocomplete="off" @focus="validations_errors.year = ''" />
                                 <small class="text-xs text-gray-500 mt-1 block">Used in: Technical Data grid</small>
                                 <LazyInputError class="text-sm mt-1" :message="validations_errors.year" />
@@ -618,7 +618,7 @@ const removeSectionListItem = (sectionIndex, field, itemIndex) => {
                             <div>
                                 <label class="font-semibold">Price</label>
                                 <InputNumber v-model="formData.price" class="w-full" :useGrouping="false" :maxFractionDigits="2" autocomplete="off"
-                                    placeholder="e.g. 150000"
+                                    placeholder="e.g. 150000" :invalid="!!validations_errors.price"
                                     @focus="validations_errors.price = ''" />
                                 <small class="text-xs text-gray-500 mt-1 block">Used in: Pricing block on Retail detail page</small>
                                 <LazyInputError class="text-sm mt-1" :message="validations_errors.price" />
@@ -698,21 +698,21 @@ const removeSectionListItem = (sectionIndex, field, itemIndex) => {
                                 <div v-show="false">
                                     <label class="font-semibold">Syndicate Total</label>
                                     <InputNumber v-model="formData.syndicate_total" class="w-full" :useGrouping="false"
-                                        :maxFractionDigits="2" @focus="validations_errors.syndicate_total = ''" />
+                                        :maxFractionDigits="2" :invalid="!!validations_errors.syndicate_total" autocomplete="off" @focus="validations_errors.syndicate_total = ''" />
                                     <LazyInputError class="text-sm mt-1" :message="validations_errors.syndicate_total" />
                                 </div>
 
                                 <div>
                                     <label class="font-semibold">Allocation Cost</label>
                                     <InputNumber v-model="formData.allocation_cost" class="w-full" :useGrouping="false"
-                                        :maxFractionDigits="2" @focus="validations_errors.allocation_cost = ''" />
+                                        :maxFractionDigits="2" :invalid="!!validations_errors.allocation_cost" @focus="validations_errors.allocation_cost = ''" />
                                     <LazyInputError class="text-sm mt-1" :message="validations_errors.allocation_cost" />
                                 </div>
 
                                 <div v-show="false">
                                     <label class="font-semibold">Target Allocation</label>
                                     <InputNumber v-model="formData.target_allocation" class="w-full" :useGrouping="false"
-                                        :maxFractionDigits="0" @focus="validations_errors.target_allocation = ''" />
+                                        :maxFractionDigits="0" :invalid="!!validations_errors.target_allocation" @focus="validations_errors.target_allocation = ''" />
                                     <LazyInputError class="text-sm mt-1" :message="validations_errors.target_allocation" />
                                 </div>
                             </div>
