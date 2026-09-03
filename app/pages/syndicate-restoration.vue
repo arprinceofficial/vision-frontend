@@ -251,13 +251,6 @@ const shouldShowAvailableSyndicatesSkeleton = computed(() => (
                 </div>
 
                 <div class="flex items-center justify-end gap-8">
-                    <div class="flex items-center gap-3 text-white">
-                        <span class="text-sm font-semibold uppercase tracking-[0.35em] opacity-85">GP</span>
-                        <span
-                            class="grid h-14 w-24 place-items-center rounded-full border-2 border-white/80 text-2xl font-bold leading-none">
-                            59
-                        </span>
-                    </div>
                     <span
                         class="text-xs font-semibold uppercase tracking-widest text-white/90 text-right max-w-[200px]">Syndicated
                         Restomod &amp; TheCarCrowd</span>

@@ -14,12 +14,14 @@ const STATUS_UPCOMING = 1;
 const STATUS_LIVE = 2;
 const STATUS_SOLD = 3;
 const STATUS_INACTIVE = 4;
+const STATUS_COMING_SOON = 5;
 
 const statusOptions = [
     { name: 'Draft', value: STATUS_DRAFT },
     { name: 'Upcoming', value: STATUS_UPCOMING },
     { name: 'Live', value: STATUS_LIVE },
     { name: 'Sold', value: STATUS_SOLD },
+    { name: 'Coming Soon', value: STATUS_COMING_SOON },
     { name: 'Inactive', value: STATUS_INACTIVE }
 ];
 
