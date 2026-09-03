@@ -1,42 +1,84 @@
 <script setup lang="ts">
-const fundedAssets = [
-    {
-        image: '/frontend/assets/images/ferrari_berlinetta.png',
-        alt: 'Ferrari 328 GTS',
-        badge: 'Funded Complete',
-        title: 'Ferrari 328 GTS',
-        cagr: '22.97%',
-        value: 'Current Value: GBP 129,123',
-        exited: false
+type CmsFundedAsset = {
+    status?: string | null
+    slug?: string | null
+    image?: string | null
+    alt?: string | null
+    collection?: string | null
+    title?: string | null
+    description?: string | null
+    cagr?: string | null
+}
+
+type CmsFundedAssetsResponse = {
+    data?: CmsFundedAsset[]
+}
+
+type FundedAsset = {
+    image: string
+    alt: string
+    badge: string
+    title: string
+    cagr: string
+    value: string
+    exited: boolean
+}
+
+const fallbackFundedAssetImage = '/svg/not-found-img.svg'
+
+const {
+    data: fundedAssetsData,
+    error: fundedAssetsError,
+    pending: fundedAssetsPending,
+    status: fundedAssetsStatus
+} = useAsyncData<CmsFundedAsset[]>(
+    'citizen-fractional-funded-assets',
+    async () => {
+        const response = await $fetchCitizen<CmsFundedAssetsResponse>('v1/customer/fractional/funded', {
+            method: 'GET'
+        })
+
+        return Array.isArray(response?.data) ? response.data : []
     },
     {
-        image: '/frontend/assets/images/porsche.png',
-        alt: 'Porsche 997 Turbo',
-        badge: 'Funded Complete',
-        title: 'Porsche 997 Turbo',
-        cagr: '7.59%',
-        value: 'Current Value: GBP 75,311',
-        exited: false
-    },
-    {
-        image: '/frontend/assets/images/AstonMartin.jpg',
-        alt: 'Aston Martin Vanquish S',
-        badge: 'Funded Complete',
-        title: 'Aston Martin Vanquish S',
-        cagr: '11.80%',
-        value: 'Current Value: GBP 92,000',
-        exited: false
-    },
-    {
-        image: '/frontend/assets/images/ferrari_328_GS.png',
-        alt: 'Ferrari 355 Berlinetta',
-        badge: 'Exited Asset',
-        title: 'Ferrari 355 Berlinetta',
-        cagr: '18.40%',
-        value: 'Exit Value: GBP 142,000',
-        exited: true
+        default: () => [],
+        lazy: true,
+        server: false
     }
-]
+)
+
+const getFirstValue = (...values: Array<number | string | null | undefined>) => {
+    const value = values.find((item) => item !== null && item !== undefined && String(item).trim() !== '')
+    return value === undefined ? '' : String(value).trim()
+}
+
+const normalizeFundedAsset = (item: CmsFundedAsset): FundedAsset | null => {
+    const title = getFirstValue(item.title)
+
+    if (!title) return null
+
+    const statusText = getFirstValue(item.status) || 'Funded'
+    const isExited = statusText.toLowerCase() === 'exited' || statusText.toLowerCase() === 'sold'
+    
+    // Default to static placeholders for value until added to the CMS API, but handle it gracefully
+    const displayValue = isExited ? 'Exit Value: TBC' : 'Current Value: TBC'
+
+    return {
+        image: getFirstValue(item.image) || fallbackFundedAssetImage,
+        alt: getFirstValue(item.alt) || title,
+        badge: isExited ? 'Exited Asset' : 'Funded Complete',
+        title,
+        cagr: getFirstValue(item.cagr) || 'TBC',
+        value: displayValue,
+        exited: isExited
+    }
+}
+
+const fundedAssets = computed<FundedAsset[]>(() => (
+    (fundedAssetsData.value || [])
+        .map(normalizeFundedAsset)
+        .filter((item): item is FundedAsset => Boolean(item))
+))
 </script>
 
 <template>

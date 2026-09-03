@@ -703,7 +703,7 @@ const serializeSubmitData = () => {
         cagr: formData.value.cagr,
         short_title: formData.value.short_title,
         hero_alt: formData.value.hero_alt,
-        gallery: normalizeImageArray(formData.value.gallery),
+        gallery: normalizeImageArray(formData.value.gallery).map(src => ({ src, alt: '', class: '' })),
         this_car_paragraphs: formData.value.this_car_paragraphs.filter(Boolean),
         this_car_metrics: formData.value.this_car_metrics.filter((item) => item.label || item.value),
         wider_market_paragraphs: formData.value.wider_market_paragraphs.filter(Boolean),
