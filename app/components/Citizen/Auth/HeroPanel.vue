@@ -19,7 +19,7 @@ defineProps<{
     </div> -->
 
     <div class="relative z-10 my-auto space-y-6 py-12">
-      <img src="/svg/logo-transparent.svg" alt="Vision148" class="h-10 w-auto">
+      <img src="/logo-4-BrrnFFbn.jpeg" alt="Syn Mod Build" class="h-16 w-auto object-contain">
       <div class="space-y-2">
         <span class="restomod-eyebrow">Member Access</span>
         <h1 class="font-poppins text-4xl font-black leading-[0.95] text-white sm:text-5xl">
@@ -30,7 +30,7 @@ defineProps<{
     </div>
 
     <div class="relative z-10 flex items-center gap-4">
-      <img src="/svg/logo-transparent.svg" alt="TCC Logo" class="h-8 w-auto">
+      <img src="/logo-4-BrrnFFbn.jpeg" alt="Syn Mod Build" class="h-10 w-auto object-contain">
       <p class="text-[10px] font-light uppercase tracking-[0.18em] text-white/40">
         &copy; 2026 Syndincated Restomod. Security-focused investment platform.
       </p>
