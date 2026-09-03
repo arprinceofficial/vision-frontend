@@ -78,6 +78,7 @@ type SyndicateDetail = {
     technicalData: TechnicalDatum[]
     news: NewsCard[]
     activeJourney: ActiveJourney | null
+    analysisSummaryPdf: string | null
 }
 
 type CmsSyndicateResponse = {
@@ -284,7 +285,8 @@ const normalizeSyndicate = (item: Record<string, any> | null | undefined): Syndi
         analysisTabs: normalizeAnalysisTabs(item.analysisTabs),
         technicalData: normalizeTechnicalData(item.technicalData, specs),
         news: normalizeNews(item.news),
-        activeJourney: normalizeActiveJourney(item.activeJourney)
+        activeJourney: normalizeActiveJourney(item.activeJourney),
+        analysisSummaryPdf: getFirstValue(item.analysisSummaryPdf) || null
     }
 }
 
@@ -1060,11 +1062,13 @@ useHead(() => ({
                             </div>
                         </div>
 
-                        <button type="button"
+                        <a v-if="syndicate.analysisSummaryPdf"
+                            :href="syndicate.analysisSummaryPdf.startsWith('http') ? syndicate.analysisSummaryPdf : `${useRuntimeConfig().public.apiBaseUrl}/storage/${syndicate.analysisSummaryPdf}`"
+                            target="_blank"
                             class="mt-8 inline-flex items-center gap-2 rounded-full border border-tccGold/40 bg-tccGold/10 px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-tccGold transition-colors hover:bg-tccGold hover:text-tccDarkNavy">
                             <i class="pi pi-download text-xs" aria-hidden="true" />
                             Download Summary
-                        </button>
+                        </a>
                     </div>
 
                     <aside class="min-w-0">
