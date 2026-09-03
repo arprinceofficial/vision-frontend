@@ -33,7 +33,7 @@ const navLinks: NavLink[] = [
         activePaths: ['/private-portfolios', '/syndicate-restoration', '/syndicates'],
         child: [
             { label: 'Private Portfolios', to: '/private-portfolios', activePaths: ['/private-portfolios'] },
-            { label: 'Syndicated Restoration', to: '/syndicate-restoration', activePaths: ['/syndicate-restoration'] },
+            { label: 'Syndicated Restomod', to: '/syndicate-restoration', activePaths: ['/syndicate-restoration'] },
             { label: 'Syndicates', to: '/syndicates', activePaths: ['/syndicates'] },
         ]
     },

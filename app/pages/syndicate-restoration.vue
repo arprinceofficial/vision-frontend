@@ -1,6 +1,6 @@
 <script setup lang="ts">
 useHead({
-    title: 'Syndicated Restoration | Vision148',
+    title: 'Syndicated Restomod | Vision148',
     meta: [
         {
             name: 'description',

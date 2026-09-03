@@ -2,7 +2,7 @@
 const products = [
     {
         image: '/generated/home-bg.png',
-        alt: 'Syndicated Restoration',
+        alt: 'Syndicated Restomod',
         badge: 'Pillar 01',
         title: 'One-of-One Builds',
         description:
