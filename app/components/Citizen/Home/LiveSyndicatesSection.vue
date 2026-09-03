@@ -260,7 +260,7 @@ const shouldShowLiveSyndicatesSkeleton = computed(() => (
                         <div class="mt-auto pt-5">
                             <NuxtLink :to="`/syndicates/${liveSyndicate.slug}`"
                                 class="block rounded-full bg-tccGold px-5 py-3 text-center font-poppins text-[11px] font-black uppercase tracking-[0.22em] text-tccDarkNavy transition-colors hover:bg-tccLightGold">
-                                Invest Now
+                                {{ ['Upcoming', 'Coming Soon'].includes(liveSyndicate.status) ? liveSyndicate.status : 'Invest Now' }}
                             </NuxtLink>
                         </div>
                     </div>
