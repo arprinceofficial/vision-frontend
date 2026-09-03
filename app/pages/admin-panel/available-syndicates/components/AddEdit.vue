@@ -29,6 +29,7 @@ const getInitialFormData = () => ({
     description: '',
     image: '',
     alt: '',
+    link: '',
     status: false,
 });
 
@@ -44,6 +45,7 @@ watch(() => props.item, (value) => {
             description: value.description || '',
             image: getImagePath(value.image),
             alt: value.alt || '',
+            link: value.link || '',
             status: isTruthy(value.status),
         };
     } else {
@@ -83,6 +85,7 @@ const serializeSubmitData = () => ({
     description: formData.value.description,
     image: formData.value.image,
     alt: formData.value.alt,
+    link: formData.value.link,
     status: formData.value.status ? 1 : 0,
 });
 
@@ -191,6 +194,15 @@ const createHandler = async () => {
                     :class="validations_errors.alt ? 'border-[#f44336!important]' : ''" autocomplete="off"
                     @focus="validations_errors.alt = ''" />
                 <LazyInputError class="text-sm mt-1" :message="validations_errors.alt" />
+            </div>
+
+            <div>
+                <label class="font-semibold">Link / URL</label>
+                <LazyInputText v-model="formData.link" class="w-full"
+                    :class="validations_errors.link ? 'border-[#f44336!important]' : ''" autocomplete="off"
+                    placeholder="e.g., /syndicate/rs500-genesis-build"
+                    @focus="validations_errors.link = ''" />
+                <LazyInputError class="text-sm mt-1" :message="validations_errors.link" />
             </div>
 
             <div class="sm:col-span-2">

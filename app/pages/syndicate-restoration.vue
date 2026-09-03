@@ -25,6 +25,7 @@ type CmsAvailableSyndicate = {
     description?: string | null
     image?: string | null
     alt?: string | null
+    link?: string | null
 }
 
 type CmsAvailableSyndicatesResponse = {
@@ -48,6 +49,7 @@ type AvailableSyndicate = {
     description: string
     image: string
     alt: string
+    link: string
 }
 
 type CardSkeleton = {
@@ -181,6 +183,7 @@ const normalizeAvailableSyndicate = (item: CmsAvailableSyndicate): AvailableSynd
         description,
         image: getFirstValue(item.image) || fallbackRestorationImage,
         alt: getFirstValue(item.alt) || title,
+        link: getFirstValue(item.link),
     }
 }
 
@@ -393,11 +396,13 @@ const shouldShowAvailableSyndicatesSkeleton = computed(() => (
                     Available syndicates are unavailable right now.
                 </div>
                 <div v-else class="mt-12 grid grid-cols-1 gap-12 md:grid-cols-3 md:gap-16">
-                    <article v-for="item in availableSyndicates" :key="item.title">
-                        <img :src="item.image" :alt="item.alt" class="aspect-[1.5/1] w-full rounded-md object-cover">
-                        <h3 class="mt-5 text-[20px] font-semibold leading-tight text-white">{{ item.title }}</h3>
+                    <component :is="item.link ? 'NuxtLink' : 'article'" :to="item.link ? item.link : undefined" v-for="item in availableSyndicates" :key="item.title" class="block group">
+                        <div class="overflow-hidden rounded-md">
+                            <img :src="item.image" :alt="item.alt" class="aspect-[1.5/1] w-full object-cover transition-transform duration-500 group-hover:scale-105">
+                        </div>
+                        <h3 class="mt-5 text-[20px] font-semibold leading-tight text-white transition-colors group-hover:text-tccGold">{{ item.title }}</h3>
                         <p class="mt-1 min-h-8 text-[11px] leading-relaxed text-white/55">{{ item.description }}</p>
-                    </article>
+                    </component>
                 </div>
             </div>
         </section>
