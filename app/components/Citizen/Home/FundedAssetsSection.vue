@@ -24,7 +24,7 @@ type FundedAsset = {
     exited: boolean
 }
 
-const fallbackFundedAssetImage = '/svg/not-found-img.svg'
+const fallbackFundedAssetImage = '/generated/porsche-studio.png'
 
 const {
     data: fundedAssetsData,

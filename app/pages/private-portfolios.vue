@@ -34,7 +34,7 @@ type PortfolioCardSkeleton = {
     bodyWidths: string[]
 }
 
-const fallbackPortfolioImage = '/svg/not-found-img.svg'
+const fallbackPortfolioImage = '/generated/porsche-studio.png'
 const investmentCardSkeletons: PortfolioCardSkeleton[] = [
     { titleWidth: 'w-4/5', bodyWidths: ['w-full', 'w-11/12', 'w-5/6', 'w-3/4'] },
     { titleWidth: 'w-3/5', bodyWidths: ['w-full', 'w-10/12', 'w-4/5', 'w-2/3'] },

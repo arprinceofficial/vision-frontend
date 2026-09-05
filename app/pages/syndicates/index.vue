@@ -87,7 +87,7 @@ type ExpertPanelSkeleton = {
     bodyWidths: string[]
 }
 
-const fallbackSyndicateImage = '/svg/not-found-img.svg'
+const fallbackSyndicateImage = '/generated/hero-aston-studio.png'
 const currentSyndicateSkeletons: SyndicateCardSkeleton[] = [
     { titleWidth: 'w-32', subtitleWidth: 'w-24' },
     { titleWidth: 'w-44', subtitleWidth: 'w-36' },

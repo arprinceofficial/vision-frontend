@@ -36,7 +36,7 @@ type LiveSyndicateSkeleton = {
     progressWidth: string
 }
 
-const fallbackLiveSyndicateImage = '/svg/not-found-img.svg'
+const fallbackLiveSyndicateImage = '/generated/hero-aston-studio.png'
 const liveSyndicateSkeletons: LiveSyndicateSkeleton[] = [
     {
         titleWidth: 'w-56',

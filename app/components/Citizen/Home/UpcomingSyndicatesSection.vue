@@ -23,7 +23,7 @@ type UpcomingSyndicate = {
     description: string
 }
 
-const fallbackUpcomingSyndicateImage = '/svg/not-found-img.svg'
+const fallbackUpcomingSyndicateImage = '/generated/ferrari-studio.png'
 
 const {
     data: upcomingSyndicatesData,

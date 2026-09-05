@@ -112,7 +112,7 @@ type RetailCarCard = {
     excerpt: string
 }
 
-const fallbackCarImage = '/svg/not-found-img.svg'
+const fallbackCarImage = '/generated/retail/ford-sierra-card.png'
 const detailSkeletonStats = ['w-24', 'w-28', 'w-32', 'w-24']
 const detailSkeletonSections = ['w-48', 'w-64', 'w-40']
 const detailSkeletonSpecs = ['w-16', 'w-28', 'w-20', 'w-24', 'w-16', 'w-28', 'w-32', 'w-20', 'w-20', 'w-28']

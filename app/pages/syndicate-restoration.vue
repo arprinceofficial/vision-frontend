@@ -61,7 +61,7 @@ type StepSkeleton = {
     width: string
 }
 
-const fallbackRestorationImage = '/svg/not-found-img.svg'
+const fallbackRestorationImage = '/generated/restoration-workshop.png'
 const benefitCardSkeletons: CardSkeleton[] = [
     { titleWidth: 'w-40', bodyWidths: ['w-full', 'w-11/12', 'w-5/6', 'w-2/3'] },
     { titleWidth: 'w-52', bodyWidths: ['w-full', 'w-10/12', 'w-4/5', 'w-3/5'] },

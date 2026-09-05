@@ -86,7 +86,7 @@ type CmsSyndicateResponse = {
     data?: Record<string, any> | null
 }
 
-const fallbackSyndicateImage = '/svg/not-found-img.svg'
+const fallbackSyndicateImage = '/generated/hero-aston-studio.png'
 const heroSkeletonLines = ['w-full max-w-4xl', 'w-4/5 max-w-3xl']
 const summarySkeletonLines = ['w-full', 'w-11/12', 'w-4/5']
 const specSkeletons = ['w-20', 'w-28', 'w-16', 'w-24', 'w-20']
