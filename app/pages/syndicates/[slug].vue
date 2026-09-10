@@ -69,6 +69,8 @@ type SyndicateDetail = {
     title: string
     shortTitle: string
     heroImage: string
+    portfolio_image: string
+    portfolioImage: string
     heroAlt: string
     summary: string
     description: string[]
@@ -260,6 +262,7 @@ const normalizeSyndicate = (item: Record<string, any> | null | undefined): Syndi
 
     const shortTitle = getFirstValue(item.shortTitle, title)
     const heroImage = getFirstValue(item.heroImage) || fallbackSyndicateImage
+    const portfolioImage = getFirstValue(item.portfolio_image, item.portfolioImage) || fallbackSyndicateImage
     const heroAlt = getFirstValue(item.heroAlt) || `${title} syndicate hero`
     const specs = normalizeStats(item.specs)
 
@@ -277,6 +280,8 @@ const normalizeSyndicate = (item: Record<string, any> | null | undefined): Syndi
         title,
         shortTitle,
         heroImage,
+        portfolio_image: portfolioImage,
+        portfolioImage,
         heroAlt,
         summary: getFirstValue(item.summary),
         description: normalizeParagraphs(item.description),
@@ -737,7 +742,7 @@ useHead(() => ({
             <section
                 class="relative min-h-[420px] overflow-hidden border-b border-white/10 bg-tccDeepBlack text-white sm:min-h-[500px] lg:min-h-[560px]">
                 <div class="absolute inset-0">
-                    <img :src="syndicate.heroImage" :alt="syndicate.heroAlt"
+                    <img :src="syndicate.portfolio_image || syndicate.heroImage" :alt="syndicate.heroAlt"
                         class="h-full w-full object-cover opacity-70">
                     <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-black/35 to-tccDeepBlack" />
                     <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/30 to-black/55" />
