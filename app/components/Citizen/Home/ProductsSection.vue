@@ -6,10 +6,7 @@ const products = [
         badge: 'Pillar 01',
         title: 'One-of-One Builds',
         description:
-            'Members join rare automotive projects from the earliest stage, following acquisition, teardown, engineering, finishing, and experience access.',
-        action: 'Learn More',
-        to: '/syndicate-restoration',
-        disabled: false
+            'Members join rare automotive projects from the earliest stage, following acquisition, teardown, engineering, finishing, and experience access.'
     },
     {
         image: '/generated/partner image.png',
@@ -17,10 +14,7 @@ const products = [
         badge: 'Pillar 02',
         title: 'World-Class Partners',
         description:
-            'Specialist sourcing, restoration, storage, insurance, and member administration are coordinated through a professional syndicate structure.',
-        action: 'Learn More',
-        to: '/private-portfolios',
-        disabled: false
+            'Specialist sourcing, restoration, storage, insurance, and member administration are coordinated through a professional syndicate structure.'
     },
     {
         image: '/frontend/assets/images/pillars.png',
@@ -28,14 +22,9 @@ const products = [
         badge: 'Pillar 03',
         title: 'Member Experience',
         description:
-            'Build updates, private previews, driving access, member votes, and document vaults make ownership feel tangible.',
-        action: 'Learn More',
-        to: '',
-        disabled: true
+            'Build updates, private previews, driving access, member votes, and document vaults make ownership feel tangible.'
     }
 ]
-
-const isExternalLink = (to: string) => /^https?:\/\//.test(to)
 </script>
 
 <template>
@@ -59,24 +48,9 @@ const isExternalLink = (to: string) => /^https?:\/\//.test(to)
                             {{ product.badge }}
                         </span>
                     </div>
-                    <div class="flex flex-1 flex-col justify-between p-6">
-                        <div>
-                            <h3 class="font-poppins text-2xl font-bold leading-tight text-white">{{ product.title }}
-                            </h3>
-                            <p class="mt-4 text-sm leading-relaxed text-white/60">{{ product.description }}</p>
-                        </div>
-                        <NuxtLink v-if="!product.disabled && !isExternalLink(product.to)" :to="product.to"
-                            class="mt-7 block rounded-full border border-white/20 py-3 text-center font-poppins text-xs font-bold uppercase tracking-[0.22em] text-white transition-colors duration-200 hover:border-tccGold hover:text-tccGold">
-                            {{ product.action }}
-                        </NuxtLink>
-                        <NuxtLink v-else-if="!product.disabled" :to="product.to" external target="_blank" rel="noopener noreferrer"
-                            class="mt-7 block rounded-full border border-white/20 py-3 text-center font-poppins text-xs font-bold uppercase tracking-[0.22em] text-white transition-colors duration-200 hover:border-tccGold hover:text-tccGold">
-                            {{ product.action }}
-                        </NuxtLink>
-                        <span v-else
-                            class="mt-7 block cursor-not-allowed rounded-full border border-white/10 bg-white/5 py-3 text-center font-poppins text-xs font-bold uppercase tracking-[0.22em] text-white/40">
-                            {{ product.action }}
-                        </span>
+                    <div class="flex flex-1 flex-col p-6">
+                        <h3 class="font-poppins text-2xl font-bold leading-tight text-white">{{ product.title }}</h3>
+                        <p class="mt-4 text-sm leading-relaxed text-white/60">{{ product.description }}</p>
                     </div>
                 </article>
             </div>

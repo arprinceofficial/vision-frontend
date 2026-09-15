@@ -30,7 +30,7 @@ defineProps<{
     </div>
 
     <div class="relative z-10 flex items-center gap-4">
-      <img src="/svg/logo-transparent.svg" alt="Syn Mod Build" class="h-10 w-auto object-contain">      
+      <img src="/logo-4-BrrnFFbn.jpeg" alt="Syn Mod Build" class="h-10 w-auto object-contain">      
       <p class="text-[10px] font-light uppercase tracking-[0.18em] text-white/40">
         &copy; 2026 Syndincated Restomod. Security-focused investment platform.
       </p>
