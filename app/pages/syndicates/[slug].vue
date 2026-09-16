@@ -366,10 +366,10 @@ const totalInvestment = computed(() => {
 
 const activeJourney = computed(() => syndicate.value?.activeJourney || null)
 const selectedAllocationCount = computed(() => (
-    Math.max(1, Math.round(normalizeNumber(allocationCount.value, 1)))
+    allocationCount.value === 5 ? 5 : 1
 ))
 
-const modalAllocationSlots = computed(() => activeJourney.value?.slot || allocationCount.value)
+const modalAllocationSlots = computed(() => activeJourney.value?.slot || selectedAllocationCount.value)
 
 const modalAllocationCost = computed(() => {
     if (!syndicate.value) return 0
@@ -398,7 +398,7 @@ const setActiveAnalysisTab = (key: string | number) => {
 }
 
 const decreaseAllocation = () => {
-    allocationCount.value = Math.max(1, allocationCount.value - 1)
+    allocationCount.value = 1
 }
 
 const increaseAllocation = () => {
@@ -406,11 +406,11 @@ const increaseAllocation = () => {
         return
     }
 
-    if (syndicate.value.allocationsRemaining <= 0) {
+    if (syndicate.value.allocationsRemaining < 5) {
         return
     }
 
-    allocationCount.value = Math.min(syndicate.value.allocationsRemaining, allocationCount.value + 1)
+    allocationCount.value = 5
 }
 
 const openAllocationModal = () => {
@@ -438,11 +438,17 @@ const getAgreementPath = (shares: number, requestSlug = '') => {
     }
 
     const agreementUid = syndicate.value.uid || syndicate.value.allocationId
-    const shareCount = Math.max(1, Math.round(normalizeNumber(shares, 1)))
+    const shareCount = Number(shares) === 5 ? 5 : 1
     const basePath = `/agreement/${encodeURIComponent(agreementUid)}/a-${shareCount}`
 
     return requestSlug ? `${basePath}/s-${encodeURIComponent(requestSlug)}` : basePath
 }
+
+watch(() => syndicate.value?.allocationsRemaining, (remaining) => {
+    if (typeof remaining === 'number' && remaining < 5 && allocationCount.value === 5) {
+        allocationCount.value = 1
+    }
+})
 
 const rememberAgreementAsset = () => {
     if (!process.client || !syndicate.value) return
@@ -909,7 +915,8 @@ useHead(() => ({
                                     <div
                                         class="mt-3 grid grid-cols-[44px_1fr_44px] overflow-hidden rounded-md border border-white/16 bg-white/[0.04]">
                                         <button type="button"
-                                            class="grid h-12 place-items-center text-white/70 transition-colors hover:bg-white/10 hover:text-tccGold"
+                                            class="grid h-12 place-items-center text-white/70 transition-colors hover:bg-white/10 hover:text-tccGold disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-white/70"
+                                            :disabled="allocationCount <= 1"
                                             aria-label="Decrease allocations" @click="decreaseAllocation">
                                             <i class="pi pi-minus text-xs" aria-hidden="true" />
                                         </button>
@@ -918,7 +925,8 @@ useHead(() => ({
                                             {{ allocationCount }}
                                         </div>
                                         <button type="button"
-                                            class="grid h-12 place-items-center text-white/70 transition-colors hover:bg-white/10 hover:text-tccGold"
+                                            class="grid h-12 place-items-center text-white/70 transition-colors hover:bg-white/10 hover:text-tccGold disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-white/70"
+                                            :disabled="allocationCount >= 5 || (syndicate && syndicate.allocationsRemaining < 5)"
                                             aria-label="Increase allocations" @click="increaseAllocation">
                                             <i class="pi pi-plus text-xs" aria-hidden="true" />
                                         </button>

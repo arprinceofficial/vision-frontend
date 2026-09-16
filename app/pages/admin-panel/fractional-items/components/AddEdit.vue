@@ -1438,7 +1438,7 @@ const createHandler = async () => {
                             <LazyInputError class="text-sm mt-1" :message="validations_errors.projected_value_image" />
                         </div>
 
-                        <div v-show="false">
+                        <div>
                             <label class="font-semibold">Gallery</label>
                             <div class="w-full mt-2">
                                 <MediaGallery :getPhoto="formData.gallery" :multiple="true" @set_photo="setGallery" />

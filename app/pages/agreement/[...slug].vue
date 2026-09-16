@@ -108,7 +108,7 @@ const shareRouteCount = computed(() => {
     if (!shareSegment) return 1
 
     const shareCount = Number(shareSegment.replace(/^a-/i, ''))
-    return Number.isFinite(shareCount) && shareCount > 0 ? Math.round(shareCount) : 1
+    return shareCount === 5 ? 5 : 1
 })
 
 const allocationRequestSlug = computed(() => {
