@@ -324,7 +324,7 @@ const shouldShowPortfolioServicesSkeleton = computed(() => (
                     </div>
                 </div>
                 <div class="min-h-[520px]">
-                    <img src="/generated/partner image.png"
+                    <img src="/generated/partner_image.png"
                         alt="Collector cars stored with a specialist automotive partner"
                         class="h-full w-full object-cover">
                 </div>

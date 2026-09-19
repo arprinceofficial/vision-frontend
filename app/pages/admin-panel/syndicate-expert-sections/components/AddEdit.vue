@@ -25,12 +25,12 @@ const getImagePath = (value) => {
 
 const getInitialFormData = () => ({
     id: null,
+    heading: '',
     title: '',
     image: '',
     alt: '',
     body: '',
-    is_highlighted: false,
-    status: false,
+    status: true,
 });
 
 const formData = ref(getInitialFormData());
@@ -41,11 +41,11 @@ watch(() => props.item, (value) => {
         validations_errors.value = {};
         formData.value = {
             id: value.id || null,
+            heading: value.heading || '',
             title: value.title || '',
             image: getImagePath(value.image),
             alt: value.alt || '',
             body: value.body || '',
-            is_highlighted: isTruthy(value.is_highlighted),
             status: isTruthy(value.status),
         };
     } else {
@@ -59,8 +59,6 @@ const setImage = (photo) => {
 
 const requiredFields = [
     'title',
-    'image',
-    'alt',
     'body',
 ];
 
@@ -81,11 +79,11 @@ const validateForm = () => {
 };
 
 const serializeSubmitData = () => ({
+    heading: formData.value.heading,
     title: formData.value.title,
     image: formData.value.image,
     alt: formData.value.alt,
     body: formData.value.body,
-    is_highlighted: formData.value.is_highlighted ? 1 : 0,
     status: formData.value.status ? 1 : 0,
 });
 
@@ -127,7 +125,7 @@ const updateHandler = async () => {
 
     try {
         isLoading.value = true;
-        const getData = await $fetchAdmin(`v1/admin/expert-panels/${props.item.id}`, {
+        const getData = await $fetchAdmin(`v1/admin/syndicate-expert-sections/${props.item.id}`, {
             method: 'PUT',
             body: serializeSubmitData(),
         });
@@ -147,7 +145,7 @@ const createHandler = async () => {
 
     try {
         isLoading.value = true;
-        const getData = await $fetchAdmin('v1/admin/expert-panels', {
+        const getData = await $fetchAdmin('v1/admin/syndicate-expert-sections', {
             method: 'POST',
             body: serializeSubmitData(),
         });
@@ -164,14 +162,23 @@ const createHandler = async () => {
 </script>
 
 <template>
-    <Dialog v-model:visible="visible" modal :closable="false" :style="{ width: '44rem', maxWidth: 'calc(100vw - 2rem)' }">
+    <Dialog v-model:visible="visible" modal :closable="false" :style="{ width: '48rem', maxWidth: 'calc(100vw - 2rem)' }">
         <template #header>
             <div class="flex items-center justify-center w-full gap-2">
-                <h4 class="text-xl font-semibold">{{ modalTitle }} Expert Panel</h4>
+                <h4 class="text-xl font-semibold">{{ modalTitle }} Syndicate Expert Section</h4>
             </div>
         </template>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="sm:col-span-2">
+                <label class="font-semibold">Heading (Main Section Headline)</label>
+                <LazyInputText v-model="formData.heading" class="w-full"
+                    :class="validations_errors.heading ? 'border-[#f44336!important]' : ''" autocomplete="off"
+                    placeholder="e.g. Fuel Your Future with These Experts in Collectible Cars"
+                    @focus="validations_errors.heading = ''" />
+                <LazyInputError class="text-sm mt-1" :message="validations_errors.heading" />
+            </div>
+
             <div class="sm:col-span-2">
                 <label class="font-semibold">Image</label>
                 <div class="w-full mt-2">
@@ -181,17 +188,19 @@ const createHandler = async () => {
             </div>
 
             <div>
-                <label class="font-semibold">Title</label>
+                <label class="font-semibold">Title (Feature Title)</label>
                 <LazyInputText v-model="formData.title" class="w-full"
                     :class="validations_errors.title ? 'border-[#f44336!important]' : ''" autocomplete="off"
+                    placeholder="e.g. The First And Largest"
                     @focus="validations_errors.title = ''" />
                 <LazyInputError class="text-sm mt-1" :message="validations_errors.title" />
             </div>
 
             <div>
-                <label class="font-semibold">Alt</label>
+                <label class="font-semibold">Alt Text</label>
                 <LazyInputText v-model="formData.alt" class="w-full"
                     :class="validations_errors.alt ? 'border-[#f44336!important]' : ''" autocomplete="off"
+                    placeholder="e.g. Collectible car experts with syndicate assets"
                     @focus="validations_errors.alt = ''" />
                 <LazyInputError class="text-sm mt-1" :message="validations_errors.alt" />
             </div>
@@ -200,16 +209,9 @@ const createHandler = async () => {
                 <label class="font-semibold">Body</label>
                 <Textarea v-model="formData.body" class="w-full" rows="5"
                     :class="validations_errors.body ? 'border-[#f44336!important]' : ''" autocomplete="off"
+                    placeholder="Main paragraph description..."
                     @focus="validations_errors.body = ''" />
                 <LazyInputError class="text-sm mt-1" :message="validations_errors.body" />
-            </div>
-
-            <div class="flex items-center gap-4">
-                <label class="font-semibold">Highlighted</label>
-                <div class="flex-auto">
-                    <ToggleSwitch v-model="formData.is_highlighted" />
-                    <small class="block text-xs text-gray-500">Feature in 1st large panel</small>
-                </div>
             </div>
 
             <div class="flex items-center gap-4">

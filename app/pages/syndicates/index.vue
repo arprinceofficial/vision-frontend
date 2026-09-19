@@ -41,14 +41,27 @@ type CmsFundedSyndicatesResponse = {
 }
 
 type CmsExpertPanel = {
+    id?: number | null
+    title?: string | null
+    image?: string | null
+    alt?: string | null
+    body?: string | null
+    is_highlighted?: boolean | number | null
+}
+
+type CmsExpertPanelsResponse = {
+    data?: CmsExpertPanel[]
+}
+
+type CmsHowItWorks = {
     title?: string | null
     image?: string | null
     alt?: string | null
     body?: string | null
 }
 
-type CmsExpertPanelsResponse = {
-    data?: CmsExpertPanel[]
+type CmsHowItWorksResponse = {
+    data?: CmsHowItWorks[]
 }
 
 type CurrentSyndicate = {
@@ -71,6 +84,15 @@ type FundedSyndicate = {
 }
 
 type ExpertPanel = {
+    id?: number
+    title: string
+    image: string
+    alt: string
+    body: string
+    is_highlighted: boolean
+}
+
+type HowItWorksItem = {
     title: string
     image: string
     alt: string
@@ -83,6 +105,11 @@ type SyndicateCardSkeleton = {
 }
 
 type ExpertPanelSkeleton = {
+    titleWidth: string
+    bodyWidths: string[]
+}
+
+type HowItWorksSkeleton = {
     titleWidth: string
     bodyWidths: string[]
 }
@@ -102,6 +129,11 @@ const fundedSyndicateSkeletons: SyndicateCardSkeleton[] = [
 const expertPanelSkeletons: ExpertPanelSkeleton[] = [
     { titleWidth: 'w-44', bodyWidths: ['w-full', 'w-11/12', 'w-4/5'] },
     { titleWidth: 'w-56', bodyWidths: ['w-full', 'w-10/12', 'w-5/6'] },
+]
+const howItWorksSkeletons: HowItWorksSkeleton[] = [
+    { titleWidth: 'w-36', bodyWidths: ['w-full', 'w-11/12', 'w-4/5'] },
+    { titleWidth: 'w-40', bodyWidths: ['w-full', 'w-10/12', 'w-5/6'] },
+    { titleWidth: 'w-32', bodyWidths: ['w-full', 'w-full', 'w-3/4'] },
 ]
 
 const {
@@ -155,6 +187,27 @@ const {
     'cms-expert-panels',
     async () => {
         const response = await $fetchCMS<CmsExpertPanelsResponse>('v1/cms/expert-panels', {
+            method: 'POST',
+        })
+
+        return Array.isArray(response?.data) ? response.data : []
+    },
+    {
+        default: () => [],
+        lazy: true,
+        server: false,
+    }
+)
+
+const {
+    data: howItWorksData,
+    error: howItWorksError,
+    pending: howItWorksPending,
+    status: howItWorksStatus
+} = useAsyncData<CmsHowItWorks[]>(
+    'cms-syndicate-how-it-works',
+    async () => {
+        const response = await $fetchCMS<CmsHowItWorksResponse>('v1/cms/syndicate-how-it-works', {
             method: 'POST',
         })
 
@@ -234,9 +287,25 @@ const normalizeExpertPanel = (panel: CmsExpertPanel): ExpertPanel | null => {
     if (!title || !body) return null
 
     return {
+        id: panel.id ? Number(panel.id) : undefined,
         title,
         image: getFirstValue(panel.image) || fallbackSyndicateImage,
         alt: getFirstValue(panel.alt) || title,
+        body,
+        is_highlighted: Boolean(panel.is_highlighted),
+    }
+}
+
+const normalizeHowItWorks = (item: CmsHowItWorks): HowItWorksItem | null => {
+    const title = getFirstValue(item.title)
+    const body = getFirstValue(item.body)
+
+    if (!title || !body) return null
+
+    return {
+        title,
+        image: getFirstValue(item.image) || fallbackSyndicateImage,
+        alt: getFirstValue(item.alt) || title,
         body,
     }
 }
@@ -253,32 +322,34 @@ const fundedSyndicates = computed<FundedSyndicate[]>(() => (
         .filter((item): item is FundedSyndicate => Boolean(item))
 ))
 
-const howItWorks = [
-    {
-        title: 'Management',
-        image: '/generated/experiential.jpeg',
-        alt: 'Syndicate management and member events',
-        body: 'You are in control, with votes held on every key day-to-day decision regarding the asset, including when to sell it. TheCarCrowd arranges the management of assets, including storage, insurance and maintenance, on the trust’s behalf, and you can view your asset at any time.'
-    },
-    {
-        title: 'Join Together',
-        image: '/generated/partner image.png',
-        alt: 'Members joining together at a collectible car event',
-        body: 'Join together with other members to own the asset outright. You have direct ownership rights of the asset along with the other syndicate members. All details of the level of funding can be found in the Syndicate Agreement, available to view to fully registered.'
-    },
-    {
-        title: 'Registration',
-        image: '/frontend/assets/images/first_car_carousel.jpg',
-        alt: 'Syndicate registration consultation',
-        body: 'Complete the registration journey to check your eligibility, as we can only allow high-net-worth and sophisticated investors to join our syndicates. We will also ask you to complete a few qualification questions to make sure you understand how our syndicates work.'
-    }
-]
+const howItWorks = computed<HowItWorksItem[]>(() => (
+    (howItWorksData.value || [])
+        .map(normalizeHowItWorks)
+        .filter((item): item is HowItWorksItem => Boolean(item))
+))
 
 const expertPanels = computed<ExpertPanel[]>(() => (
     (expertPanelsData.value || [])
         .map(normalizeExpertPanel)
         .filter((panel): panel is ExpertPanel => Boolean(panel))
 ))
+
+const highlightedExpertPanel = computed<ExpertPanel | null>(() => {
+    const items = expertPanels.value
+    if (!items.length) return null
+    return items.find(item => item.is_highlighted) || items[0]
+})
+
+const sideExpertPanels = computed<ExpertPanel[]>(() => {
+    const highlighted = highlightedExpertPanel.value
+    if (!highlighted) return []
+    return expertPanels.value.filter(item => {
+        if (item.id && highlighted.id) {
+            return item.id !== highlighted.id
+        }
+        return item.title !== highlighted.title
+    })
+})
 
 const shouldShowCurrentSyndicatesSkeleton = computed(() => (
     !currentSyndicates.value.length && (
@@ -293,6 +364,14 @@ const shouldShowFundedSyndicatesSkeleton = computed(() => (
         fundedSyndicatesPending.value ||
         fundedSyndicatesStatus.value === 'idle' ||
         fundedSyndicatesStatus.value === 'pending'
+    )
+))
+
+const shouldShowHowItWorksSkeleton = computed(() => (
+    !howItWorks.value.length && (
+        howItWorksPending.value ||
+        howItWorksStatus.value === 'idle' ||
+        howItWorksStatus.value === 'pending'
     )
 ))
 
@@ -348,8 +427,7 @@ const shouldShowExpertPanelsSkeleton = computed(() => (
 
         <section id="current-syndicates" class="border-b border-white/10 bg-[#050403] py-12 sm:py-16">
             <div class="mx-auto max-w-7xl px-6 sm:px-10 lg:px-14">
-                <h2 class="text-center text-[28px] font-semibold leading-tight text-white sm:text-[36px]">Current
-                    Syndicates</h2>
+                <h2 class="text-center text-[28px] font-semibold leading-tight text-white sm:text-[36px]">Current The Car Crowd Syndicates</h2>
 
                 <div v-if="shouldShowCurrentSyndicatesSkeleton"
                     class="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -409,8 +487,7 @@ const shouldShowExpertPanelsSkeleton = computed(() => (
 
         <section class="border-b border-white/10 bg-[#080705] py-12 sm:py-16">
             <div class="mx-auto max-w-7xl px-6 sm:px-10 lg:px-14">
-                <h2 class="text-center text-[28px] font-semibold leading-tight text-white sm:text-[36px]">Funded
-                    Syndicates</h2>
+                <h2 class="text-center text-[28px] font-semibold leading-tight text-white sm:text-[36px]">Funded The Car Crowd Syndicates</h2>
 
                 <div v-if="shouldShowFundedSyndicatesSkeleton" class="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
                     <article v-for="(itemSkeleton, skeletonIndex) in fundedSyndicateSkeletons"
@@ -464,7 +541,30 @@ const shouldShowExpertPanelsSkeleton = computed(() => (
                 <h2 class="text-center text-[28px] font-semibold leading-tight text-white sm:text-[36px]">How It Works
                 </h2>
 
-                <div class="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
+                <div v-if="shouldShowHowItWorksSkeleton" class="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
+                    <article v-for="(itemSkeleton, skeletonIndex) in howItWorksSkeletons"
+                        :key="`how-it-works-skeleton-${skeletonIndex}`"
+                        class="animate-pulse overflow-hidden rounded-md border border-white/10 bg-white/5 shadow-[0_24px_70px_rgba(0,0,0,0.28)]">
+                        <div class="h-44 w-full bg-white/10 sm:h-52" />
+                        <div class="px-5 pb-7 pt-5 sm:px-6">
+                            <span class="block h-6 rounded-full bg-white/15" :class="itemSkeleton.titleWidth" />
+                            <div class="mt-3 space-y-2">
+                                <span v-for="(width, widthIndex) in itemSkeleton.bodyWidths"
+                                    :key="`how-it-works-body-skeleton-${skeletonIndex}-${widthIndex}`"
+                                    class="block h-3.5 rounded-full bg-white/10" :class="width" />
+                            </div>
+                        </div>
+                    </article>
+                </div>
+                <div v-else-if="howItWorksError"
+                    class="mt-8 rounded-md border border-tccGold/30 bg-tccGold/10 px-6 py-6 text-center text-[15px] leading-relaxed text-white/70">
+                    How it works details are unavailable right now. Please refresh and try again.
+                </div>
+                <div v-else-if="!howItWorks.length"
+                    class="mt-8 rounded-md border border-white/10 bg-white/5 px-6 py-6 text-center text-[15px] leading-relaxed text-white/60">
+                    How it works details are unavailable right now.
+                </div>
+                <div v-else class="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
                     <article v-for="item in howItWorks" :key="item.title"
                         class="overflow-hidden rounded-md border border-white/10 bg-white/5 shadow-[0_24px_70px_rgba(0,0,0,0.28)] transition-all duration-300 hover:-translate-y-1 hover:border-tccGold/40">
                         <img :src="item.image" :alt="item.alt" class="h-44 w-full object-cover opacity-90 sm:h-52">
@@ -487,20 +587,38 @@ const shouldShowExpertPanelsSkeleton = computed(() => (
         <section class="border-b border-white/10 bg-[#080705] py-12 sm:py-16">
             <div class="mx-auto grid max-w-7xl grid-cols-1 gap-12 px-6 sm:px-10 lg:grid-cols-12 lg:px-14">
                 <div class="lg:col-span-8">
-                    <h2 class="max-w-4xl text-[28px] font-semibold leading-tight text-white sm:text-[36px]">
-                        Fuel Your Future with These Experts in Collectible Cars
-                    </h2>
-                    <img src="/frontend/assets/images/first_car_carousel.jpg"
-                        alt="Collectible car experts with syndicate assets"
-                        class="mt-8 aspect-[1.75/1] w-full rounded-md object-cover">
-                    <div class="mt-8 max-w-4xl">
-                        <h3 class="text-xl font-semibold text-white">The First And Largest</h3>
-                        <p class="mt-3 text-[14px] leading-relaxed text-white/65">
-                            We are the UK's first platform dedicated to collectible cars with industry-leading
-                            experience in both automotive and financial services. We are the largest collectible car
-                            asset specialist in the UK.
-                        </p>
+                    <div v-if="shouldShowExpertPanelsSkeleton" class="animate-pulse">
+                        <span class="block h-9 max-w-xl rounded-full bg-white/15" />
+                        <div class="mt-8 aspect-[1.75/1] w-full rounded-md bg-white/10" />
+                        <div class="mt-8 max-w-4xl space-y-3">
+                            <span class="block h-6 w-56 rounded-full bg-white/15" />
+                            <span class="block h-4 w-full rounded-full bg-white/10" />
+                            <span class="block h-4 w-11/12 rounded-full bg-white/10" />
+                            <span class="block h-4 w-4/5 rounded-full bg-white/10" />
+                        </div>
                     </div>
+                    <div v-else-if="expertPanelsError"
+                        class="rounded-md border border-tccGold/30 bg-tccGold/10 px-6 py-6 text-center text-[15px] leading-relaxed text-white/70">
+                        Expert details are unavailable right now. Please refresh and try again.
+                    </div>
+                    <div v-else-if="!highlightedExpertPanel"
+                        class="rounded-md border border-white/10 bg-white/5 px-6 py-6 text-center text-[15px] leading-relaxed text-white/60">
+                        Expert details are unavailable right now.
+                    </div>
+                    <template v-else>
+                        <h2 class="max-w-4xl text-[28px] font-semibold leading-tight text-white sm:text-[36px]">
+                            Fuel Your Future with These Experts in Collectible Cars
+                        </h2>
+                        <img :src="highlightedExpertPanel.image"
+                            :alt="highlightedExpertPanel.alt"
+                            class="mt-8 aspect-[1.75/1] w-full rounded-md object-cover">
+                        <div class="mt-8 max-w-4xl">
+                            <h3 class="text-xl font-semibold text-white">{{ highlightedExpertPanel.title }}</h3>
+                            <p class="mt-3 text-[14px] leading-relaxed text-white/65">
+                                {{ highlightedExpertPanel.body }}
+                            </p>
+                        </div>
+                    </template>
                 </div>
 
                 <div class="space-y-9 border-white/10 lg:col-span-4 lg:border-l lg:pl-10">
@@ -520,12 +638,12 @@ const shouldShowExpertPanelsSkeleton = computed(() => (
                         class="rounded-md border border-tccGold/30 bg-tccGold/10 px-5 py-5 text-[14px] leading-relaxed text-white/70">
                         Expert panels are unavailable right now. Please refresh and try again.
                     </div>
-                    <div v-else-if="!expertPanels.length"
+                    <div v-else-if="!sideExpertPanels.length"
                         class="rounded-md border border-white/10 bg-white/5 px-5 py-5 text-[14px] leading-relaxed text-white/60">
                         Expert panels are unavailable right now.
                     </div>
                     <template v-else>
-                        <article v-for="panel in expertPanels" :key="panel.title">
+                        <article v-for="panel in sideExpertPanels" :key="panel.title">
                             <img :src="panel.image" :alt="panel.alt"
                                 class="aspect-[1.65/1] w-full rounded-md object-cover">
                             <h3 class="mt-4 text-xl font-semibold text-white">{{ panel.title }}</h3>

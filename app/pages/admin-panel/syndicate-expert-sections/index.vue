@@ -23,7 +23,7 @@ const loadData = async () => {
     isLoading.value = true;
     permissions.value = {};
     try {
-        const getData = await $fetchAdmin('v1/admin/expert-panels/all', {
+        const getData = await $fetchAdmin('v1/admin/syndicate-expert-sections/all', {
             method: 'POST',
             body: {
                 paginate: true,
@@ -56,7 +56,7 @@ watch(() => route.query, () => {
 });
 
 const isActiveStatus = (value) => value == 1 || value === true;
-const truncateText = (value, length = 180) => {
+const truncateText = (value, length = 120) => {
     if (!value) return '';
     return value.length > length ? `${value.slice(0, length)}...` : value;
 };
@@ -80,7 +80,7 @@ const addNew = () => {
 const receivedData = (d) => {
     isOpenModal.value = false;
     modalTitle.value == 'Create'
-        ? data.value.push(d)
+        ? data.value.unshift(d)
         : data.value = data.value.map((currentItem) => currentItem.id == d.id ? d : currentItem);
 };
 
@@ -101,7 +101,7 @@ const openDeleteModal = (id) => {
 const deleteHandler = async () => {
     response_modal.value = {};
     try {
-        const getData = await $fetchAdmin(`v1/admin/expert-panels/${deleteId.value}`, {
+        const getData = await $fetchAdmin(`v1/admin/syndicate-expert-sections/${deleteId.value}`, {
             method: 'DELETE',
         });
         if (getData.status == true) {
@@ -120,7 +120,7 @@ const deleteHandler = async () => {
 const restoreHandler = async (id) => {
     response_modal.value = {};
     try {
-        const getData = await $fetchAdmin(`v1/admin/expert-panels/restore/${id}`, {
+        const getData = await $fetchAdmin(`v1/admin/syndicate-expert-sections/restore/${id}`, {
             method: 'POST',
         });
         if (getData.status == true) {
@@ -167,13 +167,13 @@ const onChangeHandler = () => {
                     </div>
                 </div>
                 <Skeleton v-if="isLoading" width="8rem" height="2.5rem" borderRadius="10px"></Skeleton>
-                <Button v-else-if="permissions?.add" label="Create Expert Panel" @click="addNew" class="text-xs" />
+                <Button v-else-if="permissions?.add" label="Create Section" @click="addNew" class="text-xs" />
             </div>
 
             <div class="pb-2 flex flex-col justify-between w-full">
                 <div class="mt-4 border border-gray-200 rounded-lg bg-white dark:bg-gray-800">
                     <div class="border-b border-gray-200">
-                        <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 py-2 px-4">Expert Panels</h4>
+                        <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 py-2 px-4">Syndicate Expert Sections</h4>
                     </div>
                     <div class="p-4">
                         <div class="custom_table overflow-auto border-b border-gray-200">
@@ -181,25 +181,21 @@ const onChangeHandler = () => {
                                 <thead class="sticky z-10 top-0">
                                     <tr>
                                         <th width="12%"><span>Image</span></th>
+                                        <th width="24%"><span>Heading</span></th>
                                         <th width="18%"><span>Title</span></th>
-                                        <th width="16%"><span>Alt</span></th>
                                         <th width="28%"><span>Body</span></th>
-                                        <th width="10%"><span>Highlight</span></th>
-                                        <th width="6%"><span>Status</span></th>
+                                        <th width="8%"><span>Status</span></th>
                                         <th width="10%" v-if="(permissions.edit || permissions.delete) || isLoading">
                                             <span>Action</span>
                                         </th>
                                     </tr>
                                 </thead>
                                 <tbody v-if="isLoading">
-                                    <tr v-for="(index) in 10" :key="index">
+                                    <tr v-for="(index) in 5" :key="index">
                                         <td><Skeleton size="4rem"></Skeleton></td>
+                                        <td><Skeleton width="10rem" class="mb-2"></Skeleton></td>
                                         <td><Skeleton width="8rem" class="mb-2"></Skeleton></td>
-                                        <td><Skeleton width="7rem" class="mb-2"></Skeleton></td>
-                                        <td><Skeleton width="16rem" class="mb-2"></Skeleton></td>
-                                        <td>
-                                            <div class="flex justify-center"><Skeleton size="1.5rem"></Skeleton></div>
-                                        </td>
+                                        <td><Skeleton width="14rem" class="mb-2"></Skeleton></td>
                                         <td>
                                             <div class="flex justify-center"><Skeleton size="1.5rem"></Skeleton></div>
                                         </td>
@@ -217,21 +213,10 @@ const onChangeHandler = () => {
                                             <img :src="item.image ? item.image : '/svg/not-found-img.svg'"
                                                 class="w-16 h-16 object-cover rounded-md" />
                                         </td>
+                                        <td class="text-gray-800 dark:text-gray-200 font-medium">{{ item.heading || '—' }}</td>
                                         <td class="text-gray-800 dark:text-gray-200">{{ item.title }}</td>
-                                        <td class="text-gray-800 dark:text-gray-200">{{ item.alt }}</td>
                                         <td class="text-gray-800 dark:text-gray-200">
                                             <span :title="item.body">{{ truncateText(item.body) }}</span>
-                                        </td>
-                                        <td>
-                                            <div class="flex justify-center items-center">
-                                                <span v-if="isActiveStatus(item.is_highlighted)"
-                                                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
-                                                    <i class="fa fa-star text-amber-500 text-[10px]"></i> 1st Panel
-                                                </span>
-                                                <span v-else class="text-gray-400 text-xs">
-                                                    Side Panel
-                                                </span>
-                                            </div>
                                         </td>
                                         <td>
                                             <div class="flex justify-center items-center">
@@ -271,3 +256,5 @@ const onChangeHandler = () => {
         </div>
     </div>
 </template>
+
+<style lang="scss" scoped></style>
