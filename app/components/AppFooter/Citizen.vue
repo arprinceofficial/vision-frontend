@@ -9,9 +9,13 @@
 
     <div class="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.2fr_0.8fr_0.8fr] lg:px-8">
       <div class="space-y-5">
-        <div class="flex items-center gap-2">
-          <img src="/svg/logo-transparent.svg" alt="Vision148"
-            class="h-10 w-auto opacity-70 transition-opacity duration-300 hover:opacity-100">
+        <div class="flex items-center gap-2.5 sm:gap-3">
+          <img src="/logo-4-BrrnFFbn.jpeg" alt="Syn Mod Build"
+            class="h-9 w-9 sm:h-10 sm:w-10 object-contain rounded-sm opacity-90 transition-opacity duration-300 hover:opacity-100">
+          <div class="flex flex-col gap-1 sm:gap-1.5 text-left font-poppins text-[10px] sm:text-[11px] font-medium tracking-[0.28em] uppercase text-white leading-tight">
+            <span>SYNDICATED</span>
+            <span>RESTOMOD</span>
+          </div>
         </div>
         <p class="max-w-xl text-sm leading-relaxed text-white/60">
           Collective ownership for rare automotive assets, combining transparent syndicate structures, specialist

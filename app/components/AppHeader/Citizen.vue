@@ -122,9 +122,13 @@ onBeforeUnmount(() => {
 <template>
     <header class="sticky top-0 z-50 border-b border-white/10 bg-tccDeepBlack/80 backdrop-blur-2xl">
         <nav class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
-            <NuxtLink to="/" class="flex shrink-0 items-center" aria-label="Vision148 home" @click="closeMobileMenu">
-                <img src="/svg/logo-transparent.svg" alt="Vision148"
-                    class="h-10 w-auto transition-transform duration-300 hover:scale-105">
+            <NuxtLink to="/" class="flex shrink-0 items-center gap-2.5 sm:gap-3 group" aria-label="Syndicated Restomod home" @click="closeMobileMenu">
+                <img src="/logo-4-BrrnFFbn.jpeg" alt="Syn Mod Build"
+                    class="h-9 w-9 sm:h-10 sm:w-10 object-contain rounded-sm transition-transform duration-300 group-hover:scale-105">
+                <div class="flex flex-col gap-1 sm:gap-1.5 text-left font-poppins text-[10px] sm:text-[11px] font-medium tracking-[0.28em] uppercase text-white leading-tight">
+                    <span>SYNDICATED</span>
+                    <span>RESTOMOD</span>
+                </div>
             </NuxtLink>
 
             <div ref="desktopNavRef" class="hidden items-center space-x-4 xl:flex 2xl:space-x-6">

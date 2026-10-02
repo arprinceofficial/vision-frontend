@@ -19,7 +19,13 @@ defineProps<{
     </div> -->
 
     <div class="relative z-10 my-auto space-y-6 py-12">
-      <img src="/svg/logo-transparent.svg" alt="Syn Mod Build" class="h-16 w-auto object-contain">
+      <div class="flex items-center gap-3.5">
+        <img src="/logo-4-BrrnFFbn.jpeg" alt="Syn Mod Build" class="h-12 w-12 sm:h-14 sm:w-14 object-contain rounded-sm shadow-md">
+        <div class="flex flex-col gap-1.5 sm:gap-2 text-left font-poppins text-xs sm:text-sm font-medium tracking-[0.28em] uppercase text-white leading-tight">
+          <span>SYNDICATED</span>
+          <span>RESTOMOD</span>
+        </div>
+      </div>
       <div class="space-y-2">
         <span class="restomod-eyebrow">Member Access</span>
         <h1 class="font-poppins text-4xl font-black leading-[0.95] text-white sm:text-5xl">
