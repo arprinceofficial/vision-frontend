@@ -296,6 +296,7 @@ const normalizeSyndicate = (item: Record<string, any> | null | undefined): Syndi
 }
 
 const route = useRoute()
+const { citizen_user } = citizenAuth()
 
 const slug = computed(() => String(route.params.slug || ''))
 const {
@@ -413,12 +414,53 @@ const increaseAllocation = () => {
     allocationCount.value = 5
 }
 
+const triggerSecureAllocationWebhook = async () => {
+    try {
+        const user = citizen_user?.value?.data || citizen_user?.value || {}
+        const userInfo = user.user_info || user.UserInfo || {}
+        const firstName = userInfo.first_name || user.first_name || user.firstName || ''
+        const lastName = userInfo.last_name || user.last_name || user.lastName || ''
+        const fullName = [firstName, lastName].filter(Boolean).join(' ') || user.name || 'Visitor'
+        const email = user.email || ''
+        const phone = user.phone || user.mobile || ''
+
+        const payload = {
+            first_name: firstName,
+            last_name: lastName,
+            full_name: fullName,
+            email: email,
+            phone: phone,
+            syndicate_title: syndicate.value?.title || '',
+            item_title: syndicate.value?.title || '',
+            syndicate_slug: slug.value,
+            allocation_count: selectedAllocationCount.value,
+            shares_count: selectedAllocationCount.value,
+            allocation_cost: syndicate.value?.allocationCost || 0,
+            total_investment: totalInvestment.value,
+            location_id: 'PyZUPXw40Pe4lKnp8nfa',
+            source: 'Vision Frontend - Secure My Allocation Click',
+            tags: ['vision-allocation', 'secure-allocation-click', 'interest-expressed'],
+            clicked_at: new Date().toISOString()
+        }
+
+        await fetch('https://services.leadconnectorhq.com/hooks/PyZUPXw40Pe4lKnp8nfa/webhook-trigger/2c5a8d8a-2709-4cf9-a0c1-dc718214bf6e', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        }).catch(() => null)
+    } catch {
+        // silent fail
+    }
+}
+
 const openAllocationModal = () => {
     if (!isClientReady.value) {
         return
     }
 
     pendingAllocationCount.value = selectedAllocationCount.value
+
+    void triggerSecureAllocationWebhook()
 
     if (!activeJourney.value) {
         void navigateToAgreement(pendingAllocationCount.value)
