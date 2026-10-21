@@ -420,23 +420,51 @@ const triggerSecureAllocationWebhook = async () => {
         const userInfo = user.user_info || user.UserInfo || {}
         const firstName = userInfo.first_name || user.first_name || user.firstName || ''
         const lastName = userInfo.last_name || user.last_name || user.lastName || ''
-        const fullName = [firstName, lastName].filter(Boolean).join(' ') || user.name || 'Visitor'
+        const fullName = [firstName, lastName].filter(Boolean).join(' ') || user.name || 'Prospective Member'
         const email = user.email || ''
         const phone = user.phone || user.mobile || ''
+        const count = allocationCount.value === 5 ? 5 : 1
+        const costPerShare = Number(syndicate.value?.allocationCost) || 0
+        const totalAmount = count * costPerShare
 
         const payload = {
+            // Contact info
             first_name: firstName,
             last_name: lastName,
             full_name: fullName,
+            name: fullName,
             email: email,
             phone: phone,
+
+            // Number of Allocations (all standard GHL key variations)
+            number_of_allocations: count,
+            'Number of Allocations': count,
+            'Number Of Allocations': count,
+            allocation_count: count,
+            allocations_count: count,
+            allocation: count,
+            allocations: count,
+            shares_count: count,
+            shares: count,
+            number_of_shares: count,
+            quantity: count,
+            allocation_interest: `${count} Allocation${count > 1 ? 's' : ''}`,
+
+            // Syndicate details
             syndicate_title: syndicate.value?.title || '',
             item_title: syndicate.value?.title || '',
+            car_title: syndicate.value?.title || '',
             syndicate_slug: slug.value,
-            allocation_count: selectedAllocationCount.value,
-            shares_count: selectedAllocationCount.value,
-            allocation_cost: syndicate.value?.allocationCost || 0,
-            total_investment: totalInvestment.value,
+
+            // Financials
+            allocation_cost: costPerShare,
+            'Allocation Cost': costPerShare,
+            total_investment: totalInvestment.value || `GBP ${totalAmount}`,
+            'Total Investment': totalInvestment.value || `GBP ${totalAmount}`,
+            total_amount: totalAmount,
+            currency: 'GBP',
+
+            // GHL Meta
             location_id: 'PyZUPXw40Pe4lKnp8nfa',
             source: 'Vision Frontend - Secure My Allocation Click',
             tags: ['vision-allocation', 'secure-allocation-click', 'interest-expressed'],
