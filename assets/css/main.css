@@ -311,3 +311,63 @@ canvas {
   margin-left: 1.25rem;
   color: rgba(247, 198, 0, 0.55);
 }
+
+.rich-text-content {
+  line-height: 1.65;
+}
+
+.rich-text-content p {
+  margin-bottom: 0.75rem;
+}
+
+.rich-text-content p:last-child {
+  margin-bottom: 0;
+}
+
+.rich-text-content strong,
+.rich-text-content b {
+  font-weight: 700;
+  color: #fff;
+}
+
+.rich-text-content em,
+.rich-text-content i {
+  font-style: italic;
+}
+
+.rich-text-content u {
+  text-decoration: underline;
+}
+
+.rich-text-content ul {
+  list-style-type: disc;
+  margin-left: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.rich-text-content ol {
+  list-style-type: decimal;
+  margin-left: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.rich-text-content li {
+  margin-bottom: 0.25rem;
+}
+
+.rich-text-content a {
+  color: #f7c600;
+  text-decoration: underline;
+}
+
+.rich-text-content h1,
+.rich-text-content h2,
+.rich-text-content h3,
+.rich-text-content h4 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  color: #fff;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+

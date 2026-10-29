@@ -147,18 +147,7 @@ const normalizeGallery = (items: unknown, fallbackImage: string, fallbackAlt: st
     return gallery.length ? gallery : [{ src: fallbackImage, alt: fallbackAlt, class: 'md:col-span-2 md:h-[420px]' }]
 }
 
-const normalizeParagraphs = (items: unknown): string[] => (
-    Array.isArray(items)
-        ? items
-            .map((item: any) => {
-                if (typeof item === 'string') return item
-                const heading = getFirstValue(item?.heading)
-                const content = getFirstValue(item?.content, item?.text, item?.description)
-                return heading && content ? `${heading}: ${content}` : getFirstValue(content, heading)
-            })
-            .filter(Boolean)
-        : []
-)
+const normalizeParagraphs = (items: unknown): string[] => htmlToParagraphs(items)
 
 const getDefaultAnalysisTab = (label: string): AnalysisTab => ({
     label,
@@ -284,7 +273,7 @@ const normalizeSyndicate = (item: Record<string, any> | null | undefined): Syndi
         portfolioImage,
         heroAlt,
         summary: getFirstValue(item.summary),
-        description: normalizeParagraphs(item.description),
+        description: normalizeParagraphs(item.item_details || item.description_html || item.description),
         specs,
         gallery: normalizeGallery(item.gallery, heroImage, heroAlt),
         analysisTabs: normalizeAnalysisTabs(item.analysisTabs),
@@ -870,8 +859,8 @@ useHead(() => ({
                             <p class="mt-4 max-w-5xl text-[15px] font-semibold leading-relaxed text-white/85">
                                 {{ syndicate.summary }}
                             </p>
-                            <div class="mt-4 max-w-5xl space-y-3 text-[13px] leading-relaxed text-white/62 sm:text-sm">
-                                <p v-for="paragraph in syndicate.description" :key="paragraph">{{ paragraph }}</p>
+                            <div class="rich-text-content mt-4 max-w-5xl space-y-3 text-[13px] leading-relaxed text-white/62 sm:text-sm">
+                                <div v-for="(paragraph, pIdx) in syndicate.description" :key="pIdx" v-html="paragraph" />
                             </div>
 
                             <div
@@ -1118,9 +1107,8 @@ useHead(() => ({
                                 <p class="text-[10px] font-black uppercase tracking-[0.22em] text-tccGold">
                                     {{ currentAnalysisTab.eyebrow }}
                                 </p>
-                                <p class="mt-3 text-base font-bold leading-relaxed text-white/88">
-                                    {{ currentAnalysisTab.lead }}
-                                </p>
+                                <div class="rich-text-content mt-3 text-base font-bold leading-relaxed text-white/88"
+                                    v-html="currentAnalysisTab.lead" />
 
                                 <div class="mt-5 grid gap-3 sm:grid-cols-3">
                                     <div v-for="metric in currentAnalysisTab.metrics"
@@ -1136,12 +1124,11 @@ useHead(() => ({
                                 </div>
                             </div>
 
-                            <div class="mt-6 space-y-4 text-sm leading-relaxed text-white/64">
-                                <p v-for="(paragraph, index) in currentAnalysisTab.paragraphs"
-                                    :key="`${activeAnalysisTab}-${index}`">
-                                    {{ paragraph }}
-                                </p>
-                                <p class="font-bold text-white/88">{{ currentAnalysisTab.conclusion }}</p>
+                            <div class="rich-text-content mt-6 space-y-4 text-sm leading-relaxed text-white/64">
+                                <div v-for="(paragraph, index) in currentAnalysisTab.paragraphs"
+                                    :key="`${activeAnalysisTab}-${index}`"
+                                    v-html="paragraph" />
+                                <div class="font-bold text-white/88" v-html="currentAnalysisTab.conclusion" />
                             </div>
                         </div>
 

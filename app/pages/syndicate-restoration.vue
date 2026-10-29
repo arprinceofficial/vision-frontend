@@ -174,7 +174,7 @@ const normalizeHowItWorksStep = (step: CmsRestorationCard): HowItWorksStep | nul
 
 const normalizeAvailableSyndicate = (item: CmsAvailableSyndicate): AvailableSyndicate | null => {
     const title = getFirstValue(item.title)
-    const description = getFirstValue(item.description)
+    const description = stripHtmlToText(getFirstValue(item.description))
 
     if (!title || !description) return null
 

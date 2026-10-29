@@ -112,7 +112,7 @@ const normalizeLiveSyndicate = (item: CmsLiveSyndicate): LiveSyndicate | null =>
         alt: getFirstValue(item.alt) || title,
         collection: getFirstValue(item.collection),
         title,
-        description: getFirstValue(item.description),
+        description: stripHtmlToText(getFirstValue(item.description)),
         allocations: getFirstValue(item.allocations) || '0',
         cagr: getFirstValue(item.cagr) || 'TBC',
         progress: normalizeProgress(item.progress)

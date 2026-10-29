@@ -72,7 +72,7 @@ const normalizeUpcomingSyndicate = (item: CmsUpcomingSyndicate): UpcomingSyndica
         alt: getFirstValue(item.alt) || title,
         meta: getFirstValue(item.collection) || 'Syndicate',
         title,
-        description: getFirstValue(item.description)
+        description: stripHtmlToText(getFirstValue(item.description))
     }
 }
 
