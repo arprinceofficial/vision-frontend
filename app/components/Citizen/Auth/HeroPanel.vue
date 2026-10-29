@@ -8,7 +8,7 @@ defineProps<{
   <aside
     class="relative flex min-h-[520px] flex-col justify-between overflow-hidden bg-tccDeepBlack p-8 text-white sm:p-12 lg:col-span-5 lg:min-h-screen">
     <div class="absolute inset-0 bg-cover bg-center opacity-70"
-      style="background-image: url('/generated/restoration-workshop.png');" />
+      style="background-image: url('/frontend/assets/images/login_image.png');" />
     <div class="absolute inset-0 bg-gradient-to-b from-tccDeepBlack/80 via-tccDeepBlack/60 to-tccDeepBlack" />
 
     <!-- <div class="relative z-10">
@@ -19,18 +19,27 @@ defineProps<{
     </div> -->
 
     <div class="relative z-10 my-auto space-y-6 py-12">
-      <img src="/TCC-Logo.jpeg" alt="Vision148" class="h-10 w-auto">
+      <div class="flex items-center gap-3.5">
+        <img src="/logo-4-BrrnFFbn.jpeg" alt="Syn Mod Build" class="h-12 w-12 sm:h-14 sm:w-14 object-contain rounded-sm shadow-md">
+        <div class="flex flex-col gap-1.5 sm:gap-2 text-left font-poppins text-xs sm:text-sm font-medium tracking-[0.28em] uppercase text-white leading-tight">
+          <span>SYNDICATED</span>
+          <span>RESTOMOD</span>
+        </div>
+      </div>
       <div class="space-y-2">
         <span class="restomod-eyebrow">Member Access</span>
         <h1 class="font-poppins text-4xl font-black leading-[0.95] text-white sm:text-5xl">
-          Built In The <span class="text-tccGold">Open</span>
+          Built to be <span class="text-tccGold">Experienced</span>
         </h1>
         <p class="max-w-sm text-sm font-light leading-relaxed text-white/70">{{ description }}</p>
       </div>
     </div>
 
-    <p class="relative z-10 text-[10px] font-light uppercase tracking-[0.18em] text-white/40">
-      &copy; 2026 Vision148. Security-focused investment platform.
-    </p>
+    <div class="relative z-10 flex items-center gap-4">
+      <img src="/logo-4-BrrnFFbn.jpeg" alt="Syn Mod Build" class="h-10 w-auto object-contain">      
+      <p class="text-[10px] font-light uppercase tracking-[0.18em] text-white/40">
+        &copy; 2026 Syndincated Restomod. Security-focused investment platform.
+      </p>
+    </div>
   </aside>
 </template>

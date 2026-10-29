@@ -1,10 +1,10 @@
 <script setup lang="ts">
 useHead({
-    title: 'Syndicated Restoration | Vision148',
+    title: 'Syndicated Restomod | Vision148',
     meta: [
         {
             name: 'description',
-            content: 'Share the investment, the experience, and the enjoyment of syndicated classic car restoration.'
+            content: 'Share the experience, the ownership and enjoyment'
         }
     ]
 })
@@ -25,6 +25,7 @@ type CmsAvailableSyndicate = {
     description?: string | null
     image?: string | null
     alt?: string | null
+    link?: string | null
 }
 
 type CmsAvailableSyndicatesResponse = {
@@ -48,6 +49,7 @@ type AvailableSyndicate = {
     description: string
     image: string
     alt: string
+    link: string
 }
 
 type CardSkeleton = {
@@ -59,7 +61,7 @@ type StepSkeleton = {
     width: string
 }
 
-const fallbackRestorationImage = '/svg/not-found-img.svg'
+const fallbackRestorationImage = '/generated/restoration-workshop.png'
 const benefitCardSkeletons: CardSkeleton[] = [
     { titleWidth: 'w-40', bodyWidths: ['w-full', 'w-11/12', 'w-5/6', 'w-2/3'] },
     { titleWidth: 'w-52', bodyWidths: ['w-full', 'w-10/12', 'w-4/5', 'w-3/5'] },
@@ -172,7 +174,7 @@ const normalizeHowItWorksStep = (step: CmsRestorationCard): HowItWorksStep | nul
 
 const normalizeAvailableSyndicate = (item: CmsAvailableSyndicate): AvailableSyndicate | null => {
     const title = getFirstValue(item.title)
-    const description = getFirstValue(item.description)
+    const description = stripHtmlToText(getFirstValue(item.description))
 
     if (!title || !description) return null
 
@@ -181,6 +183,7 @@ const normalizeAvailableSyndicate = (item: CmsAvailableSyndicate): AvailableSynd
         description,
         image: getFirstValue(item.image) || fallbackRestorationImage,
         alt: getFirstValue(item.alt) || title,
+        link: getFirstValue(item.link),
     }
 }
 
@@ -231,16 +234,16 @@ const shouldShowAvailableSyndicatesSkeleton = computed(() => (
 <template>
     <div class="bg-tccDeepBlack font-poppins text-white">
         <section class="relative flex min-h-[680px] items-end overflow-hidden bg-[#101515] pb-24 pt-24 text-white">
-            <img src="/generated/restoration-workshop.png" alt="Classic car restoration in progress"
-                class="absolute inset-0 h-full w-full object-cover">
+            <video src="/frontend/assets/images/rs500_reimagined_morphing.mp4" autoplay loop muted playsinline
+                class="absolute inset-0 h-full w-full object-cover"></video>
             <div class="absolute inset-0 bg-black/55" />
             <div class="absolute inset-0 bg-gradient-to-r from-black/45 via-black/15 to-black/35" />
 
             <div class="relative mx-auto flex w-full max-w-7xl flex-col gap-12 px-5 sm:px-8 lg:px-12">
                 <div class="max-w-4xl">
-                    <h1 class="text-[42px] font-bold leading-tight sm:text-[56px]">Syndicated Restoration</h1>
-                    <p class="mt-3 text-lg font-semibold leading-relaxed text-white">Share the investment, the
-                        experience, and the enjoyment.</p>
+                    <h1 class="text-[42px] font-bold leading-tight sm:text-[56px]">SYNDICATED RESTOMOD</h1>
+                    <p class="mt-3 text-lg font-semibold leading-relaxed text-white">Share the experience, the ownership
+                        and enjoyment.</p>
                     <NuxtLink to="#how-it-works"
                         class="mt-10 inline-flex items-center gap-2 rounded-full bg-tccGold px-7 py-4 text-[15px] font-bold text-tccDarkNavy transition-colors hover:bg-tccLightGold">
                         Find Out More
@@ -251,14 +254,9 @@ const shouldShowAvailableSyndicatesSkeleton = computed(() => (
                 </div>
 
                 <div class="flex items-center justify-end gap-8">
-                    <div class="flex items-center gap-3 text-white">
-                        <span class="text-sm font-semibold uppercase tracking-[0.35em] opacity-85">GP</span>
-                        <span
-                            class="grid h-14 w-24 place-items-center rounded-full border-2 border-white/80 text-2xl font-bold leading-none">
-                            59
-                        </span>
-                    </div>
-                    <img src="/frontend/assets/images/TCClogowhite.png" alt="Vision148" class="h-auto w-32">
+                    <span
+                        class="text-xs font-semibold uppercase tracking-widest text-white/90 text-right max-w-[200px]">Syndicated
+                        Restomod &amp; TheCarCrowd</span>
                 </div>
             </div>
         </section>
@@ -267,20 +265,22 @@ const shouldShowAvailableSyndicatesSkeleton = computed(() => (
             <div class="mx-auto grid max-w-7xl grid-cols-1 lg:grid-cols-[1.08fr_1fr]">
                 <div class="border-white/10 px-6 py-14 sm:px-10 lg:border-r lg:px-14">
                     <p class="max-w-[620px] text-[36px] font-semibold leading-[1.18] sm:text-[46px]">
-                        Restoration of a classic car can be expensive and often inaccessible, and once restored used for
-                        just a few weeks each year.
+                        Unique access to specialist One-of-One car builds built to the highest standards by world class
+                        partners to be driven and enjoyed by members of an exclusive Syndicate.
                     </p>
                 </div>
                 <div class="grid">
                     <div class="border-b border-white/10 px-6 py-12 sm:px-10 lg:px-14">
                         <p class="text-[30px] font-normal leading-tight sm:text-[40px]">
-                            Now there is a <span class="text-tccGold">Better Way.</span>
+                            VISION • DESIGN • ENABLE
+                            <!--Now there is a <span class="text-tccGold">Better Way.</span> -->
                         </p>
                     </div>
                     <div class="px-6 py-10 sm:px-10 lg:px-14">
                         <p class="text-[30px] font-normal leading-snug sm:text-[40px]">
-                            Introducing <span class="text-tccGold">Syndicated<br class="hidden sm:block">
-                                Restorations.</span>
+                            RESTOMODS
+                            <!-- Introducing <span class="text-tccGold">Syndicated<br class="hidden sm:block">
+                                Restorations.</span> -->
                         </p>
                     </div>
                 </div>
@@ -330,7 +330,9 @@ const shouldShowAvailableSyndicatesSkeleton = computed(() => (
                 class="mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 px-6 sm:px-10 lg:grid-cols-[0.82fr_1.18fr] lg:px-14">
                 <div>
                     <p class="max-w-[455px] text-[38px] font-semibold leading-[1.42] text-white sm:text-[46px]">
-                        It's classic car ownership - smarter, more social, and more sustainable.
+                        Unique One-of-One specialist builds created as total ahead turners to be driven and experienced
+                        through
+                        a Syndicated Membership.
                     </p>
                 </div>
                 <div>
@@ -394,11 +396,13 @@ const shouldShowAvailableSyndicatesSkeleton = computed(() => (
                     Available syndicates are unavailable right now.
                 </div>
                 <div v-else class="mt-12 grid grid-cols-1 gap-12 md:grid-cols-3 md:gap-16">
-                    <article v-for="item in availableSyndicates" :key="item.title">
-                        <img :src="item.image" :alt="item.alt" class="aspect-[1.5/1] w-full rounded-md object-cover">
-                        <h3 class="mt-5 text-[20px] font-semibold leading-tight text-white">{{ item.title }}</h3>
+                    <component :is="item.link ? 'NuxtLink' : 'article'" :to="item.link ? item.link : undefined" v-for="item in availableSyndicates" :key="item.title" class="block group">
+                        <div class="overflow-hidden rounded-md">
+                            <img :src="item.image" :alt="item.alt" class="aspect-[1.5/1] w-full object-cover transition-transform duration-500 group-hover:scale-105">
+                        </div>
+                        <h3 class="mt-5 text-[20px] font-semibold leading-tight text-white transition-colors group-hover:text-tccGold">{{ item.title }}</h3>
                         <p class="mt-1 min-h-8 text-[11px] leading-relaxed text-white/55">{{ item.description }}</p>
-                    </article>
+                    </component>
                 </div>
             </div>
         </section>

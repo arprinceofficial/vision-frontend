@@ -29,6 +29,7 @@ const getInitialFormData = () => ({
     image: '',
     alt: '',
     body: '',
+    is_highlighted: false,
     status: false,
 });
 
@@ -44,6 +45,7 @@ watch(() => props.item, (value) => {
             image: getImagePath(value.image),
             alt: value.alt || '',
             body: value.body || '',
+            is_highlighted: isTruthy(value.is_highlighted),
             status: isTruthy(value.status),
         };
     } else {
@@ -83,6 +85,7 @@ const serializeSubmitData = () => ({
     image: formData.value.image,
     alt: formData.value.alt,
     body: formData.value.body,
+    is_highlighted: formData.value.is_highlighted ? 1 : 0,
     status: formData.value.status ? 1 : 0,
 });
 
@@ -199,6 +202,14 @@ const createHandler = async () => {
                     :class="validations_errors.body ? 'border-[#f44336!important]' : ''" autocomplete="off"
                     @focus="validations_errors.body = ''" />
                 <LazyInputError class="text-sm mt-1" :message="validations_errors.body" />
+            </div>
+
+            <div class="flex items-center gap-4">
+                <label class="font-semibold">Highlighted</label>
+                <div class="flex-auto">
+                    <ToggleSwitch v-model="formData.is_highlighted" />
+                    <small class="block text-xs text-gray-500">Feature in 1st large panel</small>
+                </div>
             </div>
 
             <div class="flex items-center gap-4">

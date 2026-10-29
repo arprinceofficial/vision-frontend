@@ -180,10 +180,11 @@ const onChangeHandler = () => {
                             <table class="table table-auto">
                                 <thead class="sticky z-10 top-0">
                                     <tr>
-                                        <th width="14%"><span>Image</span></th>
-                                        <th width="20%"><span>Title</span></th>
-                                        <th width="18%"><span>Alt</span></th>
-                                        <th width="32%"><span>Body</span></th>
+                                        <th width="12%"><span>Image</span></th>
+                                        <th width="18%"><span>Title</span></th>
+                                        <th width="16%"><span>Alt</span></th>
+                                        <th width="28%"><span>Body</span></th>
+                                        <th width="10%"><span>Highlight</span></th>
                                         <th width="6%"><span>Status</span></th>
                                         <th width="10%" v-if="(permissions.edit || permissions.delete) || isLoading">
                                             <span>Action</span>
@@ -196,6 +197,9 @@ const onChangeHandler = () => {
                                         <td><Skeleton width="8rem" class="mb-2"></Skeleton></td>
                                         <td><Skeleton width="7rem" class="mb-2"></Skeleton></td>
                                         <td><Skeleton width="16rem" class="mb-2"></Skeleton></td>
+                                        <td>
+                                            <div class="flex justify-center"><Skeleton size="1.5rem"></Skeleton></div>
+                                        </td>
                                         <td>
                                             <div class="flex justify-center"><Skeleton size="1.5rem"></Skeleton></div>
                                         </td>
@@ -217,6 +221,17 @@ const onChangeHandler = () => {
                                         <td class="text-gray-800 dark:text-gray-200">{{ item.alt }}</td>
                                         <td class="text-gray-800 dark:text-gray-200">
                                             <span :title="item.body">{{ truncateText(item.body) }}</span>
+                                        </td>
+                                        <td>
+                                            <div class="flex justify-center items-center">
+                                                <span v-if="isActiveStatus(item.is_highlighted)"
+                                                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
+                                                    <i class="fa fa-star text-amber-500 text-[10px]"></i> 1st Panel
+                                                </span>
+                                                <span v-else class="text-gray-400 text-xs">
+                                                    Side Panel
+                                                </span>
+                                            </div>
                                         </td>
                                         <td>
                                             <div class="flex justify-center items-center">

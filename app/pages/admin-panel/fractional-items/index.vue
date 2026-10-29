@@ -7,6 +7,7 @@ const STATUS_UPCOMING = 1;
 const STATUS_LIVE = 2;
 const STATUS_SOLD = 3;
 const STATUS_INACTIVE = 4;
+const STATUS_COMING_SOON = 5;
 
 const { $optionsList } = useNuxtApp();
 
@@ -277,6 +278,7 @@ const formatNumber = (value) => {
                                                         'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300': row.status === STATUS_UPCOMING,
                                                         'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300': row.status === STATUS_LIVE,
                                                         'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300': row.status === STATUS_SOLD,
+                                                        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300': row.status === STATUS_COMING_SOON,
                                                         'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300': row.status === STATUS_INACTIVE
                                                     }">
                                                     {{ row.live_status || 'Unknown' }}

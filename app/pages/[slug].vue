@@ -97,7 +97,7 @@ const pageMap: Record<string, PageConfig> = {
         type: 'status',
         icon: 'pi-star',
         tone: 'success',
-        primary: { label: 'Open Syndicated Restoration', to: '/syndicate-restoration' }
+        primary: { label: 'Open Syndicated Restomod', to: '/syndicate-restoration' }
     },
     'kyc-success': {
         title: 'Identity Verified',
@@ -134,7 +134,7 @@ const pageMap: Record<string, PageConfig> = {
         description: 'Understand the trust structure, voting rights, storage, insurance, and exit mechanics before allocating capital.',
         type: 'documents',
         primary: { label: 'Start Classification', to: '/investor-classification' },
-        secondary: { label: 'View Syndicated Restoration', to: '/syndicate-restoration' }
+        secondary: { label: 'View Syndicated Restomod', to: '/syndicate-restoration' }
     },
     showroom: {
         title: 'Investment Showroom',
@@ -229,7 +229,7 @@ const pageMap: Record<string, PageConfig> = {
         icon: 'pi-check',
         tone: 'success',
         primary: { label: 'Go to Dashboard', to: '/profile' },
-        secondary: { label: 'View Syndicated Restoration', to: '/syndicate-restoration' }
+        secondary: { label: 'View Syndicated Restomod', to: '/syndicate-restoration' }
     },
     'documents-review': {
         title: 'Documents Review',

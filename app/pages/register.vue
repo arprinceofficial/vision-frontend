@@ -24,7 +24,7 @@ const registration = reactive({
     email: '',
     firstName: '',
     lastName: '',
-    phoneCode: '+880',
+    phoneCode: '+44',
     phone: '',
     password: '',
     confirmPassword: '',
@@ -433,8 +433,8 @@ const resendOtp = async () => {
                                     <div class="flex gap-2">
                                         <select v-model="registration.phoneCode"
                                             class="rounded-lg border border-tccBorder bg-white px-3 py-2.5 text-sm focus:outline-none">
-                                            <option value="+880">BD (+880)</option>
                                             <option value="+44">GB (+44)</option>
+                                            <option value="+880">BD (+880)</option>
                                             <option value="+1">US (+1)</option>
                                             <option value="+31">NL (+31)</option>
                                             <option value="+49">DE (+49)</option>

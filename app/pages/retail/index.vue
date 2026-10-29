@@ -85,8 +85,9 @@ type RetailProcessStep = {
     text: string
 }
 
-const fallbackCarImage = '/svg/not-found-img.svg'
+const fallbackCarImage = '/generated/retail/ford-sierra-card.png'
 const processSteps: RetailProcessStep[] = [
+
     {
         number: '01',
         title: 'Vision and strategy',
@@ -281,7 +282,7 @@ const shouldShowExpertiseCardsSkeleton = computed(() => (
     <div class="bg-tccDeepBlack text-white">
         <section class="relative min-h-[620px] overflow-hidden bg-tccDeepBlack text-white">
             <div class="absolute inset-0">
-                <img src="/svg/not-found-img.svg" alt="Collector car on circuit"
+                <img src="/generated/ferrari-studio.png" alt="Collector car on circuit"
                     class="h-full w-full object-cover opacity-70">
                 <div
                     class="absolute inset-0 bg-gradient-to-b from-tccDeepBlack/45 via-tccDeepBlack/55 to-tccDeepBlack" />

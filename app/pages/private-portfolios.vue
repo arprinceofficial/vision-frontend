@@ -34,7 +34,7 @@ type PortfolioCardSkeleton = {
     bodyWidths: string[]
 }
 
-const fallbackPortfolioImage = '/svg/not-found-img.svg'
+const fallbackPortfolioImage = '/generated/porsche-studio.png'
 const investmentCardSkeletons: PortfolioCardSkeleton[] = [
     { titleWidth: 'w-4/5', bodyWidths: ['w-full', 'w-11/12', 'w-5/6', 'w-3/4'] },
     { titleWidth: 'w-3/5', bodyWidths: ['w-full', 'w-10/12', 'w-4/5', 'w-2/3'] },
@@ -324,7 +324,7 @@ const shouldShowPortfolioServicesSkeleton = computed(() => (
                     </div>
                 </div>
                 <div class="min-h-[520px]">
-                    <img src="/generated/partner image.png"
+                    <img src="/generated/partner_image.png"
                         alt="Collector cars stored with a specialist automotive partner"
                         class="h-full w-full object-cover">
                 </div>

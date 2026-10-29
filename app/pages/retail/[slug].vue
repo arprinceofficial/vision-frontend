@@ -112,7 +112,7 @@ type RetailCarCard = {
     excerpt: string
 }
 
-const fallbackCarImage = '/svg/not-found-img.svg'
+const fallbackCarImage = '/generated/retail/ford-sierra-card.png'
 const detailSkeletonStats = ['w-24', 'w-28', 'w-32', 'w-24']
 const detailSkeletonSections = ['w-48', 'w-64', 'w-40']
 const detailSkeletonSpecs = ['w-16', 'w-28', 'w-20', 'w-24', 'w-16', 'w-28', 'w-32', 'w-20', 'w-20', 'w-28']
@@ -177,7 +177,7 @@ const normalizeSections = (car: CmsRetailCar, excerpt: string): RetailContentSec
         ? car.sections
             .map((section) => {
                 const heading = getFirstValue(section.heading)
-                const paragraphs = normalizeStringArray(section.paragraphs)
+                const paragraphs = htmlToParagraphs(section.paragraphs)
                 const bullets = normalizeStringArray(section.bullets)
 
                 if (!heading || (!paragraphs.length && !bullets.length)) return null
@@ -204,7 +204,7 @@ const normalizeRetailCar = (car: CmsRetailCar | null | undefined): RetailCar | n
 
     const cardImage = getFirstValue(car.cardImage, car.card_image, car.heroImage, car.hero_image) || fallbackCarImage
     const heroImage = getFirstValue(car.heroImage, car.hero_image, cardImage) || fallbackCarImage
-    const excerpt = getFirstValue(car.excerpt, car.description) || 'Contact Vision148 for the full ownership file and inspection details.'
+    const excerpt = stripHtmlToText(getFirstValue(car.excerpt, car.description)) || 'Contact Vision148 for the full ownership file and inspection details.'
     const exteriorGallery = normalizeStringArray(car.gallery?.exterior)
     const interiorGallery = normalizeStringArray(car.gallery?.interior)
 
@@ -212,7 +212,7 @@ const normalizeRetailCar = (car: CmsRetailCar | null | undefined): RetailCar | n
         slug: slugValue,
         status: getFirstValue(car.status) || 'Open to enquiries',
         title,
-        subtitle: getFirstValue(car.subtitle, car.description, car.excerpt) || 'Contact Vision148 for the full ownership file and inspection details.',
+        subtitle: stripHtmlToText(getFirstValue(car.subtitle, car.description, car.excerpt)) || 'Contact Vision148 for the full ownership file and inspection details.',
         price: getFirstValue(car.price) || 'Price on application',
         year: getFirstValue(car.year),
         make: getFirstValue(car.make),
@@ -588,8 +588,8 @@ useHead(() => ({
                             <section v-for="section in car.sections" :key="section.heading">
                                 <h2 class="font-poppins text-2xl font-black text-white">{{ section.heading }}</h2>
                                 <div v-if="section.paragraphs"
-                                    class="mt-4 space-y-4 text-base leading-relaxed text-white/70">
-                                    <p v-for="paragraph in section.paragraphs" :key="paragraph">{{ paragraph }}</p>
+                                    class="rich-text-content mt-4 space-y-4 text-base leading-relaxed text-white/70">
+                                    <div v-for="(paragraph, pIndex) in section.paragraphs" :key="pIndex" v-html="paragraph" />
                                 </div>
                                 <ul v-if="section.bullets"
                                     class="mt-4 space-y-2 text-sm leading-relaxed text-white/70 sm:text-base">

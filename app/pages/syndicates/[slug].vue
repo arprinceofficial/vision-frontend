@@ -69,6 +69,8 @@ type SyndicateDetail = {
     title: string
     shortTitle: string
     heroImage: string
+    portfolio_image: string
+    portfolioImage: string
     heroAlt: string
     summary: string
     description: string[]
@@ -78,6 +80,7 @@ type SyndicateDetail = {
     technicalData: TechnicalDatum[]
     news: NewsCard[]
     activeJourney: ActiveJourney | null
+    analysisSummaryPdf: string | null
 }
 
 type CmsSyndicateResponse = {
@@ -85,7 +88,7 @@ type CmsSyndicateResponse = {
     data?: Record<string, any> | null
 }
 
-const fallbackSyndicateImage = '/svg/not-found-img.svg'
+const fallbackSyndicateImage = '/generated/hero-aston-studio.png'
 const heroSkeletonLines = ['w-full max-w-4xl', 'w-4/5 max-w-3xl']
 const summarySkeletonLines = ['w-full', 'w-11/12', 'w-4/5']
 const specSkeletons = ['w-20', 'w-28', 'w-16', 'w-24', 'w-20']
@@ -144,18 +147,7 @@ const normalizeGallery = (items: unknown, fallbackImage: string, fallbackAlt: st
     return gallery.length ? gallery : [{ src: fallbackImage, alt: fallbackAlt, class: 'md:col-span-2 md:h-[420px]' }]
 }
 
-const normalizeParagraphs = (items: unknown): string[] => (
-    Array.isArray(items)
-        ? items
-            .map((item: any) => {
-                if (typeof item === 'string') return item
-                const heading = getFirstValue(item?.heading)
-                const content = getFirstValue(item?.content, item?.text, item?.description)
-                return heading && content ? `${heading}: ${content}` : getFirstValue(content, heading)
-            })
-            .filter(Boolean)
-        : []
-)
+const normalizeParagraphs = (items: unknown): string[] => htmlToParagraphs(items)
 
 const getDefaultAnalysisTab = (label: string): AnalysisTab => ({
     label,
@@ -259,6 +251,7 @@ const normalizeSyndicate = (item: Record<string, any> | null | undefined): Syndi
 
     const shortTitle = getFirstValue(item.shortTitle, title)
     const heroImage = getFirstValue(item.heroImage) || fallbackSyndicateImage
+    const portfolioImage = getFirstValue(item.portfolio_image, item.portfolioImage) || fallbackSyndicateImage
     const heroAlt = getFirstValue(item.heroAlt) || `${title} syndicate hero`
     const specs = normalizeStats(item.specs)
 
@@ -276,19 +269,23 @@ const normalizeSyndicate = (item: Record<string, any> | null | undefined): Syndi
         title,
         shortTitle,
         heroImage,
+        portfolio_image: portfolioImage,
+        portfolioImage,
         heroAlt,
         summary: getFirstValue(item.summary),
-        description: normalizeParagraphs(item.description),
+        description: normalizeParagraphs(item.item_details || item.description_html || item.description),
         specs,
         gallery: normalizeGallery(item.gallery, heroImage, heroAlt),
         analysisTabs: normalizeAnalysisTabs(item.analysisTabs),
         technicalData: normalizeTechnicalData(item.technicalData, specs),
         news: normalizeNews(item.news),
-        activeJourney: normalizeActiveJourney(item.activeJourney)
+        activeJourney: normalizeActiveJourney(item.activeJourney),
+        analysisSummaryPdf: getFirstValue(item.analysisSummaryPdf) || null
     }
 }
 
 const route = useRoute()
+const { citizen_user } = citizenAuth()
 
 const slug = computed(() => String(route.params.slug || ''))
 const {
@@ -359,10 +356,10 @@ const totalInvestment = computed(() => {
 
 const activeJourney = computed(() => syndicate.value?.activeJourney || null)
 const selectedAllocationCount = computed(() => (
-    Math.max(1, Math.round(normalizeNumber(allocationCount.value, 1)))
+    allocationCount.value === 5 ? 5 : 1
 ))
 
-const modalAllocationSlots = computed(() => activeJourney.value?.slot || allocationCount.value)
+const modalAllocationSlots = computed(() => activeJourney.value?.slot || selectedAllocationCount.value)
 
 const modalAllocationCost = computed(() => {
     if (!syndicate.value) return 0
@@ -391,7 +388,7 @@ const setActiveAnalysisTab = (key: string | number) => {
 }
 
 const decreaseAllocation = () => {
-    allocationCount.value = Math.max(1, allocationCount.value - 1)
+    allocationCount.value = 1
 }
 
 const increaseAllocation = () => {
@@ -399,11 +396,78 @@ const increaseAllocation = () => {
         return
     }
 
-    if (syndicate.value.allocationsRemaining <= 0) {
+    if (syndicate.value.allocationsRemaining < 5) {
         return
     }
 
-    allocationCount.value = Math.min(syndicate.value.allocationsRemaining, allocationCount.value + 1)
+    allocationCount.value = 5
+}
+
+const triggerSecureAllocationWebhook = async () => {
+    try {
+        const user = citizen_user?.value?.data || citizen_user?.value || {}
+        const userInfo = user.user_info || user.UserInfo || {}
+        const firstName = userInfo.first_name || user.first_name || user.firstName || ''
+        const lastName = userInfo.last_name || user.last_name || user.lastName || ''
+        const fullName = [firstName, lastName].filter(Boolean).join(' ') || user.name || 'Prospective Member'
+        const email = user.email || ''
+        const phone = user.phone || user.mobile || ''
+        const count = allocationCount.value === 5 ? 5 : 1
+        const costPerShare = Number(syndicate.value?.allocationCost) || 0
+        const totalAmount = count * costPerShare
+
+        const payload = {
+            // Contact info
+            first_name: firstName,
+            last_name: lastName,
+            full_name: fullName,
+            name: fullName,
+            email: email,
+            phone: phone,
+
+            // Number of Allocations (all standard GHL key variations)
+            number_of_allocations: count,
+            'Number of Allocations': count,
+            'Number Of Allocations': count,
+            allocation_count: count,
+            allocations_count: count,
+            allocation: count,
+            allocations: count,
+            shares_count: count,
+            shares: count,
+            number_of_shares: count,
+            quantity: count,
+            allocation_interest: `${count} Allocation${count > 1 ? 's' : ''}`,
+
+            // Syndicate details
+            syndicate_title: syndicate.value?.title || '',
+            item_title: syndicate.value?.title || '',
+            car_title: syndicate.value?.title || '',
+            syndicate_slug: slug.value,
+
+            // Financials
+            allocation_cost: costPerShare,
+            'Allocation Cost': costPerShare,
+            total_investment: totalInvestment.value || `GBP ${totalAmount}`,
+            'Total Investment': totalInvestment.value || `GBP ${totalAmount}`,
+            total_amount: totalAmount,
+            currency: 'GBP',
+
+            // GHL Meta
+            location_id: 'PyZUPXw40Pe4lKnp8nfa',
+            source: 'Vision Frontend - Secure My Allocation Click',
+            tags: ['vision-allocation', 'secure-allocation-click', 'interest-expressed'],
+            clicked_at: new Date().toISOString()
+        }
+
+        await fetch('https://services.leadconnectorhq.com/hooks/PyZUPXw40Pe4lKnp8nfa/webhook-trigger/2c5a8d8a-2709-4cf9-a0c1-dc718214bf6e', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        }).catch(() => null)
+    } catch {
+        // silent fail
+    }
 }
 
 const openAllocationModal = () => {
@@ -412,6 +476,8 @@ const openAllocationModal = () => {
     }
 
     pendingAllocationCount.value = selectedAllocationCount.value
+
+    void triggerSecureAllocationWebhook()
 
     if (!activeJourney.value) {
         void navigateToAgreement(pendingAllocationCount.value)
@@ -431,11 +497,17 @@ const getAgreementPath = (shares: number, requestSlug = '') => {
     }
 
     const agreementUid = syndicate.value.uid || syndicate.value.allocationId
-    const shareCount = Math.max(1, Math.round(normalizeNumber(shares, 1)))
+    const shareCount = Number(shares) === 5 ? 5 : 1
     const basePath = `/agreement/${encodeURIComponent(agreementUid)}/a-${shareCount}`
 
     return requestSlug ? `${basePath}/s-${encodeURIComponent(requestSlug)}` : basePath
 }
+
+watch(() => syndicate.value?.allocationsRemaining, (remaining) => {
+    if (typeof remaining === 'number' && remaining < 5 && allocationCount.value === 5) {
+        allocationCount.value = 1
+    }
+})
 
 const rememberAgreementAsset = () => {
     if (!process.client || !syndicate.value) return
@@ -735,7 +807,7 @@ useHead(() => ({
             <section
                 class="relative min-h-[420px] overflow-hidden border-b border-white/10 bg-tccDeepBlack text-white sm:min-h-[500px] lg:min-h-[560px]">
                 <div class="absolute inset-0">
-                    <img :src="syndicate.heroImage" :alt="syndicate.heroAlt"
+                    <img :src="syndicate.portfolio_image || syndicate.heroImage" :alt="syndicate.heroAlt"
                         class="h-full w-full object-cover opacity-70">
                     <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-black/35 to-tccDeepBlack" />
                     <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/30 to-black/55" />
@@ -787,8 +859,8 @@ useHead(() => ({
                             <p class="mt-4 max-w-5xl text-[15px] font-semibold leading-relaxed text-white/85">
                                 {{ syndicate.summary }}
                             </p>
-                            <div class="mt-4 max-w-5xl space-y-3 text-[13px] leading-relaxed text-white/62 sm:text-sm">
-                                <p v-for="paragraph in syndicate.description" :key="paragraph">{{ paragraph }}</p>
+                            <div class="rich-text-content mt-4 max-w-5xl space-y-3 text-[13px] leading-relaxed text-white/62 sm:text-sm">
+                                <div v-for="(paragraph, pIdx) in syndicate.description" :key="pIdx" v-html="paragraph" />
                             </div>
 
                             <div
@@ -902,7 +974,8 @@ useHead(() => ({
                                     <div
                                         class="mt-3 grid grid-cols-[44px_1fr_44px] overflow-hidden rounded-md border border-white/16 bg-white/[0.04]">
                                         <button type="button"
-                                            class="grid h-12 place-items-center text-white/70 transition-colors hover:bg-white/10 hover:text-tccGold"
+                                            class="grid h-12 place-items-center text-white/70 transition-colors hover:bg-white/10 hover:text-tccGold disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-white/70"
+                                            :disabled="allocationCount <= 1"
                                             aria-label="Decrease allocations" @click="decreaseAllocation">
                                             <i class="pi pi-minus text-xs" aria-hidden="true" />
                                         </button>
@@ -911,7 +984,8 @@ useHead(() => ({
                                             {{ allocationCount }}
                                         </div>
                                         <button type="button"
-                                            class="grid h-12 place-items-center text-white/70 transition-colors hover:bg-white/10 hover:text-tccGold"
+                                            class="grid h-12 place-items-center text-white/70 transition-colors hover:bg-white/10 hover:text-tccGold disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-white/70"
+                                            :disabled="allocationCount >= 5 || (syndicate && syndicate.allocationsRemaining < 5)"
                                             aria-label="Increase allocations" @click="increaseAllocation">
                                             <i class="pi pi-plus text-xs" aria-hidden="true" />
                                         </button>
@@ -1033,9 +1107,8 @@ useHead(() => ({
                                 <p class="text-[10px] font-black uppercase tracking-[0.22em] text-tccGold">
                                     {{ currentAnalysisTab.eyebrow }}
                                 </p>
-                                <p class="mt-3 text-base font-bold leading-relaxed text-white/88">
-                                    {{ currentAnalysisTab.lead }}
-                                </p>
+                                <div class="rich-text-content mt-3 text-base font-bold leading-relaxed text-white/88"
+                                    v-html="currentAnalysisTab.lead" />
 
                                 <div class="mt-5 grid gap-3 sm:grid-cols-3">
                                     <div v-for="metric in currentAnalysisTab.metrics"
@@ -1051,20 +1124,21 @@ useHead(() => ({
                                 </div>
                             </div>
 
-                            <div class="mt-6 space-y-4 text-sm leading-relaxed text-white/64">
-                                <p v-for="(paragraph, index) in currentAnalysisTab.paragraphs"
-                                    :key="`${activeAnalysisTab}-${index}`">
-                                    {{ paragraph }}
-                                </p>
-                                <p class="font-bold text-white/88">{{ currentAnalysisTab.conclusion }}</p>
+                            <div class="rich-text-content mt-6 space-y-4 text-sm leading-relaxed text-white/64">
+                                <div v-for="(paragraph, index) in currentAnalysisTab.paragraphs"
+                                    :key="`${activeAnalysisTab}-${index}`"
+                                    v-html="paragraph" />
+                                <div class="font-bold text-white/88" v-html="currentAnalysisTab.conclusion" />
                             </div>
                         </div>
 
-                        <button type="button"
+                        <a v-if="syndicate.analysisSummaryPdf"
+                            :href="syndicate.analysisSummaryPdf.startsWith('http') ? syndicate.analysisSummaryPdf : `${useRuntimeConfig().public.apiBaseUrl}/storage/${syndicate.analysisSummaryPdf}`"
+                            target="_blank"
                             class="mt-8 inline-flex items-center gap-2 rounded-full border border-tccGold/40 bg-tccGold/10 px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-tccGold transition-colors hover:bg-tccGold hover:text-tccDarkNavy">
                             <i class="pi pi-download text-xs" aria-hidden="true" />
                             Download Summary
-                        </button>
+                        </a>
                     </div>
 
                     <aside class="min-w-0">

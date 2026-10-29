@@ -36,7 +36,7 @@ type LiveSyndicateSkeleton = {
     progressWidth: string
 }
 
-const fallbackLiveSyndicateImage = '/svg/not-found-img.svg'
+const fallbackLiveSyndicateImage = '/generated/hero-aston-studio.png'
 const liveSyndicateSkeletons: LiveSyndicateSkeleton[] = [
     {
         titleWidth: 'w-56',
@@ -112,7 +112,7 @@ const normalizeLiveSyndicate = (item: CmsLiveSyndicate): LiveSyndicate | null =>
         alt: getFirstValue(item.alt) || title,
         collection: getFirstValue(item.collection),
         title,
-        description: getFirstValue(item.description),
+        description: stripHtmlToText(getFirstValue(item.description)),
         allocations: getFirstValue(item.allocations) || '0',
         cagr: getFirstValue(item.cagr) || 'TBC',
         progress: normalizeProgress(item.progress)
@@ -260,7 +260,7 @@ const shouldShowLiveSyndicatesSkeleton = computed(() => (
                         <div class="mt-auto pt-5">
                             <NuxtLink :to="`/syndicates/${liveSyndicate.slug}`"
                                 class="block rounded-full bg-tccGold px-5 py-3 text-center font-poppins text-[11px] font-black uppercase tracking-[0.22em] text-tccDarkNavy transition-colors hover:bg-tccLightGold">
-                                Invest Now
+                                {{ ['Upcoming', 'Coming Soon'].includes(liveSyndicate.status) ? liveSyndicate.status : 'Invest Now' }}
                             </NuxtLink>
                         </div>
                     </div>

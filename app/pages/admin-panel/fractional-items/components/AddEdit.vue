@@ -14,12 +14,14 @@ const STATUS_UPCOMING = 1;
 const STATUS_LIVE = 2;
 const STATUS_SOLD = 3;
 const STATUS_INACTIVE = 4;
+const STATUS_COMING_SOON = 5;
 
 const statusOptions = [
     { name: 'Draft', value: STATUS_DRAFT },
     { name: 'Upcoming', value: STATUS_UPCOMING },
     { name: 'Live', value: STATUS_LIVE },
     { name: 'Sold', value: STATUS_SOLD },
+    { name: 'Coming Soon', value: STATUS_COMING_SOON },
     { name: 'Inactive', value: STATUS_INACTIVE }
 ];
 
@@ -28,7 +30,7 @@ const formTabs = [
     { key: 'analysis', label: 'Analysis Data', desc: 'Car & market return analysis', icon: 'pi pi-chart-bar' },
     { key: 'media', label: 'Media Gallery', desc: 'Images, videos, and PDFs', icon: 'pi pi-images' },
     { key: 'sections', label: 'CMS Sections', desc: 'Custom dynamic page sections', icon: 'pi pi-file-edit' },
-    { key: 'lists', label: 'Lists & Charts', desc: 'Metrics, news feed & charts', icon: 'pi pi-list' },
+    // { key: 'lists', label: 'Lists & Charts', desc: 'Metrics, news feed & charts', icon: 'pi pi-list' },
     { key: 'settings', label: 'Status & Visibility', desc: 'Exclusive flag & live status', icon: 'pi pi-cog' },
 ];
 
@@ -285,6 +287,30 @@ const loadVehicles = async () => {
 onMounted(() => {
     loadVehicles();
 });
+
+const onVehicleChange = () => {
+    const selectedId = formData.value.assetable_id;
+    if (!selectedId) return;
+    const vehicle = vehicles.value.find(v => v.id === selectedId);
+
+    if (vehicle) {
+        if (!formData.value.slug && vehicle.slug) formData.value.slug = vehicle.slug;
+        if (!formData.value.headline && vehicle.subtitle) formData.value.headline = vehicle.subtitle;
+        if (!formData.value.subhead_line && vehicle.subtitle) formData.value.subhead_line = vehicle.subtitle;
+        if (!formData.value.item_name && vehicle.name) formData.value.item_name = vehicle.name;
+        if (!formData.value.item_second_name && vehicle.make && vehicle.model) formData.value.item_second_name = `${vehicle.make} ${vehicle.model}`;
+        if (!formData.value.item_details && vehicle.description) formData.value.item_details = vehicle.description;
+        if (!formData.value.bg_image && vehicle.hero_image) formData.value.bg_image = vehicle.hero_image;
+        if (!formData.value.summary_image && vehicle.card_image) formData.value.summary_image = vehicle.card_image;
+        if (!formData.value.item_3d_image && vehicle.three_d_image_url) formData.value.item_3d_image = vehicle.three_d_image_url;
+        if (!formData.value.portfolio_video && vehicle.video_path) formData.value.portfolio_video = vehicle.video_path;
+        if (!formData.value.asset_name && vehicle.name) formData.value.asset_name = vehicle.name;
+        if (!formData.value.total_value && vehicle.syndicate_total) formData.value.total_value = vehicle.syndicate_total;
+        if (!formData.value.share_price && vehicle.allocation_cost) formData.value.share_price = vehicle.allocation_cost;
+        if (!formData.value.total_shares && vehicle.target_allocation) formData.value.total_shares = vehicle.target_allocation;
+        if (!formData.value.trust_name && vehicle.syndicate_name) formData.value.trust_name = vehicle.syndicate_name;
+    }
+};
 
 const normalizeExperienceSection = (section) => {
     const value = section || {};
@@ -622,7 +648,7 @@ const serializeSubmitData = () => {
         reveal_bg_image: formData.value.reveal_bg_image,
         item_name: formData.value.item_name,
         item_second_name: formData.value.item_second_name,
-        item_details: formData.value.item_details,
+        item_details: cleanRichTextHtml(formData.value.item_details),
         item_3d_image: formData.value.item_3d_image,
         fanzone_bg_image: formData.value.fanzone_bg_image,
         experience_section: {
@@ -644,8 +670,8 @@ const serializeSubmitData = () => {
             ...formData.value.story_section,
             details: (formData.value.story_section?.details || []).filter((item) => item.title || item.description),
         },
-        conservative_case: formData.value.conservative_case,
-        aspirational_case: formData.value.aspirational_case,
+        conservative_case: cleanRichTextHtml(formData.value.conservative_case),
+        aspirational_case: cleanRichTextHtml(formData.value.aspirational_case),
         projected_value_image: formData.value.projected_value_image,
         analysis_summary_pdf: formData.value.analysis_summary_pdf,
         net_returns_title: formData.value.net_returns_title,
@@ -655,8 +681,8 @@ const serializeSubmitData = () => {
         funded_at: $formatDateForApi(formData.value.funded_at),
         key_points: formData.value.key_points.filter(Boolean),
         opportunity_summary: formData.value.opportunity_summary.filter(Boolean),
-        investment_thesis_description: formData.value.investment_thesis_description,
-        why_this_asset_description: formData.value.why_this_asset_description,
+        investment_thesis_description: cleanRichTextHtml(formData.value.investment_thesis_description),
+        why_this_asset_description: cleanRichTextHtml(formData.value.why_this_asset_description),
         trust_name: formData.value.trust_name,
         asset_name: formData.value.asset_name,
         asset_cost: toNumber(formData.value.asset_cost),
@@ -664,20 +690,20 @@ const serializeSubmitData = () => {
         home_syndicate_total: toNumber(formData.value.home_syndicate_total),
         holding_period: formData.value.holding_period,
         this_car_eyebrow: formData.value.this_car_eyebrow,
-        this_car_lead: formData.value.this_car_lead,
-        this_car_conclusion: formData.value.this_car_conclusion,
+        this_car_lead: cleanRichTextHtml(formData.value.this_car_lead),
+        this_car_conclusion: cleanRichTextHtml(formData.value.this_car_conclusion),
         wider_market_eyebrow: formData.value.wider_market_eyebrow,
-        wider_market_lead: formData.value.wider_market_lead,
-        wider_market_conclusion: formData.value.wider_market_conclusion,
+        wider_market_lead: cleanRichTextHtml(formData.value.wider_market_lead),
+        wider_market_conclusion: cleanRichTextHtml(formData.value.wider_market_conclusion),
         net_returns_eyebrow: formData.value.net_returns_eyebrow,
-        net_returns_lead: formData.value.net_returns_lead,
-        net_returns_conclusion: formData.value.net_returns_conclusion,
+        net_returns_lead: cleanRichTextHtml(formData.value.net_returns_lead),
+        net_returns_conclusion: cleanRichTextHtml(formData.value.net_returns_conclusion),
         allocation_id: formData.value.allocation_id,
         collection_name: formData.value.collection_name,
         cagr: formData.value.cagr,
         short_title: formData.value.short_title,
         hero_alt: formData.value.hero_alt,
-        gallery: normalizeImageArray(formData.value.gallery),
+        gallery: normalizeImageArray(formData.value.gallery).map(src => ({ src, alt: '', class: '' })),
         this_car_paragraphs: formData.value.this_car_paragraphs.filter(Boolean),
         this_car_metrics: formData.value.this_car_metrics.filter((item) => item.label || item.value),
         wider_market_paragraphs: formData.value.wider_market_paragraphs.filter(Boolean),
@@ -883,6 +909,7 @@ const createHandler = async () => {
                         <Select v-model="formData.assetable_id" :options="vehicles" filter optionLabel="name"
                             optionValue="id" placeholder="Select Vehicle" class="w-full" :loading="isVehiclesLoading"
                             :class="validations_errors.assetable_id ? 'border-[#f44336!important]' : ''"
+                            @change="onVehicleChange"
                             @focus="validations_errors.assetable_id = ''" />
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.assetable_id" />
                     </div>
@@ -890,127 +917,151 @@ const createHandler = async () => {
                     <div>
                         <label class="font-semibold">Slug <span class="text-red-500">*</span></label>
                         <LazyInputText v-model="formData.slug" class="w-full"
+                            placeholder="e.g. ferrari-f40"
                             :class="validations_errors.slug ? 'border-[#f44336!important]' : ''" autocomplete="off"
                             @focus="validations_errors.slug = ''" />
+                        <small class="text-xs text-gray-500 mt-1 block">Used in: URL path (/syndicates/[slug])</small>
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.slug" />
                     </div>
 
                     <div>
                         <label class="font-semibold">Headline <span class="text-red-500">*</span></label>
                         <LazyInputText v-model="formData.headline" class="w-full"
+                            placeholder="e.g. Own a piece of motorsport history"
                             :class="validations_errors.headline ? 'border-[#f44336!important]' : ''" autocomplete="off"
                             @focus="validations_errors.headline = ''" />
+                        <small class="text-xs text-gray-500 mt-1 block">Used in: Hero section title on the Syndicate detail page</small>
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.headline" />
                     </div>
 
                     <div>
                         <label class="font-semibold">Subhead Line <span class="text-red-500">*</span></label>
                         <LazyInputText v-model="formData.subhead_line" class="w-full"
+                            placeholder="e.g. A rare opportunity to invest in a classic."
                             :class="validations_errors.subhead_line ? 'border-[#f44336!important]' : ''"
                             autocomplete="off" @focus="validations_errors.subhead_line = ''" />
+                        <small class="text-xs text-gray-500 mt-1 block">Used in: Subtitle below hero title</small>
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.subhead_line" />
                     </div>
 
                     <div>
                         <label class="font-semibold">Item Name <span class="text-red-500">*</span></label>
                         <LazyInputText v-model="formData.item_name" class="w-full"
+                            placeholder="e.g. Ferrari F40"
                             :class="validations_errors.item_name ? 'border-[#f44336!important]' : ''" autocomplete="off"
                             @focus="validations_errors.item_name = ''" />
+                        <small class="text-xs text-gray-500 mt-1 block">Used in: Main asset name on Syndicate detail page</small>
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.item_name" />
                     </div>
 
                     <div>
                         <label class="font-semibold">Item Second Name <span class="text-red-500">*</span></label>
                         <LazyInputText v-model="formData.item_second_name" class="w-full" autocomplete="off"
+                            placeholder="e.g. 1990 - Rosso Corsa"
                             @focus="validations_errors.item_second_name = ''" />
+                        <small class="text-xs text-gray-500 mt-1 block">Used in: Alternative or descriptive title</small>
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.item_second_name" />
                     </div>
 
                     <div>
                         <label class="font-semibold">Total Shares <span class="text-red-500">*</span></label>
-                        <LazyInputText v-model="formData.total_shares" type="number" class="w-full"
-                            :class="validations_errors.total_shares ? 'border-[#f44336!important]' : ''"
+                        <InputNumber v-model="formData.total_shares" :useGrouping="false" class="w-full"
+                            placeholder="e.g. 10000"
+                            :invalid="!!validations_errors.total_shares"
                             autocomplete="off" @focus="validations_errors.total_shares = ''" />
+                        <small class="text-xs text-gray-500 mt-1 block">Used in: Investment metrics block on Syndicate detail page</small>
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.total_shares" />
                     </div>
 
                     <div>
                         <label class="font-semibold">Available Shares <span class="text-red-500">*</span></label>
-                        <LazyInputText v-model="formData.available_shares" type="number" class="w-full"
-                            :class="validations_errors.available_shares ? 'border-[#f44336!important]' : ''"
+                        <InputNumber v-model="formData.available_shares" :useGrouping="false" class="w-full"
+                            placeholder="e.g. 2500"
+                            :invalid="!!validations_errors.available_shares"
                             autocomplete="off" @focus="validations_errors.available_shares = ''" />
+                        <small class="text-xs text-gray-500 mt-1 block">Used in: Investment metrics block</small>
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.available_shares" />
                     </div>
 
                     <div>
                         <label class="font-semibold">Share Price <span class="text-red-500">*</span></label>
-                        <LazyInputText v-model="formData.share_price" type="number" step="0.01" class="w-full"
-                            :class="validations_errors.share_price ? 'border-[#f44336!important]' : ''"
+                        <InputNumber v-model="formData.share_price" :useGrouping="false" :maxFractionDigits="2" class="w-full"
+                            placeholder="e.g. 150.00"
+                            :invalid="!!validations_errors.share_price"
                             autocomplete="off" @focus="validations_errors.share_price = ''" />
+                        <small class="text-xs text-gray-500 mt-1 block">Used in: Investment metrics block</small>
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.share_price" />
                     </div>
 
                     <div>
                         <label class="font-semibold">Total Value <span class="text-red-500">*</span></label>
-                        <LazyInputText v-model="formData.total_value" type="number" step="0.01" class="w-full"
-                            :class="validations_errors.total_value ? 'border-[#f44336!important]' : ''"
+                        <InputNumber v-model="formData.total_value" :useGrouping="false" :maxFractionDigits="2" class="w-full"
+                            placeholder="e.g. 1500000"
+                            :invalid="!!validations_errors.total_value"
                             autocomplete="off" @focus="validations_errors.total_value = ''" />
+                        <small class="text-xs text-gray-500 mt-1 block">Used in: Investment metrics block</small>
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.total_value" />
                     </div>
 
                     <div>
                         <label class="font-semibold">Historical Value</label>
-                        <LazyInputText v-model="formData.historical_value" type="number" step="0.01" class="w-full"
-                            :class="validations_errors.historical_value ? 'border-[#f44336!important]' : ''"
+                        <InputNumber v-model="formData.historical_value" :useGrouping="false" :maxFractionDigits="2" class="w-full"
+                            placeholder="e.g. 1200000"
+                            :invalid="!!validations_errors.historical_value"
                             autocomplete="off" @focus="validations_errors.historical_value = ''" />
+                        <small class="text-xs text-gray-500 mt-1 block">Used in: Investment metrics block</small>
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.historical_value" />
                     </div>
 
                     <div>
                         <label class="font-semibold">Annual Fees</label>
-                        <LazyInputText v-model="formData.annual_fees" type="number" step="0.01" class="w-full"
-                            :class="validations_errors.annual_fees ? 'border-[#f44336!important]' : ''"
+                        <InputNumber v-model="formData.annual_fees" :useGrouping="false" :maxFractionDigits="2" class="w-full"
+                            placeholder="e.g. 1.5"
+                            :invalid="!!validations_errors.annual_fees"
                             autocomplete="off" @focus="validations_errors.annual_fees = ''" />
+                        <small class="text-xs text-gray-500 mt-1 block">Used in: Financials block (Annual Fees %)</small>
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.annual_fees" />
                     </div>
 
                     <div>
                         <label class="font-semibold">AUM Trust Fee</label>
-                        <LazyInputText v-model="formData.aum_trust_fee" type="number" step="0.01" class="w-full"
-                            :class="validations_errors.aum_trust_fee ? 'border-[#f44336!important]' : ''"
+                        <InputNumber v-model="formData.aum_trust_fee" :useGrouping="false" :maxFractionDigits="2" class="w-full"
+                            placeholder="e.g. 1.0"
+                            :invalid="!!validations_errors.aum_trust_fee"
                             autocomplete="off" @focus="validations_errors.aum_trust_fee = ''" />
+                        <small class="text-xs text-gray-500 mt-1 block">Used in: Financials block (Trust Fee %)</small>
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.aum_trust_fee" />
                     </div>
 
-                    <div>
+                    <div v-show="false">
                         <label class="font-semibold">Net Returns Title</label>
                         <LazyInputText v-model="formData.net_returns_title" class="w-full" autocomplete="off"
                             @focus="validations_errors.net_returns_title = ''" />
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.net_returns_title" />
                     </div>
 
-                    <div>
+                    <div v-show="false">
                         <label class="font-semibold">Funded Current Price</label>
-                        <LazyInputText v-model="formData.funded_current_price" type="number" step="0.01" class="w-full"
+                        <InputNumber v-model="formData.funded_current_price" :useGrouping="false" :maxFractionDigits="2" class="w-full"
                             autocomplete="off" @focus="validations_errors.funded_current_price = ''" />
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.funded_current_price" />
                     </div>
 
-                    <div>
+                    <div v-show="false">
                         <label class="font-semibold">Exit Value</label>
-                        <LazyInputText v-model="formData.exit_value" type="number" step="0.01" class="w-full"
+                        <InputNumber v-model="formData.exit_value" :useGrouping="false" :maxFractionDigits="2" class="w-full"
                             autocomplete="off" @focus="validations_errors.exit_value = ''" />
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.exit_value" />
                     </div>
 
-                    <div>
+                    <div v-show="false">
                         <label class="font-semibold">Exit Date</label>
                         <DatePicker v-model="formData.exit_date" showIcon fluid iconDisplay="input" :manualInput="false"
                             class="w-full" autocomplete="off" @focus="validations_errors.exit_date = ''" />
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.exit_date" />
                     </div>
 
-                    <div>
+                    <div v-show="false">
                         <label class="font-semibold">Funded At</label>
                         <DatePicker v-model="formData.funded_at" showIcon fluid iconDisplay="input" :manualInput="false"
                             class="w-full" autocomplete="off" @focus="validations_errors.funded_at = ''" />
@@ -1020,74 +1071,78 @@ const createHandler = async () => {
                     <div>
                         <label class="font-semibold">Trust Name</label>
                         <LazyInputText v-model="formData.trust_name" class="w-full" autocomplete="off"
+                            placeholder="e.g. Vision Collection Trust"
                             @focus="validations_errors.trust_name = ''" />
+                        <small class="text-xs text-gray-500 mt-1 block">Used in: Financials block (Holding Entity)</small>
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.trust_name" />
                     </div>
 
                     <div>
                         <label class="font-semibold">Asset Name</label>
                         <LazyInputText v-model="formData.asset_name" class="w-full" autocomplete="off"
+                            placeholder="e.g. 1990 Ferrari F40"
                             @focus="validations_errors.asset_name = ''" />
+                        <small class="text-xs text-gray-500 mt-1 block">Used in: Financials block (Asset Designation)</small>
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.asset_name" />
                     </div>
 
-                    <div>
+                    <div v-show="false">
                         <label class="font-semibold">Asset Cost</label>
-                        <LazyInputText v-model="formData.asset_cost" type="number" step="0.01" class="w-full"
+                        <InputNumber v-model="formData.asset_cost" :useGrouping="false" :maxFractionDigits="2" class="w-full"
                             autocomplete="off" @focus="validations_errors.asset_cost = ''" />
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.asset_cost" />
                     </div>
 
-                    <div>
+                    <div v-show="false">
                         <label class="font-semibold">Asset Curation Fee</label>
-                        <LazyInputText v-model="formData.asset_curation_fee" type="number" step="0.01" class="w-full"
+                        <InputNumber v-model="formData.asset_curation_fee" :useGrouping="false" :maxFractionDigits="2" class="w-full"
                             autocomplete="off" @focus="validations_errors.asset_curation_fee = ''" />
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.asset_curation_fee" />
                     </div>
 
-                    <div>
+                    <div v-show="false">
                         <label class="font-semibold">Home Syndicate Total</label>
-                        <LazyInputText v-model="formData.home_syndicate_total" type="number" step="0.01" class="w-full"
+                        <InputNumber v-model="formData.home_syndicate_total" :useGrouping="false" :maxFractionDigits="2" class="w-full"
                             autocomplete="off" @focus="validations_errors.home_syndicate_total = ''" />
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.home_syndicate_total" />
                     </div>
 
-                    <div>
+                    <div v-show="false">
                         <label class="font-semibold">Holding Period</label>
                         <LazyInputText v-model="formData.holding_period" class="w-full" autocomplete="off"
                             @focus="validations_errors.holding_period = ''" />
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.holding_period" />
                     </div>
 
-                    <div>
+                    <div v-show="false">
                         <label class="font-semibold">Allocation ID</label>
                         <LazyInputText v-model="formData.allocation_id" class="w-full" autocomplete="off"
                             @focus="validations_errors.allocation_id = ''" />
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.allocation_id" />
                     </div>
 
-                    <div>
+                    <div v-show="false">
                         <label class="font-semibold">Collection Name</label>
                         <LazyInputText v-model="formData.collection_name" class="w-full" autocomplete="off"
                             @focus="validations_errors.collection_name = ''" />
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.collection_name" />
                     </div>
 
-                    <div>
+                    <div v-show="false">
                         <label class="font-semibold">CAGR</label>
                         <LazyInputText v-model="formData.cagr" class="w-full" autocomplete="off"
                             @focus="validations_errors.cagr = ''" />
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.cagr" />
                     </div>
 
-                    <div>
+                    <div v-show="false">
                         <label class="font-semibold">Short Title</label>
                         <LazyInputText v-model="formData.short_title" class="w-full" autocomplete="off"
                             @focus="validations_errors.short_title = ''" />
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.short_title" />
                     </div>
 
-                    <div class="sm:col-span-2">
+                    <div v-show="false" class="sm:col-span-2">
                         <label class="font-semibold">Hero Alt</label>
                         <LazyInputText v-model="formData.hero_alt" class="w-full" autocomplete="off"
                             @focus="validations_errors.hero_alt = ''" />
@@ -1096,11 +1151,12 @@ const createHandler = async () => {
 
                     <div class="sm:col-span-3">
                         <label class="font-semibold">Item Details <span class="text-red-500">*</span></label>
-                        <Editor v-model="formData.item_details" editorStyle="height: 180px" class="w-full" />
+                        <Editor v-model="formData.item_details" editorStyle="height: 180px" class="w-full" placeholder="e.g. Detailed history and provenance of the asset..." />
+                        <small class="text-xs text-gray-500 mt-1 block">Used in: Main description block on Syndicate detail page</small>
                         <LazyInputError class="text-sm mt-1" :message="validations_errors.item_details" />
                     </div>
 
-                    <div class="sm:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div v-show="false" class="sm:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="font-semibold">Investment Thesis Description</label>
                             <Editor v-model="formData.investment_thesis_description" editorStyle="height: 180px" class="w-full" />
@@ -1117,7 +1173,7 @@ const createHandler = async () => {
                     </div>
 
                     <div class="sm:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
+                        <div v-show="false">
                             <label class="font-semibold">Conservative Case</label>
                             <Editor v-model="formData.conservative_case" editorStyle="height: 140px" class="w-full" />
                             <LazyInputError class="text-sm mt-1" :message="validations_errors.conservative_case" />
@@ -1140,19 +1196,23 @@ const createHandler = async () => {
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <div>
                                 <label class="font-semibold text-sm">Eyebrow</label>
-                                <LazyInputText v-model="formData.this_car_eyebrow" class="w-full" autocomplete="off" />
+                                <LazyInputText v-model="formData.this_car_eyebrow" class="w-full" autocomplete="off"
+                                    placeholder="e.g. Unique Features" />
+                                <small class="text-xs text-gray-500 mt-1 block">Used in: Analysis section small heading</small>
                             </div>
                             <div class="sm:col-span-2">
                                 <label class="font-semibold text-sm">Lead</label>
-                                <Editor v-model="formData.this_car_lead" editorStyle="height: 120px" class="w-full" />
+                                <Editor v-model="formData.this_car_lead" editorStyle="height: 120px" class="w-full" placeholder="e.g. This exceptional model represents..." />
+                                <small class="text-xs text-gray-500 mt-1 block">Used in: Analysis section introductory text</small>
                             </div>
                             <div class="sm:col-span-3">
                                 <label class="font-semibold text-sm">Conclusion</label>
-                                <Editor v-model="formData.this_car_conclusion" editorStyle="height: 140px" class="w-full" />
+                                <Editor v-model="formData.this_car_conclusion" editorStyle="height: 140px" class="w-full" placeholder="e.g. In conclusion, the value proposition is..." />
+                                <small class="text-xs text-gray-500 mt-1 block">Used in: Analysis section concluding remarks</small>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                        <div v-show="false" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                             <div>
                                 <div class="flex justify-between items-center mb-3">
                                     <label class="font-semibold">Paragraphs</label>
@@ -1196,19 +1256,22 @@ const createHandler = async () => {
                             <div>
                                 <label class="font-semibold text-sm">Eyebrow</label>
                                 <LazyInputText v-model="formData.wider_market_eyebrow" class="w-full"
-                                    autocomplete="off" />
+                                    autocomplete="off" placeholder="e.g. Market Trends" />
+                                <small class="text-xs text-gray-500 mt-1 block">Used in: Analysis section small heading</small>
                             </div>
                             <div class="sm:col-span-2">
                                 <label class="font-semibold text-sm">Lead</label>
-                                <Editor v-model="formData.wider_market_lead" editorStyle="height: 120px" class="w-full" />
+                                <Editor v-model="formData.wider_market_lead" editorStyle="height: 120px" class="w-full" placeholder="e.g. The broader market shows..." />
+                                <small class="text-xs text-gray-500 mt-1 block">Used in: Wider Market Analysis introductory text</small>
                             </div>
                             <div class="sm:col-span-3">
                                 <label class="font-semibold text-sm">Conclusion</label>
-                                <Editor v-model="formData.wider_market_conclusion" editorStyle="height: 140px" class="w-full" />
+                                <Editor v-model="formData.wider_market_conclusion" editorStyle="height: 140px" class="w-full" placeholder="e.g. With current trends..." />
+                                <small class="text-xs text-gray-500 mt-1 block">Used in: Wider Market Analysis concluding remarks</small>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                        <div v-show="false" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                             <div>
                                 <div class="flex justify-between items-center mb-3">
                                     <label class="font-semibold">Paragraphs</label>
@@ -1252,19 +1315,22 @@ const createHandler = async () => {
                             <div>
                                 <label class="font-semibold text-sm">Eyebrow</label>
                                 <LazyInputText v-model="formData.net_returns_eyebrow" class="w-full"
-                                    autocomplete="off" />
+                                    autocomplete="off" placeholder="e.g. Return Projections" />
+                                <small class="text-xs text-gray-500 mt-1 block">Used in: Analysis section small heading</small>
                             </div>
                             <div class="sm:col-span-2">
                                 <label class="font-semibold text-sm">Lead</label>
-                                <Editor v-model="formData.net_returns_lead" editorStyle="height: 120px" class="w-full" />
+                                <Editor v-model="formData.net_returns_lead" editorStyle="height: 120px" class="w-full" placeholder="e.g. Expected net returns are calculated..." />
+                                <small class="text-xs text-gray-500 mt-1 block">Used in: Net Returns Analysis introductory text</small>
                             </div>
                             <div class="sm:col-span-3">
                                 <label class="font-semibold text-sm">Conclusion</label>
-                                <Editor v-model="formData.net_returns_conclusion" editorStyle="height: 140px" class="w-full" />
+                                <Editor v-model="formData.net_returns_conclusion" editorStyle="height: 140px" class="w-full" placeholder="e.g. The projected yield stands at..." />
+                                <small class="text-xs text-gray-500 mt-1 block">Used in: Net Returns Analysis concluding remarks</small>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                        <div v-show="false" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                             <div>
                                 <div class="flex justify-between items-center mb-3">
                                     <label class="font-semibold">Paragraphs</label>
@@ -1308,6 +1374,7 @@ const createHandler = async () => {
                             <div class="w-full mt-2">
                                 <MediaGallery :getPhoto="formData.bg_image" @set_photo="setBgImage" />
                             </div>
+                            <small class="text-xs text-gray-500 mt-1 block">Used in: Hero background on Syndicate detail page</small>
                             <LazyInputError class="text-sm mt-1" :message="validations_errors.bg_image" />
                         </div>
 
@@ -1316,6 +1383,7 @@ const createHandler = async () => {
                             <div class="w-full mt-2">
                                 <MediaGallery :getPhoto="formData.summary_image" @set_photo="setSummaryImage" />
                             </div>
+                            <small class="text-xs text-gray-500 mt-1 block">Used in: Thumbnail on the Syndicates list page</small>
                             <LazyInputError class="text-sm mt-1" :message="validations_errors.summary_image" />
                         </div>
 
@@ -1324,6 +1392,7 @@ const createHandler = async () => {
                             <div class="w-full mt-2">
                                 <MediaGallery :getPhoto="formData.portfolio_image" @set_photo="setPortfolioImage" />
                             </div>
+                            <small class="text-xs text-gray-500 mt-1 block">Used in: Thumbnail on User Portfolio page</small>
                             <LazyInputError class="text-sm mt-1" :message="validations_errors.portfolio_image" />
                         </div>
 
@@ -1340,6 +1409,7 @@ const createHandler = async () => {
                             <div class="w-full mt-2">
                                 <MediaGallery :getPhoto="formData.reveal_bg_image" @set_photo="setRevealBgImage" />
                             </div>
+                            <small class="text-xs text-gray-500 mt-1 block">Used in: Background image for reveal section</small>
                             <LazyInputError class="text-sm mt-1" :message="validations_errors.reveal_bg_image" />
                         </div>
 
@@ -1359,7 +1429,7 @@ const createHandler = async () => {
                             <LazyInputError class="text-sm mt-1" :message="validations_errors.fanzone_bg_image" />
                         </div>
 
-                        <div>
+                        <div v-show="false">
                             <label class="font-semibold">Projected Value Image</label>
                             <div class="w-full mt-2">
                                 <MediaGallery :getPhoto="formData.projected_value_image"
@@ -1376,7 +1446,7 @@ const createHandler = async () => {
                             <LazyInputError class="text-sm mt-1" :message="validations_errors.gallery" />
                         </div>
 
-                        <div>
+                        <div v-show="false">
                             <label class="font-semibold">Analysis Summary PDF</label>
                             <div class="w-full mt-2">
                                 <MediaGallery :getPhoto="formData.analysis_summary_pdf" @set_photo="setAnalysisSummaryPdf" />
@@ -1396,7 +1466,9 @@ const createHandler = async () => {
                             <div>
                                 <label class="font-semibold text-sm">Title</label>
                                 <LazyInputText v-model="formData.experience_section.title" class="w-full"
+                                    placeholder="e.g. Unmatched Driving Experience"
                                     autocomplete="off" />
+                                <small class="text-xs text-gray-500 mt-1 block">Used in: Experience CMS section title</small>
                             </div>
                             <div>
                                 <label class="font-semibold text-sm">Subtitle</label>
@@ -1456,7 +1528,9 @@ const createHandler = async () => {
                         <div>
                             <label class="font-semibold text-sm">Title</label>
                             <LazyInputText v-model="formData.historic_section.title" class="w-full"
+                                placeholder="e.g. Performance History"
                                 autocomplete="off" />
+                            <small class="text-xs text-gray-500 mt-1 block">Used in: Historic CMS section title</small>
                         </div>
 
                         <div class="flex justify-between items-center mt-4 mb-3">
@@ -1481,12 +1555,12 @@ const createHandler = async () => {
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label class="font-semibold text-sm">Year</label>
-                                    <LazyInputText v-model="point.year" type="number" class="w-full"
+                                    <InputNumber v-model="point.year" :useGrouping="false" class="w-full"
                                         autocomplete="off" />
                                 </div>
                                 <div>
                                     <label class="font-semibold text-sm">Value</label>
-                                    <LazyInputText v-model="point.value" type="number" class="w-full"
+                                    <InputNumber v-model="point.value" :useGrouping="false" class="w-full"
                                         autocomplete="off" />
                                 </div>
                             </div>
@@ -1503,7 +1577,9 @@ const createHandler = async () => {
                             <div>
                                 <label class="font-semibold text-sm">Title</label>
                                 <LazyInputText v-model="formData.mission_section.title" class="w-full"
+                                    placeholder="e.g. Our Mission"
                                     autocomplete="off" />
+                                <small class="text-xs text-gray-500 mt-1 block">Used in: Mission CMS section title</small>
                             </div>
                             <div>
                                 <label class="font-semibold text-sm">About Title</label>
@@ -1550,7 +1626,9 @@ const createHandler = async () => {
                             <div>
                                 <label class="font-semibold text-sm">Title</label>
                                 <LazyInputText v-model="formData.story_section.title" class="w-full"
+                                    placeholder="e.g. The Legacy"
                                     autocomplete="off" />
+                                <small class="text-xs text-gray-500 mt-1 block">Used in: Story CMS section title</small>
                             </div>
                             <div>
                                 <label class="font-semibold text-sm">Subtitle</label>
@@ -1610,7 +1688,7 @@ const createHandler = async () => {
 
                 <div v-show="activeTab === 'lists'" class="grid grid-cols-1 gap-4">
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div class="border border-gray-200 dark:border-gray-800 rounded-xl p-6 bg-white dark:bg-gray-900 shadow-sm">
+                        <div v-show="false" class="border border-gray-200 dark:border-gray-800 rounded-xl p-6 bg-white dark:bg-gray-900 shadow-sm">
                             <div class="flex justify-between items-center mb-3">
                                 <label class="font-semibold">Key Points</label>
                                 <Button type="button" icon="pi pi-plus" severity="success"
@@ -1630,7 +1708,7 @@ const createHandler = async () => {
                             <LazyInputError class="text-sm mt-1" :message="validations_errors.key_points" />
                         </div>
 
-                        <div class="border border-gray-200 dark:border-gray-800 rounded-xl p-6 bg-white dark:bg-gray-900 shadow-sm">
+                        <div v-show="false" class="border border-gray-200 dark:border-gray-800 rounded-xl p-6 bg-white dark:bg-gray-900 shadow-sm">
                             <div class="flex justify-between items-center mb-3">
                                 <label class="font-semibold">Opportunity Summary</label>
                                 <Button type="button" icon="pi pi-plus" severity="success"
@@ -1651,7 +1729,7 @@ const createHandler = async () => {
                             <LazyInputError class="text-sm mt-1" :message="validations_errors.opportunity_summary" />
                         </div>
 
-                        <div class="border border-gray-200 dark:border-gray-800 rounded-xl p-6 bg-white dark:bg-gray-900 shadow-sm">
+                        <div v-show="false" class="border border-gray-200 dark:border-gray-800 rounded-xl p-6 bg-white dark:bg-gray-900 shadow-sm">
                             <div class="flex justify-between items-center mb-3">
                                 <label class="font-semibold">News</label>
                                 <Button type="button" icon="pi pi-plus" severity="success"
@@ -1711,7 +1789,7 @@ const createHandler = async () => {
                         </div>
                     </div>
 
-                    <div class="w-full border border-gray-200 dark:border-gray-800 rounded-xl p-6 bg-white dark:bg-gray-900 shadow-sm">
+                    <div v-show="false" class="w-full border border-gray-200 dark:border-gray-800 rounded-xl p-6 bg-white dark:bg-gray-900 shadow-sm">
                         <div class="flex justify-between items-center mb-3">
                             <label class="font-semibold">Chart Section</label>
                         </div>
@@ -1762,7 +1840,7 @@ const createHandler = async () => {
                                 </div>
                                 <div v-for="(year, index) in formData.chart_years" :key="index"
                                     class="flex items-center gap-2 mb-3">
-                                    <LazyInputText v-model="formData.chart_years[index]" type="number" class="w-full"
+                                    <InputNumber v-model="formData.chart_years[index]" :useGrouping="false" class="w-full"
                                         autocomplete="off" />
                                     <Button type="button" icon="pi pi-trash" severity="danger" outlined
                                         @click="removeListItem('chart_years', index)" />
@@ -1777,7 +1855,7 @@ const createHandler = async () => {
                                 </div>
                                 <div v-for="(value, index) in formData.chart_values" :key="index"
                                     class="flex items-center gap-2 mb-3">
-                                    <LazyInputText v-model="formData.chart_values[index]" type="number" step="0.01"
+                                    <InputNumber v-model="formData.chart_values[index]" :useGrouping="false" :maxFractionDigits="2"
                                         class="w-full" autocomplete="off" />
                                     <Button type="button" icon="pi pi-trash" severity="danger" outlined
                                         @click="removeListItem('chart_values', index)" />
